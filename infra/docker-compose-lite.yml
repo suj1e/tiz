@@ -1,0 +1,218 @@
+version: '3.9'
+
+# 全局日志配置 - 限制日志大小防止系统盘被占满
+# 单个容器日志最大 10MB，最多保留 3 个文件
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+# 网络定义
+networks:
+  nexora-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+services:
+  # ==================== MySQL ====================
+  mysql:
+    image: docker.m.daocloud.io/library/mysql:9.2
+    container_name: nexora-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Nexora@2026
+      MYSQL_DATABASE: nexora
+      MYSQL_USER: nexora
+      MYSQL_PASSWORD: Nexora@2026
+      TZ: Asia/Shanghai
+    ports:
+      - "30001:3306"
+    volumes:
+      - /opt/dev/dockermnt/mysql:/var/lib/mysql
+      - ./config/docker/mysql/init:/docker-entrypoint-initdb.d
+    command:
+      - --max_connections=500
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - "--default-time-zone=+08:00"
+      - --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO
+    networks:
+      nexora-network:
+        ipv4_address: 172.28.0.10
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging: *default-logging
+
+  # ==================== Redis ====================
+  redis:
+    image: docker.m.daocloud.io/library/redis:7.4-alpine
+    container_name: nexora-redis
+    restart: always
+    ports:
+      - "30002:6379"
+    volumes:
+      - /opt/dev/dockermnt/redis:/data
+      - ./config/docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      nexora-network:
+        ipv4_address: 172.28.0.11
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    logging: *default-logging
+
+  # ==================== Elasticsearch ====================
+  elasticsearch:
+    image: docker.m.daocloud.io/elastic/elasticsearch:8.19.1
+    container_name: nexora-elasticsearch
+    restart: always
+    environment:
+      - node.name=es-node-1
+      - cluster.name=nexora-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - xpack.security.enrollment.enabled=true
+      - ELASTIC_PASSWORD=Nexora@2026
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "30003:9200"
+      - "30004:9300"
+    volumes:
+      - /opt/dev/dockermnt/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      nexora-network:
+        ipv4_address: 172.28.0.12
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -u elastic:Nexora@2026 http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging: *default-logging
+
+  # ==================== Nacos ====================
+  nacos:
+    image: docker.m.daocloud.io/nacos/nacos-server:v3.1.1
+    container_name: nexora-nacos
+    restart: always
+    environment:
+      - MODE=standalone
+      - PREFER_HOST_MODE=ip
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=172.28.0.10
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_DB_NAME=nacos
+      - MYSQL_SERVICE_USER=root
+      - MYSQL_SERVICE_PASSWORD=Nexora@2026
+      - MYSQL_SERVICE_DB_PARAM=characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      - NACOS_AUTH_ENABLE=true
+      - NACOS_AUTH_TOKEN=SecretKey012345678901234567890123456789012345678901234567890123456789
+      - NACOS_AUTH_IDENTITY_KEY=serverIdentity
+      - NACOS_AUTH_IDENTITY_VALUE=security
+      - NACOS_SERVER_PORT=8848
+      - NACOS_APPLICATION_PORT=8848
+      - JVM_XMS=256m
+      - JVM_XMX=256m
+      - JVM_XMN=128m
+    ports:
+      - "30006:8080"    # HTTP
+      - "31006:9848"    # gRPC
+      - "31007:9849"    # gRPC server
+    volumes:
+      - /opt/dev/dockermnt/nacos:/home/nacos/data
+      - ./config/docker/nacos/logs:/home/nacos/logs
+    networks:
+      nexora-network:
+        ipv4_address: 172.28.0.14
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    logging: *default-logging
+
+  # ==================== Kafka (KRaft Mode) ====================
+  kafka:
+    image: docker.m.daocloud.io/confluentinc/cp-kafka:7.8.0
+    container_name: nexora-kafka
+    restart: always
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      CLUSTER_ID: 5Yr1-8vU-SEW1-8z0v-3k1V
+      KAFKA_LISTENERS: BROKER://kafka:9092,CONTROLLER://kafka:9093,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: BROKER:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms512m"
+    ports:
+      - "30009:9094"
+    volumes:
+      - /opt/dev/dockermnt/kafka:/var/lib/kafka/data
+    networks:
+      nexora-network:
+        ipv4_address: 172.28.0.15
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9094"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    logging: *default-logging
+
+  # ==================== Kafka UI ====================
+  kafka-ui:
+    image: docker.m.daocloud.io/provectuslabs/kafka-ui:latest
+    container_name: nexora-kafka-ui
+    restart: always
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=nexora-cluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9094
+      - JAVA_OPTS=-Xms128m -Xmx128m
+    ports:
+      - "30010:8080"
+    networks:
+      nexora-network:
+        ipv4_address: 172.28.0.16
+    depends_on:
+      kafka:
+        condition: service_healthy
+    logging: *default-logging

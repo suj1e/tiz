@@ -1,0 +1,1012 @@
+{
+  "info": {
+    "name": "Tiz API",
+    "description": "Tiz 语言学习应用 API - 支持翻译、AI 聊天、测验等功能",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.example.com",
+      "type": "string"
+    },
+    {
+      "key": "apiVersion",
+      "value": "api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "disabled": true
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@tiz.app\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "auth", "login"]
+            },
+            "description": "用户使用邮箱和密码登录"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@tiz.app\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 200,\n  \"message\": \"登录成功\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n      \"id\": \"user_001\",\n      \"name\": \"Tiz 用户\",\n      \"email\": \"user@tiz.app\",\n      \"avatar\": null,\n      \"bio\": \"学习语言，探索世界 🌍\",\n      \"joinDate\": \"2024-01-01T00:00:00Z\",\n      \"studyDays\": 45,\n      \"wordsLearned\": 350,\n      \"quizzesCompleted\": 12,\n      \"streak\": 7,\n      \"level\": \"intermediate\",\n      \"achievements\": [\"first_quiz\", \"word_collector\"],\n      \"languageProgress\": {\n        \"en\": 65,\n        \"ja\": 40,\n        \"de\": 25\n      }\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"张三\",\n  \"email\": \"zhangsan@example.com\",\n  \"password\": \"password123\",\n  \"confirmPassword\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "auth", "register"]
+            },
+            "description": "新用户注册"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "auth", "logout"]
+            },
+            "description": "用户登出，使 token 失效"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "auth", "refresh"]
+            },
+            "description": "使用过期 token 获取新 token"
+          },
+          "response": []
+        }
+      ],
+      "description": "认证相关接口"
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "users", "me"]
+            },
+            "description": "获取当前登录用户的详细信息"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"新名字\",\n  \"bio\": \"这是我的个人简介\",\n  \"avatar\": \"https://example.com/avatar.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "users", "me"]
+            },
+            "description": "更新当前用户信息"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"themeMode\": \"dark\",\n  \"defaultLanguage\": \"zh\",\n  \"favoriteLanguages\": [\"en\", \"ja\"],\n  \"enableNotifications\": true,\n  \"dailyGoalMinutes\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/users/me/preferences",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "users", "me", "preferences"]
+            },
+            "description": "更新用户偏好设置"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Achievements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/users/me/achievements",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "users", "me", "achievements"]
+            },
+            "description": "获取用户的所有成就"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/users/me/stats?period=week",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "users", "me", "stats"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "week"
+                }
+              ]
+            },
+            "description": "获取用户学习统计数据"
+          },
+          "response": []
+        }
+      ],
+      "description": "用户相关接口"
+    },
+    {
+      "name": "Translation",
+      "item": [
+        {
+          "name": "Translate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceText\": \"Hello, how are you?\",\n  \"sourceLanguage\": \"en\",\n  \"targetLanguage\": \"zh\",\n  \"enhanceWithAI\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/translations/translate",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "translations", "translate"]
+            },
+            "description": "执行文本翻译"
+          },
+          "response": []
+        },
+        {
+          "name": "AI Enhanced Translate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceText\": \"The quick brown fox jumps over the lazy dog.\",\n  \"sourceLanguage\": \"en\",\n  \"targetLanguage\": \"zh\",\n  \"enhanceWithAI\": true,\n  \"model\": \"gpt35\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/translations/translate",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "translations", "translate"]
+            },
+            "description": "使用 AI 增强翻译"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Translation History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/translations/history?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "translations", "history"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "获取翻译历史记录"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Translation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"translationId\": \"trans_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/translations/save",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "translations", "save"]
+            },
+            "description": "保存翻译记录到收藏"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Favorite Translations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/translations/favorites",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "translations", "favorites"]
+            },
+            "description": "获取收藏的翻译列表"
+          },
+          "response": []
+        }
+      ],
+      "description": "翻译相关接口"
+    },
+    {
+      "name": "AI Chat",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"如何学习英语单词？\",\n  \"model\": \"gpt35\",\n  \"enableDeepThinking\": false,\n  \"stream\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "chat"]
+            },
+            "description": "发送消息给 AI 助手"
+          },
+          "response": []
+        },
+        {
+          "name": "Send Message (Continue Session)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"session_001\",\n  \"message\": \"能详细解释一下吗？\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "chat"]
+            },
+            "description": "继续已有会话"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Chat Sessions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/chat/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "chat", "sessions"]
+            },
+            "description": "获取所有聊天会话列表"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Session Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/chat/sessions/:sessionId",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "chat", "sessions", ":sessionId"]
+            },
+            "description": "获取指定会话的所有消息"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Session",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/chat/sessions/:sessionId",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "chat", "sessions", ":sessionId"]
+            },
+            "description": "删除指定的聊天会话"
+          },
+          "response": []
+        },
+        {
+          "name": "Clear All Sessions",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/chat/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "chat", "sessions"]
+            },
+            "description": "清空所有聊天会话"
+          },
+          "response": []
+        }
+      ],
+      "description": "AI 聊天相关接口"
+    },
+    {
+      "name": "Quiz",
+      "item": [
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/quizzes/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "quizzes", "categories"]
+            },
+            "description": "获取所有可用的测验分类"
+          },
+          "response": []
+        },
+        {
+          "name": "Start Quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"english\",\n  \"mode\": \"choice\",\n  \"difficulty\": \"intermediate\",\n  \"questionCount\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/quizzes/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "quizzes", "start"]
+            },
+            "description": "开始一个新的测验"
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"en1\",\n  \"answer\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/quizzes/:sessionId/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "quizzes", ":sessionId", "answer"]
+            },
+            "description": "提交当前问题的答案"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz Result",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/quizzes/:sessionId/result",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "quizzes", ":sessionId", "result"]
+            },
+            "description": "获取测验的最终结果"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/quizzes/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "quizzes", "history"]
+            },
+            "description": "获取测验历史记录"
+          },
+          "response": []
+        }
+      ],
+      "description": "测验相关接口"
+    },
+    {
+      "name": "Notification",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/notifications?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "notifications"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "获取用户的通知列表"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Unread Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/notifications?isRead=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "notifications"],
+              "query": [
+                {
+                  "key": "isRead",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "获取未读通知"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/notifications/:notificationId/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "notifications", ":notificationId", "read"]
+            },
+            "description": "将指定通知标记为已读"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "notifications", "read-all"]
+            },
+            "description": "将所有未读通知标记为已读"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Notification",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/notifications/:notificationId",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "notifications", ":notificationId"]
+            },
+            "description": "删除指定通知"
+          },
+          "response": []
+        },
+        {
+          "name": "Clear All Notifications",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "notifications"]
+            },
+            "description": "清空所有通知"
+          },
+          "response": []
+        }
+      ],
+      "description": "通知相关接口"
+    },
+    {
+      "name": "AI Config",
+      "item": [
+        {
+          "name": "Get AI Config",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "config"]
+            },
+            "description": "获取用户的 AI 配置"
+          },
+          "response": []
+        },
+        {
+          "name": "Update AI Config",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt35\",\n  \"temperature\": 0.7,\n  \"maxTokens\": 2048,\n  \"enhanceTranslation\": true,\n  \"smartRecommend\": true,\n  \"deepThinkingMode\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "config"]
+            },
+            "description": "更新用户的 AI 配置"
+          },
+          "response": []
+        },
+        {
+          "name": "Set API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt35\",\n  \"apiKey\": \"sk-xxxxxxxxxxxxxxxxxxxxxxxx\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/config/api-key",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "config", "api-key"]
+            },
+            "description": "设置 AI 服务的 API Key"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/ai/config/api-key/:model",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "ai", "config", "api-key", ":model"]
+            },
+            "description": "删除指定模型的 API Key"
+          },
+          "response": []
+        }
+      ],
+      "description": "AI 配置相关接口"
+    },
+    {
+      "name": "Commands",
+      "item": [
+        {
+          "name": "Execute Command",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command\": \"制定一个英语学习计划\",\n  \"context\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/commands/execute",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "commands", "execute"]
+            },
+            "description": "执行自然语言指令"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Task Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/commands/tasks/:taskId",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "commands", "tasks", ":taskId"]
+            },
+            "description": "获取指令执行任务的状态"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Command History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/commands/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "commands", "history"]
+            },
+            "description": "获取指令执行历史"
+          },
+          "response": []
+        }
+      ],
+      "description": "指令自动化相关接口"
+    },
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Get App Config",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/system/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "system", "config"]
+            },
+            "description": "获取应用公共配置（无需认证）"
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiVersion}}/system/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiVersion}}", "system", "health"]
+            },
+            "description": "系统健康检查（无需认证）"
+          },
+          "response": []
+        }
+      ],
+      "description": "系统相关接口"
+    }
+  ]
+}

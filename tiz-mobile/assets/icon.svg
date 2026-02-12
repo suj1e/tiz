@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#0a0a0a" rx="180"/>
+
+  <!-- Gradient Circle -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a1a1aa;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Circle -->
+  <circle cx="512" cy="512" r="320" fill="url(#gradient1)" opacity="0.1"/>
+
+  <!-- T Letter -->
+  <text x="512" y="680" font-family="Arial, sans-serif" font-size="480" font-weight="bold" fill="#fafafa" text-anchor="middle">T</text>
+
+  <!-- Small accent dot -->
+  <circle cx="750" cy="380" r="40" fill="#fafafa" opacity="0.8"/>
+</svg>

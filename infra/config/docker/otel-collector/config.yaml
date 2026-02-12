@@ -1,0 +1,61 @@
+# OpenTelemetry Collector Configuration for Nexora
+# Receives traces/metrics from applications and forwards to Jaeger
+
+receivers:
+  # OTLP over gRPC
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+  # OTLP over HTTP
+  otlp/2:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  # Batch traces before sending
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+    send_batch_max_size: 1024
+
+  # Add resource attributes
+  resource:
+    attributes:
+      - key: service.namespace
+        value: nexora
+        action: insert
+      - key: deployment.environment
+        value: dev
+        action: insert
+
+exporters:
+  # Export traces to Jaeger
+  jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # Logging for debugging
+  logging:
+    loglevel: info
+
+service:
+  pipelines:
+    # Traces pipeline
+    traces:
+      receivers: [otlp, otlp/2]
+      processors: [batch, resource]
+      exporters: [jaeger, logging]
+
+    # Metrics pipeline (optional, for future use)
+    metrics:
+      receivers: [otlp, otlp/2]
+      processors: [batch, resource]
+      exporters: [logging]
+
+  # Telemetry for the collector itself
+  telemetry:
+    metrics:
+      address: 0.0.0.0:8888

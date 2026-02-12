@@ -1,0 +1,546 @@
+{
+  "info": {
+    "name": "Tiz Mobile API",
+    "description": "Tiz Mobile Backend API - Language Learning App with AI Features\n\n## Architecture\n- **API Gateway**: Java Spring Cloud Gateway (Path: /api/v1/*)\n- **Java Services**: auth-service, user-service, quiz-service, notify-service (Spring Boot)\n- **Python Services**: ai-service, nlp-service, ml-service (FastAPI)\n- **Service Discovery**: Consul / Nacos\n- **Load Balancer**: Spring Cloud LoadBalancer",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.tiz.app/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "task_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notification_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"secure_password\",\n  \"language\": \"zh\",\n  \"target_language\": \"en\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Create a new user account"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"secure_password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticate existing user"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"your_refresh_token_here\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Refresh access token using refresh token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AI Services",
+      "item": [
+        {
+          "name": "Chat Completion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt35\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful AI assistant for language learning.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"How do I say 'hello' in Japanese?\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 2048,\n  \"deep_thinking\": false,\n  \"stream\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/chat",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "chat"]
+            },
+            "description": "AI conversation endpoint for dialogue and Q&A"
+          },
+          "response": []
+        },
+        {
+          "name": "Translation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"你好，世界\",\n  \"source_lang\": \"zh\",\n  \"target_lang\": \"en\",\n  \"enhanced\": true,\n  \"model\": \"gpt35\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/translate",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "translate"]
+            },
+            "description": "AI-powered text translation with context awareness"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recommendations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"context\": {\n    \"user_id\": \"user_123\",\n    \"interests\": [\"vocabulary\", \"grammar\"],\n    \"recent_activities\": [\"translation\", \"quiz\"],\n    \"current_language\": \"zh\",\n    \"target_language\": \"en\",\n    \"proficiency_level\": 3\n  },\n  \"limit\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/recommendations",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "recommendations"]
+            },
+            "description": "Personalized learning recommendations"
+          },
+          "response": []
+        },
+        {
+          "name": "Execute Command",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command\": \"开始英语测验\",\n  \"context\": {\n    \"category\": \"english\",\n    \"difficulty\": \"intermediate\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/commands",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "commands"]
+            },
+            "description": "Execute automation commands with progress tracking"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Command Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ai/commands/{{task_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "commands", "{{task_id}}"]
+            },
+            "description": "Get status of an executing command"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quiz System",
+      "item": [
+        {
+          "name": "Start Quiz Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"english\",\n  \"mode\": \"choice\",\n  \"difficulty\": \"intermediate\",\n  \"question_count\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quiz/sessions",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "sessions"]
+            },
+            "description": "Initialize a new quiz session"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz Question",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/quiz/sessions/{{session_id}}/question",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "sessions", "{{session_id}}", "question"]
+            },
+            "description": "Retrieve the next question in a quiz session"
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Quiz Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question_id\": \"q_123\",\n  \"answer\": \"B\",\n  \"time_spent\": 15\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quiz/sessions/{{session_id}}/answer",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "sessions", "{{session_id}}", "answer"]
+            },
+            "description": "Submit an answer for a quiz question"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/quiz/sessions/{{session_id}}/results",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "sessions", "{{session_id}}", "results"]
+            },
+            "description": "Get final results for a completed quiz session"
+          },
+          "response": []
+        },
+        {
+          "name": "Start Voice Call",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"english\",\n  \"difficulty\": \"intermediate\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quiz/voice-call",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "voice-call"]
+            },
+            "description": "Initialize a voice call quiz session"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/profile",
+              "host": ["{{base_url}}"],
+              "path": ["user", "profile"]
+            },
+            "description": "Get current user profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"zh\",\n  \"target_language\": \"en\",\n  \"proficiency_level\": 4,\n  \"preferences\": {\n    \"theme\": \"dark\",\n    \"notifications_enabled\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/profile",
+              "host": ["{{base_url}}"],
+              "path": ["user", "profile"]
+            },
+            "description": "Update user profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Get AI Config",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/ai-config",
+              "host": ["{{base_url}}"],
+              "path": ["user", "ai-config"]
+            },
+            "description": "Get user's AI configuration"
+          },
+          "response": []
+        },
+        {
+          "name": "Update AI Config",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt4\",\n  \"temperature\": 0.5,\n  \"max_tokens\": 4096,\n  \"features\": {\n    \"enhance_translation\": true,\n    \"deep_thinking_mode\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/ai-config",
+              "host": ["{{base_url}}"],
+              "path": ["user", "ai-config"]
+            },
+            "description": "Update user's AI configuration"
+          },
+          "response": []
+        },
+        {
+          "name": "Store API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider\": \"openai\",\n  \"api_key\": \"sk-...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/ai-api-key",
+              "host": ["{{base_url}}"],
+              "path": ["user", "ai-api-key"]
+            },
+            "description": "Securely store API key for AI service"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Get user notifications"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications/{{notification_id}}/read",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "{{notification_id}}", "read"]
+            },
+            "description": "Mark a notification as read"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications/read-all",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "read-all"]
+            },
+            "description": "Mark all notifications as read"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "History",
+      "item": [
+        {
+          "name": "Get Translation History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/history/translations?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["history", "translations"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Get user's translation history"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/history/quizzes?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["history", "quizzes"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Get user's quiz history"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

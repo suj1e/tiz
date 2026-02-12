@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticjob-ui
+  namespace: nexora-infra
+  labels:
+    app: elasticjob-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticjob-ui
+  template:
+    metadata:
+      labels:
+        app: elasticjob-ui
+    spec:
+      containers:
+      - name: elasticjob-ui
+        image: apache/shardingsphere-elasticjob-ui:3.0.2
+        env:
+        - name: AUTHORIZATION_ENABLED
+          value: "false"
+        - name: EVENT_TRACE_RDB_DATABASE
+          value: nexora_job
+        - name: EVENT_TRACE_RDB_DRIVER
+          value: com.mysql.cj.jdbc.Driver
+        - name: EVENT_TRACE_RDB_URL
+          value: jdbc:mysql://mysql:3306/nexora_job?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+        - name: EVENT_TRACE_RDB_USERNAME
+          value: root
+        - name: EVENT_TRACE_RDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-root-password
+        ports:
+        - containerPort: 8088
+          name: http
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8088
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8088
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
