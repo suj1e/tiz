@@ -1,0 +1,29 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary directories
+nexora/
+nexora-web/
+optr/
+usersrv/
+
+# Build outputs
+build/
+dist/
+target/
+out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
