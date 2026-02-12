@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seata
+  namespace: nexora-infra
+  labels:
+    app: seata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seata
+  template:
+    metadata:
+      labels:
+        app: seata
+    spec:
+      containers:
+      - name: seata
+        image: seataio/seata-server:2.5.0
+        env:
+        - name: SEATA_IP
+          value: seata
+        - name: SEATA_PORT
+          value: "8091"
+        - name: SEATA_CONFIG_NAME
+          value: file:/root/seata-config/registry
+        - name: SEATA_ENV
+          value: dev
+        - name: STORE_MODE
+          value: db
+        - name: SEATA_DB_STORE_TYPE
+          value: mysql
+        - name: SEATA_DB_JDBC_URL
+          value: jdbc:mysql://mysql:3306/seata?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+        - name: SEATA_DB_USER
+          value: root
+        - name: SEATA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-root-password
+        ports:
+        - containerPort: 8091
+          name: rpc
+        - containerPort: 7091
+          name: web
+        volumeMounts:
+        - name: seata-storage
+          mountPath: /seata-server/sessionStore
+        - name: seata-config
+          mountPath: /root/seata-config
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - netstat -an | grep 8091 || exit 1
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - netstat -an | grep 8091 || exit 1
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+      volumes:
+      - name: seata-storage
+        persistentVolumeClaim:
+          claimName: seata-pvc
+      - name: seata-config
+        configMap:
+          name: seata-config

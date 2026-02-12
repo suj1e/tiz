@@ -1,0 +1,201 @@
+# ============================================
+# GatewaySrv - Nacos 配置模板
+# ============================================
+# 使用方法: 复制此内容到 Nacos 控制台
+# Data ID: gatewaysrv-dev.yml
+# Group: DEFAULT_GROUP
+# 格式: YAML
+
+# ========== Server 配置 ==========
+server:
+  # HTTP/2 支持
+  http2:
+    enabled: true
+  # 压缩配置
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json
+    min-response-size: 1024
+
+# ========== Management 健康检查与监控配置 ==========
+management:
+  # 指标配置
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: ${spring.profiles.active}
+  # Prometheus 指标导出（Spring Boot 3.x 新路径）
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 30s
+  # 端点配置
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+  # 健康检查配置
+  health:
+    redis:
+      enabled: true
+    nacos:
+      enabled: true
+    diskspace:
+      enabled: true
+      threshold: 10MB
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+  # 追踪配置（需要额外依赖，默认禁用）
+  tracing:
+    enabled: false
+  # 观察性配置 (Spring Boot 3.x Observation API)
+  observations:
+    enable:
+      "spring.cloud.gateway": true
+
+# ========== Gateway 路由配置 ==========
+spring:
+  cloud:
+    gateway:
+      # HTTP 客户端连接池配置（Spring Boot 3.x 新路径）
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 5000
+            response-timeout: 30s
+            pool:
+              type: elastic
+              max-connections: 500
+              acquire-timeout: 30000
+              max-idle-time: 60s
+              max-life-time: 60s
+          # 路由配置（Spring Boot 3.x 新路径）
+          routes:
+            # 认证服务
+            - id: authsrv
+              uri: lb://authsrv
+              predicates:
+                - Path=/api/v1/auth/**
+              filters:
+                - StripPrefix=2
+
+            # Mix 服务
+            - id: mixsrv
+              uri: lb://mixsrv
+              predicates:
+                - Path=/api/v1/mix/**
+              filters:
+                - StripPrefix=2
+
+            # Meal 服务
+            - id: mealsrv
+              uri: lb://mealsrv
+              predicates:
+                - Path=/api/v1/meal/**
+              filters:
+                - StripPrefix=2
+
+            # Recommend 服务
+            - id: recommend
+              uri: lb://recommendsrv
+              predicates:
+                - Path=/api/v1/recommend/**
+              filters:
+                - StripPrefix=2
+
+  # Redis 配置（用于限流）
+  data:
+    redis:
+      host: ${REDIS_HOST:nexora-redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 5s
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: 2s
+
+# ========== Resilience4j 熔断配置 ==========
+resilience4j:
+  circuitbreaker:
+    instances:
+      mixsrv:
+        failure-rate-threshold: 50
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 30s
+      recommend:
+        failure-rate-threshold: 50
+        sliding-window-size: 10
+        wait-duration-in-open-state: 30s
+
+  timelimiter:
+    instances:
+      mixsrv:
+        timeout-duration: 10s
+      recommend:
+        timeout-duration: 10s
+
+  retry:
+    instances:
+      mixsrv:
+        max-attempts: 3
+        wait-duration: 1s
+      recommend:
+        max-attempts: 3
+        wait-duration: 1s
+
+  ratelimiter:
+    instances:
+      auth-endpoint:
+        limit-for-period: 10
+        limit-refresh-period: 1s
+      api-default:
+        limit-for-period: 100
+        limit-refresh-period: 1s
+
+# ========== 日志配置 ==========
+logging:
+  level:
+    root: INFO
+    com.nexora.gateway: INFO
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
+    org.springframework.security: WARN
+    org.springframework.web: INFO
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
+  # 结构化日志 (JSON 格式) - 用于日志聚合系统
+  format:
+    json: false
+  file:
+    name: ./logs/gateway.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: ./logs/gateway-%d{yyyy-MM-dd}.%i.log.gz
+      max-file-size: 100MB
+      max-history: 7
+      total-size-cap: 1GB
+
+# ========== 安全配置（敏感信息使用环境变量占位符）==========
+nexora:
+  security:
+    jwt:
+      enabled: true
+      secret: ${JWT_SECRET}         # 使用环境变量占位符
+      expiration: 1h
+      refresh-expiration: 7d
+      issuer: nexora-gateway
+      audience: nexora-api

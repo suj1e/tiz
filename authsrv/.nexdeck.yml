@@ -1,0 +1,16 @@
+deck:
+  name: authsrv-deck
+
+workspaces:
+  - name: main
+    branch: master
+    path: .
+    type: code
+
+services:
+  authsrv:
+    type: spring
+    workspaces:
+      main:
+        port: 8080
+        command: ./gradlew bootRun
