@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/storage/preferences.dart';
+import '../../../core/theme/theme_provider.dart';
 import '../profile_provider.dart';
 import 'theme_settings_page.dart';
 import 'webhook_settings_page.dart';
