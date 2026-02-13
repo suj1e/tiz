@@ -10,7 +10,6 @@ class TizApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    final themeMode = ref.watch(themeModeProvider);
     final themeModeNotifier = ref.watch(themeModeProvider.notifier);
 
     return MaterialApp.router(
