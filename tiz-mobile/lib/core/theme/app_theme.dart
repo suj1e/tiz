@@ -29,13 +29,9 @@ class AppTheme {
         color: AppColors.lightBorder,
         thickness: 1,
       ),
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: AppColors.lightSurface,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: AppColors.lightBorder),
-        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -101,13 +97,9 @@ class AppTheme {
         color: AppColors.darkBorder,
         thickness: 1,
       ),
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: AppColors.darkSurface,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: AppColors.darkBorder),
-        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
