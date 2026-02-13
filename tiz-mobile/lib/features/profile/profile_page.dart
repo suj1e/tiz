@@ -1,514 +1,147 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../theme/theme_provider.dart';
-import '../../theme/app_colors.dart';
-import '../../core/constants.dart';
+import '../../features/auth/bloc/auth_bloc.dart';
+import '../../features/auth/bloc/auth_event.dart';
+import '../../features/auth/bloc/auth_state.dart';
+import '../../routes/app_routes.dart';
+import 'widgets/dev_mode_toggle.dart';
 
-/// Minimalist Profile Page
-/// User profile, settings, and navigation to AI settings
-class ProfilePage extends StatelessWidget {
+/// Profile page
+/// Shows user profile, settings, and options
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  int _versionTapCount = 0;
+  DateTime? _lastTapTime;
+  bool _devMenuUnlocked = false;
+
+  void _onVersionTap() {
+    final now = DateTime.now();
+
+    // Reset if more than 500ms between taps
+    if (_lastTapTime != null &&
+        now.difference(_lastTapTime!).inMilliseconds > 500) {
+      _versionTapCount = 0;
+    }
+
+    _lastTapTime = now;
+    _versionTapCount++;
+
+    if (_versionTapCount >= 5 && !_devMenuUnlocked) {
+      setState(() => _devMenuUnlocked = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Developer mode unlocked')),
+      );
+      _versionTapCount = 0;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final colors = context.watch<ThemeProvider>().colors;
+    final authState = context.watch<AuthBloc>().state;
 
     return Scaffold(
-      backgroundColor: colors.bg,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Card
-              _buildProfileCard(context, colors),
-
-              const SizedBox(height: 24),
-
-              // AI Settings Navigation
-              _buildSettingsSection(context, colors, AppStrings.profileAiSettings, [
-                _buildAiSettingsNavigation(context, colors),
-              ]),
-
-              const SizedBox(height: 24),
-
-              // App Settings Section
-              _buildSettingsSection(context, colors, '应用设置', [
-                _buildThemeItem(colors),
-              ]),
-
-              const SizedBox(height: 24),
-
-              // Other Section
-              _buildSettingsSection(context, colors, '其他', [
-                _buildNavigationItem(context, colors, Icons.person_outline_rounded, '个人信息'),
-                _buildNavigationItem(context, colors, Icons.shield_outlined, '隐私与安全'),
-                _buildNavigationItem(context, colors, Icons.info_outline_rounded, '关于 Tiz'),
-              ]),
-
-              const SizedBox(height: 24),
-
-              // Logout Button
-              _buildLogoutButton(context, colors),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: const Text('Profile'),
+            floating: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: () {
+                  context.push(AppRoutes.settings);
+                },
+              ),
             ],
           ),
-        ),
-      ),
-    );
-  }
 
-  /// Build Profile Card
-  Widget _buildProfileCard(BuildContext context, ThemeColors colors) {
-    return InkWell(
-      onTap: () => Navigator.pushNamed(context, '/personal-info'),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: colors.bg,
-          border: Border.all(color: colors.border, width: 1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Avatar - SVG Icon
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: colors.bgSecondary,
-                border: Border.all(color: colors.border, width: 1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.person_rounded,
-                color: colors.text,
-                size: 32,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Name
-            Text(
-              'Tiz 用户',
-              style: TextStyle(
-                color: colors.text,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            // Bio
-            Text(
-              '学习语言，探索世界',
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 13,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            // Edit hint
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.edit_outlined,
-                  color: colors.textTertiary,
-                  size: 14,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '点击编辑',
-                  style: TextStyle(
-                    color: colors.textTertiary,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Build Settings Section with Title
-  Widget _buildSettingsSection(BuildContext context, ThemeColors colors, String title, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section Title
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 12),
-          child: Text(
-            title.toUpperCase(),
-            style: TextStyle(
-              color: colors.textTertiary,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.05,
-            ),
-          ),
-        ),
-        // Section Items
-        ...items,
-      ],
-    );
-  }
-
-  /// Build AI Settings Navigation Item
-  Widget _buildAiSettingsNavigation(BuildContext context, ThemeColors colors) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/ai-settings'),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: colors.bg,
-          border: Border.all(color: colors.border, width: 1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            // Icon
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: colors.bgSecondary,
-                border: Border.all(color: colors.border, width: 1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.smart_toy_outlined,
-                color: colors.text,
-                size: 18,
-              ),
-            ),
-            const SizedBox(width: 12),
-            // Label
-            Expanded(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'AI 配置',
-                    style: TextStyle(
-                      color: colors.text,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                  // Profile Header
+                  _ProfileHeader(
+                    userName: authState is Authenticated
+                        ? (authState.email.split('@')[0])
+                        : 'Guest',
+                    email: authState is Authenticated ? authState.email : '',
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Stats Section
+                  const _StatsSection(),
+                  const SizedBox(height: 24),
+
+                  // Menu Options
+                  const _MenuSection(),
+                  const SizedBox(height: 24),
+
+                  // Developer Menu (if unlocked)
+                  if (_devMenuUnlocked) ...[
+                    _DevMenuSection(),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Version Info (hidden entry for dev menu)
+                  GestureDetector(
+                    onTap: _onVersionTap,
+                    child: Text(
+                      'Version 1.0.0+1',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.grey,
+                          ),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '模型选择、API Key、高级设置',
-                    style: TextStyle(
-                      color: colors.textTertiary,
-                      fontSize: 11,
+                  const SizedBox(height: 16),
+
+                  // Logout Button
+                  if (authState is Authenticated)
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonalIcon(
+                        onPressed: () => _handleLogout(context),
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Log Out'),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
-            // Arrow
-            Text(
-              '›',
-              style: TextStyle(
-                color: colors.textTertiary,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Build Theme Item
-  Widget _buildThemeItem(ThemeColors colors) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: colors.bg,
-        border: Border.all(color: colors.border, width: 1),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          // Icon
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: colors.bgSecondary,
-              border: Border.all(color: colors.border, width: 1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.palette_outlined,
-              color: colors.text,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Label
-          Expanded(
-            child: Text(
-              AppStrings.profileTheme,
-              style: TextStyle(
-                color: colors.text,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          // Theme Selector
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              final currentTheme = themeProvider.currentThemeType;
-              return Row(
-                children: AppTheme.values.map((theme) {
-                  final isSelected = currentTheme == theme;
-                  return GestureDetector(
-                    onTap: () {
-                      context.read<ThemeProvider>().setTheme(theme);
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      margin: EdgeInsets.only(left: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected ? colors.accent : colors.bgSecondary,
-                        border: Border.all(
-                          color: isSelected ? colors.accent : colors.border,
-                          width: isSelected ? 2 : 1,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            theme == AppTheme.light
-                                ? Icons.wb_sunny_outlined
-                                : Icons.nights_stay_outlined,
-                            color: isSelected ? colors.bg : colors.text,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            theme.displayName,
-                            style: TextStyle(
-                              color: isSelected ? colors.bg : colors.text,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              );
-            },
           ),
         ],
       ),
     );
   }
 
-  /// Build Navigation Item (with arrow)
-  Widget _buildNavigationItem(BuildContext context, ThemeColors colors, IconData icon, String label) {
-    return GestureDetector(
-      onTap: () {
-        // Navigate to appropriate page based on label
-        switch (label) {
-          case '个人信息':
-            Navigator.pushNamed(context, '/personal-info');
-            break;
-          case '隐私与安全':
-            Navigator.pushNamed(context, '/privacy');
-            break;
-          case '关于 Tiz':
-            Navigator.pushNamed(context, '/about');
-            break;
-          default:
-            _showMockDialog(context, colors, label);
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: colors.bg,
-          border: Border.all(color: colors.border, width: 1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            // Icon
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: colors.bgSecondary,
-                border: Border.all(color: colors.border, width: 1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: colors.text,
-                size: 18,
-              ),
-            ),
-            const SizedBox(width: 12),
-            // Label
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: colors.text,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            // Arrow
-            Text(
-              '›',
-              style: TextStyle(
-                color: colors.textTertiary,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Build Logout Button
-  Widget _buildLogoutButton(BuildContext context, ThemeColors colors) {
-    return GestureDetector(
-      onTap: () => _showLogoutDialog(context, colors),
-      child: Container(
-        margin: const EdgeInsets.only(top: 24),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          border: Border.all(color: colors.border, width: 1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(
-            '退出登录',
-            style: TextStyle(
-              color: colors.error,
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Show Logout Dialog
-  void _showLogoutDialog(BuildContext context, ThemeColors colors) {
+  void _handleLogout(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: colors.bg,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: colors.border, width: 1),
-        ),
-        title: Text(
-          '退出登录',
-          style: TextStyle(
-            color: colors.text,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        content: Text(
-          '确定要退出登录吗？',
-          style: TextStyle(
-            color: colors.textSecondary,
-            fontSize: 14,
-          ),
-        ),
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              '取消',
-              style: TextStyle(
-                color: colors.text,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            onPressed: () => dialogContext.pop(),
+            child: const Text('Cancel'),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () {
-              Navigator.pop(context);
-              // Navigate to login screen
-              Navigator.pushReplacementNamed(context, '/login');
+              dialogContext.pop();
+              context.read<AuthBloc>().add(LogoutRequested());
             },
-            child: Text(
-              '确定',
-              style: TextStyle(
-                color: colors.error,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Show Mock Dialog
-  void _showMockDialog(BuildContext context, ThemeColors colors, String title) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: colors.bg,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: colors.border, width: 1),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: colors.text,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        content: Text(
-          '此功能正在开发中',
-          style: TextStyle(
-            color: colors.textSecondary,
-            fontSize: 14,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              '确定',
-              style: TextStyle(
-                color: colors.text,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: const Text('Log Out'),
           ),
         ],
       ),
@@ -516,3 +149,316 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+/// Developer Menu Section
+class _DevMenuSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: Colors.orange.withOpacity(0.5),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(
+              Icons.developer_mode,
+              color: Colors.orange,
+            ),
+            title: const Text(
+              'Developer Options',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            enabled: false,
+          ),
+          const Divider(height: 1),
+          const DevModeToggle(),
+        ],
+      ),
+    );
+  }
+}
+
+/// Profile Header Widget
+class _ProfileHeader extends StatelessWidget {
+  final String userName;
+  final String email;
+
+  const _ProfileHeader({
+    required this.userName,
+    required this.email,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor,
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+              child: Text(
+                userName[0].toUpperCase(),
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                ),
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    userName,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    email,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.edit_outlined, size: 16),
+                    label: const Text('Edit Profile'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      minimumSize: const Size(0, 28),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Stats Section Widget
+class _StatsSection extends StatelessWidget {
+  const _StatsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor,
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _StatItem(
+              value: '12',
+              label: 'Days Streak',
+              icon: Icons.local_fire_department,
+              color: Colors.orange,
+            ),
+            _StatItem(
+              value: '48',
+              label: 'Lessons',
+              icon: Icons.school,
+              color: Colors.blue,
+            ),
+            _StatItem(
+              value: '850',
+              label: 'XP Points',
+              icon: Icons.stars,
+              color: Colors.amber,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Stat Item Widget
+class _StatItem extends StatelessWidget {
+  final String value;
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  const _StatItem({
+    required this.value,
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: color,
+            size: 24,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Menu Section Widget
+class _MenuSection extends StatelessWidget {
+  const _MenuSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          _MenuItem(
+            icon: Icons.book_outlined,
+            title: 'My Courses',
+            trailing: '3 Active',
+            onTap: () {},
+          ),
+          const Divider(height: 1),
+          _MenuItem(
+            icon: Icons.emoji_events_outlined,
+            title: 'Achievements',
+            trailing: '12 Earned',
+            onTap: () {},
+          ),
+          const Divider(height: 1),
+          _MenuItem(
+            icon: Icons.history,
+            title: 'Activity History',
+            onTap: () {},
+          ),
+          const Divider(height: 1),
+          _MenuItem(
+            icon: Icons.help_outline,
+            title: 'Help & Support',
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Menu Item Widget
+class _MenuItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? trailing;
+  final VoidCallback onTap;
+
+  const _MenuItem({
+    required this.icon,
+    required this.title,
+    this.trailing,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                color: Theme.of(context).primaryColor,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+            if (trailing != null) ...[
+              Text(
+                trailing!,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey,
+                    ),
+              ),
+              const SizedBox(width: 8),
+            ],
+            const Icon(
+              Icons.chevron_right,
+              color: Colors.grey,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
