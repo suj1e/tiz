@@ -3,20 +3,14 @@ plugins {
 }
 
 dependencies {
-    // Nexora Common (for PasswordUtil, etc.)
-    api(libs.nexora.common)
-    implementation(libs.nexora.spring.boot.starter.data.jpa)
+    // Nexora Spring Boot Starters
+    api(libs.nexora.spring.boot.starter.data.jpa)
+    api(libs.nexora.spring.boot.starter.kafka)
+    api(libs.nexora.spring.boot.starter.audit)
 
-    // Jakarta Persistence API for entity annotations
-    api("jakarta.persistence:jakarta.persistence-api")
-
-    // Spring Data for JPA annotations in BaseEntity
-    api("org.springframework.data:spring-data-jpa")
-    api("org.springframework:spring-context")
-
-    // Spring Security for PasswordEncoder in domain services
-    api("org.springframework.security:spring-security-crypto")
-    api("org.springframework.security:spring-security-core")
+    // Spring Boot starters (always included)
+    api(libs.spring.boot.validation)
+    api(libs.spring.boot.aop)
 
     // Lombok
     compileOnly(libs.lombok)

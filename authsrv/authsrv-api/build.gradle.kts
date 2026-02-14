@@ -12,7 +12,7 @@ dependencies {
     // Spring Web for @HttpExchange
     api(libs.spring.web)
 
-    // Lombok (compile only for DTOs)
+    // Lombok
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
 }

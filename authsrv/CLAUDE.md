@@ -1,36 +1,31 @@
-# CLAUDE.md
+# authsrv
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+{{SERVICE_DESCRIPTION}}
 
-## Overview
-
-Authsrv is an enterprise authentication and authorization service built with Java 21 and Spring Boot 4.0.2, implementing Domain-Driven Design (DDD) with clean layered architecture. It provides REST API and HTTP Interface (@HttpExchange) endpoints for integration.
-
-## Project Structure
+## Module Structure
 
 ```
 authsrv/
-├── authsrv-api/          # API SDK - Client interfaces, DTOs, events (published as Maven artifact)
-├── authsrv-core/         # Domain Layer - Entities, domain services (pure business logic)
-├── authsrv-adapter/      # Adapter Layer - Controllers, repositories, infrastructure
-├── authsrv-boot/         # Boot Layer - Application entry, main configuration
-└── qa/                   # Quality Assurance - K6 load tests
+├── authsrv-api/      # Public SDK (@HttpExchange, DTOs)
+├── authsrv-core/     # Domain (entities, domain services)
+├── authsrv-adapter/  # Infrastructure (REST, repos, config)
+└── authsrv-boot/     # Entry point (Application.java, resources)
 ```
 
-**Module Dependencies:** Boot → Adapter → Core; API is standalone SDK used by other services.
+## Dependency Graph
 
-## Common Commands
+```
+boot → adapter → core
+                ↘ api
+```
 
-### Build & Run
+## Quick Start
 
 ```bash
-# Build entire project
-./gradlew clean build
-
-# Run application (foreground)
+# Run in development mode
 ./run.sh dev
 
-# Run application (background)
+# Run in background
 ./run.sh bg dev
 
 # Check status
@@ -41,12 +36,144 @@ authsrv/
 
 # Stop service
 ./run.sh stop
+```
 
-# Build JAR only
-./gradlew :authsrv-boot:bootJar
+## Build
 
-# Build Docker image (Jib)
-./gradlew jibDockerBuild
+```bash
+# Build all modules
+./gradlew clean build
+
+# Run tests
+./gradlew test
+
+# Build without tests
+./gradlew build -x test
+```
+
+## Docker
+
+```bash
+# Build image
+docker build -t nexora/authsrv:latest .
+
+# Run container
+docker run -p 40006:8080 nexora/authsrv:latest
+```
+
+## Ports
+
+| Port | Purpose |
+|------|---------|
+| 40006 | Application |
+| 40007 | Management/Actuator |
+
+## Configuration
+
+- **application.yml**: Main configuration
+- **.env.example**: Environment variables template (copy to .env.local)
+- **Nacos**: Dynamic configuration (if enabled)
+
+---
+
+## Development Guidelines
+
+### Layer Responsibilities
+
+| Layer | Responsibility | Allowed Dependencies |
+|-------|---------------|---------------------|
+| **api** | Public interfaces, DTOs | None (pure Java) |
+| **core** | Business logic, entities | api |
+| **adapter** | REST, repositories, external | core, api |
+| **boot** | Configuration, startup | adapter |
+
+### Naming Conventions
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| Entity | `{Name}` | `User`, `Order` |
+| Repository | `{Entity}Repository` | `UserRepository` |
+| Service | `{Entity}Service` | `UserService` |
+| Service Impl | `{Entity}ServiceImpl` | `UserServiceImpl` |
+| Controller | `{Entity}Controller` | `UserController` |
+| DTO Request | `{Action}{Entity}Request` | `CreateUserRequest` |
+| DTO Response | `{Entity}Response` | `UserResponse` |
+| Mapper | `{Entity}Mapper` | `UserMapper` |
+
+### Package Structure
+
+```
+io.github.suj1e.auth/
+├── api/
+│   ├── client/          # @HttpExchange interfaces
+│   ├── dto/
+│   │   ├── request/
+│   │   └── response/
+│   └── event/           # Kafka event DTOs
+├── core/
+│   ├── domain/          # JPA entities
+│   ├── domainservice/   # Domain service interfaces
+│   │   └── impl/
+│   └── support/         # Value objects, helpers
+├── adapter/
+│   ├── infra/
+│   │   ├── event/       # Kafka listeners
+│   │   ├── id/          # ID generators
+│   │   └── job/         # Scheduled jobs
+│   └── service/         # Adapter services
+├── config/              # @Configuration
+├── exception/           # Custom exceptions
+├── infra/repository/    # JPA repositories
+├── mapper/              # MapStruct mappers
+├── rest/                # @RestController
+├── security/            # Security config
+└── service/             # Application services
+    └── impl/
+```
+
+### API Design
+
+**REST Endpoint Pattern:**
+```
+POST   /v1/{resources}          # Create
+GET    /v1/{resources}/{id}     # Get by ID
+GET    /v1/{resources}          # List (with pagination)
+PUT    /v1/{resources}/{id}     # Update
+DELETE /v1/{resources}/{id}     # Delete
+```
+
+**Response Format (via nexora-spring-boot-starter-web):**
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": { ... }
+}
+```
+
+### Exception Handling
+
+```java
+// Business exception
+throw new BusinessException("USER_NOT_FOUND", "User not found");
+
+// Use @ExceptionHandler in GlobalExceptionHandler
+```
+
+### Database
+
+**Flyway Migration:**
+- Location: `authsrv-boot/src/main/resources/db/migration/`
+- Naming: `V{number}__{description}.sql`
+- Example: `V1__create_user_table.sql`
+
+**Entity Guidelines:**
+```java
+@Entity
+@Table(name = "t_user")
+public class User extends BaseEntity {
+    // Use BaseEntity for auditing (createdAt, updatedAt)
+}
 ```
 
 ### Testing
@@ -55,227 +182,109 @@ authsrv/
 # Run all tests
 ./gradlew test
 
-# Run single test class
-./gradlew test --tests AuthServiceTest
-
-# Run single test method
-./gradlew test --tests AuthServiceTest.testLogin
-
-# Run K6 load tests
-cd qa/k6
-./load-test.sh -s smoke
-./load-test.sh -s load
-./load-test.sh -s stress
-
-# Quick benchmark (requires wrk/hey/ab)
-./benchmark.sh
+# Run single test
+./gradlew test --tests "*UserServiceTest"
 ```
 
-### Database Migrations
+**Test Naming:**
+- Unit: `{Class}Test`
+- Integration: `{Class}IT`
 
-```bash
-# Flyway migrations run automatically on startup
-# To manually migrate:
-./gradlew :authsrv-boot:flywayMigrate
-
-# Check migration status
-./gradlew :authsrv-boot:flywayInfo
-```
-
-## Architecture
-
-### API Routing
-
-**Context Path:** `/auth`
-**API Version:** `/v1`
-**Management Port:** 40006 (app), 40007 (actuator)
-
-Final URL format: `http://host:40006/auth/v1/{endpoint}`
-
-Examples:
-- Login: `POST /auth/v1/login`
-- Register: `POST /auth/v1/register`
-- Token refresh: `POST /auth/v1/refresh`
-- Validate token: `GET /auth/v1/validate` (used by gateway)
-- User info: `GET /auth/v1/users/me`
-- Batch users: `GET /auth/v1/users/batch?ids=1,2,3`
-
-### Layered Architecture
-
-**Domain Layer** (`authsrv-core`):
-- `User`, `Role`, `RefreshToken`, `AuditLog`, `OutboxEvent` entities
-- `AuthDomainService`, `UserDomainService`, `TokenDomainService`
-
-**Application Layer** (`authsrv-adapter/service`):
-- `AuthService`, `UserService`, `TokenService`, `AuditService`
-
-**Infrastructure Layer** (`authsrv-adapter/infra`):
-- `repository/*` - JPA repositories with QueryDSL
-- `security/*` - JWT filter, OAuth2 handlers
-- `job/*` - Quartz jobs (account unlock, outbox publisher, token cleanup)
-
-**Adapter Layer** (`authsrv-adapter/rest`):
-- `AuthController`, `UserController`, `OAuth2Controller`, `FileUploadController`
-
-### HTTP Interface SDK
-
-The `authsrv-api` module provides `@HttpExchange` interfaces for other services:
+### Logging
 
 ```java
-// In authsrv-api
-@HttpExchange(url = "/v1", accept = "application/json")
-public interface AuthClient {
-    @PostExchange("/login")
-    LoginResponse login(@RequestBody LoginRequest request);
-
-    @GetExchange("/validate")
-    TokenValidationResponse validateToken(@RequestParam String token);
-}
-
-// In consuming service
-@Bean
-public AuthClient authClient() {
-    RestClient restClient = RestClient.builder()
-        .baseUrl("http://authsrv:40006/auth")
-        .build();
-    HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder()
-        .clientAdapter(RestClientAdapter.create(restClient))
-        .build();
-    return factory.createClient(AuthClient.class);
+@Slf4j
+public class UserService {
+    public void method() {
+        log.info("Processing user: {}", userId);
+        log.debug("Detail: {}", detail);
+        log.error("Error occurred", exception);
+    }
 }
 ```
 
-## Configuration Management
+### Event (Kafka)
 
-**Hybrid Approach:** Local `.env` files + Nacos configuration center
+**Topic Naming:**
+```
+{domain}.{entity}.{action}.v{version}
 
-### Environment Files
-
-- `.env.example` - Template (in repo)
-- `.env.{dev|test|prod}` - Environment defaults (gitignored)
-- `.env.local` - Local overrides for dev (gitignored)
-
-Loading order: `.env.{env}` → `.env.local` → environment variables
-
-### Nacos Integration
-
-```yaml
-spring:
-  config:
-    import: optional:nacos:${spring.application.name}-${spring.profiles.active}.yml
+Examples:
+- user.user.created.v1
+- user.user.updated.v1
+- order.order.paid.v1
 ```
 
-Configuration split:
-- **Local (immutable):** Ports, Nacos connection, JPA, Flyway
-- **Nacos (refreshable):** Datasource, Redis, Kafka, security, business rules
-
-### Refreshable Properties
-
-`AuthProperties` class supports `@RefreshScope`:
-- Password policy (min length, complexity)
-- Brute force protection (max attempts, lockout duration)
-- JWT settings (expiration, issuer, audience)
-- OAuth2 providers
-- CORS configuration
-
-## Key Technologies
-
-- **Spring Boot 4.0.2** + **Spring Cloud 2025.1.1** + **SCA 2025.1.0.0**
-- **Nacos** - Service discovery & config management
-- **MySQL 9.1.0** + **Flyway** - Database & migrations
-- **Redis** - Caching, token blacklist
-- **Kafka** - Event streaming (Outbox pattern)
-- **Quartz** - Scheduled jobs
-- **MapStruct** - DTO mapping
-- **QueryDSL** - Type-safe queries
-
-### Nexora Starters (Internal Frameworks)
-
-- `nexora-spring-boot-starter-web` - Unified `Result<T>` response, global exception handling
-- `nexora-spring-boot-starter-security` - JWT provider, encryption utilities
-- `nexora-spring-boot-starter-redis` - Redis caching, token blacklist
-- `nexora-spring-boot-starter-kafka` - Event publishing with DLQ
-- `nexora-spring-boot-starter-resilience` - Circuit breaker, retry, timeout
-- `nexora-spring-boot-starter-file-storage` - File upload handling
-- `nexora-spring-boot-starter-data-jpa` - JPA auditing, soft delete
-- `nexora-spring-boot-starter-audit` - Audit logging
-
-## Security Patterns
-
-### Authentication Flow
-
-1. **Local:** Username/password (BCrypt, strength=12)
-2. **OAuth2/OIDC:** Google, GitHub, custom providers
-3. **JWT:** Access token (15min) + Refresh token (7 days)
-
-### Security Features
-
-- **Brute Force Protection:** Configurable max attempts, auto lockout
-- **Account Locking:** Time-based locks with auto-unlock job
-- **Password Policy:** Configurable complexity rules
-- **Token Blacklist:** Redis-based revocation
-- **Session Management:** Max concurrent sessions
-- **CORS:** Environment-aware configuration
-
-### Security Configuration
-
-`SecurityConfig.java` - Stateless session management, role-based access control
-
-Public endpoints: `/v1/login`, `/v1/register`, `/v1/refresh`, `/oauth2/**`, `/actuator/health/**`
-
-## Background Jobs (Quartz)
-
-- `AccountUnlockJob` - Auto-unlock expired locks
-- `OutboxPublisherJob` - Publish events to Kafka (every 10s)
-- `RefreshTokenCleanupJob` - Clean expired tokens
-
-## Event Publishing (Outbox Pattern)
-
-1. Business logic writes to `outbox_event` table in same transaction
-2. Background job scans and publishes to Kafka
-3. Ensures at-least-once delivery with retry
-
-## Error Handling
-
-`ErrorCode` enum organized by category:
-- 10xx: Authentication errors
-- 11xx: Registration errors
-- 12xx: User errors
-- 13xx: Role errors
-- 14xx: OAuth2 errors
-- 15xx: Session errors
-- 16xx: File upload errors
-- 17xx: Validation errors
-- 50xx: System errors
-
-## Important Notes
-
-### API Path Convention
-
-When adding new endpoints:
-- Controllers use `@RequestMapping("/v1")` or `@RequestMapping("/v1/{resource}")`
-- Do NOT use `/api/v1` prefix (context path `/auth` is already configured)
-- Final URL: `{host}:40006/auth/v1/{endpoint}`
-
-### Dependency Management
-
-**ALL dependency versions must use the TOML catalog** (`gradle/libs.versions.toml`).
-
-Never hardcode versions in `build.gradle.kts`. Use:
-```kotlin
-implementation(libs.some.library)
+**Event Format:**
+```json
+{
+  "eventId": "uuid",
+  "eventType": "user.created",
+  "timestamp": "2024-01-01T00:00:00Z",
+  "source": "authsrv",
+  "data": { ... }
+}
 ```
 
-### Database Migrations
+**Publishing:**
+```java
+@Autowired
+private EventPublisher eventPublisher;
 
-- Location: `authsrv-boot/src/main/resources/db/migration/`
-- Naming: `V{number}__{description}.sql`
-- Use MySQL syntax (BIGINT AUTO_INCREMENT, DATETIME, JSON)
-- ON CONFLICT → ON DUPLICATE KEY UPDATE
+eventPublisher.publish("user.user.created.v1", userEvent);
+```
 
-### Performance Targets
+### Cache (Redis)
 
-- P50 < 50ms, P95 < 200ms, P99 < 500ms
-- Login throughput: > 500 req/s
-- Token validation: > 5000 req/s
-- Error rate: < 0.1%
+**Key Naming:**
+```
+{service}:{type}:{id}
+
+Examples:
+- auth:info:123
+- auth:session:abc
+- auth:lock:123
+```
+
+**TTL Strategy:**
+| Type | TTL |
+|------|-----|
+| Info | 30 minutes |
+| Session | 7 days |
+| Lock | 10 seconds |
+
+**Usage:**
+```java
+@Autowired
+private RedisTemplate<String, Object> redisTemplate;
+
+// Set
+redisTemplate.opsForValue().set(key, value, 30, TimeUnit.MINUTES);
+
+// Get
+Object value = redisTemplate.opsForValue().get(key);
+
+// Delete
+redisTemplate.delete(key);
+```
+
+**Cache Patterns:**
+- **Cache-Aside**: Check cache first, then DB, then update cache
+- **Write-Through**: Write to cache and DB together
+- **Write-Behind**: Write to cache, async to DB
+
+### Health Check
+
+```bash
+curl http://localhost:40007/actuator/health
+```
+
+---
+
+## Key Dependencies
+
+| Module | Purpose |
+|--------|---------|
+| nexora-spring-boot-starter-web | Unified REST response |
+| nexora-spring-boot-starter-data-jpa | JPA with auditing |
+| spring-cloud-starter-alibaba-nacos | Service discovery & config |

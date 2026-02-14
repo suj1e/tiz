@@ -1,14 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# Nexora Authsrv - 极客启动脚本 v2.0
-# ==============================================================================
-# 特性:
-# - 使用 java -jar 启动（比 gradle bootRun 快 10 倍）
-# - PID 文件管理
-# - 健康检查
-# - 优雅关闭
-# - 多环境支持
-# - JMX 监控支持
+# Nexora authsrv - 启动脚本 v2.0
 # ==============================================================================
 
 set -euo pipefail
@@ -21,7 +13,7 @@ JAR_FILE="authsrv-boot/build/libs/authsrv-boot-${VERSION}.jar"
 PID_FILE=".authsrv.pid"
 LOG_FILE="logs/authsrv.log"
 GC_LOG_FILE="logs/gc.log"
-HEALTH_URL="http://localhost:40007/auth/actuator/health/readiness"
+HEALTH_URL="http://localhost:40007//auth/actuator/health/readiness"
 MANAGEMENT_PORT=40007
 
 # Java 21 优化参数
@@ -70,7 +62,6 @@ log_section() { printf "\n${BOLD}${BLUE}%s${NC}\n" "$1"; }
 # ------------------------------------
 cd "$(dirname "$0")"
 
-# 检测 Java 版本
 check_java() {
 	local java_version=$(java -version 2>&1 | head -1 | cut -d'"' -f2 | cut -d'.' -f1)
 	if [[ "$java_version" -lt 21 ]]; then
@@ -80,7 +71,6 @@ check_java() {
 	log_debug "Java 版本: $java_version ✓"
 }
 
-# 检查端口占用
 check_port() {
 	local port=$1
 	if lsof -i ":$port" >/dev/null 2>&1; then
@@ -89,7 +79,6 @@ check_port() {
 	fi
 }
 
-# 等待健康检查
 wait_for_health() {
 	local max_wait=${1:-60}
 	local count=0
@@ -117,7 +106,6 @@ load_env() {
 	local env=$1
 	local env_file=".env.${env}"
 
-	# 加载环境特定文件
 	if [[ -f "$env_file" ]]; then
 		set -a
 		source "$env_file"
@@ -125,7 +113,6 @@ load_env() {
 		log_debug "已加载: $env_file"
 	fi
 
-	# 加载本地覆盖（仅开发）
 	if [[ "$env" == "dev" && -f .env.local ]]; then
 		set -a
 		source .env.local
@@ -133,7 +120,6 @@ load_env() {
 		log_debug "已加载: .env.local"
 	fi
 
-	# 设置环境特定配置
 	case $env in
 		dev)
 		export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
@@ -150,11 +136,8 @@ load_env() {
 	esac
 }
 
-# 环境验证
 validate_env() {
 	local errors=0
-
-	# 检查必需变量
 	local required_vars=("NACOS_HOST")
 	for var in "${required_vars[@]}"; do
 		if [[ -z "${!var:-}" ]]; then
@@ -162,14 +145,12 @@ validate_env() {
 			((errors++))
 		fi
 	done
-
 	return $errors
 }
 
 # ------------------------------------
 # 核心命令
 # ------------------------------------
-# 构建（如果需要）
 build_if_needed() {
 	if [[ ! -f "$JAR_FILE" ]]; then
 		log_warn "JAR 文件不存在，开始构建..."
@@ -178,14 +159,12 @@ build_if_needed() {
 	fi
 }
 
-# 前台启动
 start() {
 	local env=$1
 	load_env "$env"
 	check_java
 	validate_env || exit 1
 
-	# 检查端口
 	if ! check_port 40006 || ! check_port 40007; then
 		log_error "请先停止已运行的实例"
 		exit 1
@@ -197,7 +176,6 @@ start() {
 	log_info "JAR: $JAR_FILE"
 	log_info "日志: $LOG_FILE"
 
-	# 启动 - 重新加载环境文件以确保变量可用
 	(
 		set -a
 		[[ -f ".env.${env}" ]] && source ".env.${env}"
@@ -208,14 +186,12 @@ start() {
 	)
 }
 
-# 后台启动
 bg() {
 	local env=${2:-dev}
 	load_env "$env"
 	check_java
 	validate_env || exit 1
 
-	# 检查 PID 文件
 	if [[ -f "$PID_FILE" ]]; then
 		local old_pid=$(cat "$PID_FILE")
 		if ps -p "$old_pid" >/dev/null 2>&1; then
@@ -237,7 +213,6 @@ bg() {
 
 	log_section "▶ 后台启动 authsrv [$env]"
 
-	# 启动服务 - 使用子shell加载环境变量
 	nohup bash -c '
 		set -a
 		[[ -f ".env.'$env'" ]] && source ".env.'$env'"
@@ -252,7 +227,6 @@ bg() {
 	log_info "PID: $pid"
 	log_info "日志: tail -f $LOG_FILE"
 
-	# 等待启动
 	if wait_for_health 60; then
 		log_info "✓ 启动成功"
 		tail -n 20 "$LOG_FILE"
@@ -262,11 +236,9 @@ bg() {
 	fi
 }
 
-# 停止
 stop() {
 	if [[ ! -f "$PID_FILE" ]]; then
 		log_warn "未运行（无 PID 文件）"
-		# 尝试通过进程名查找
 		local pid=$(pgrep -f "authsrv-boot.*jar" || true)
 		if [[ -n "$pid" ]]; then
 			log_info "发现运行中的进程 (PID: $pid)"
@@ -279,10 +251,8 @@ stop() {
 
 	log_info "停止服务 (PID: $pid)..."
 
-	# 优雅关闭（SIGTERM）
 	kill "$pid" 2>/dev/null || true
 
-	# 等待进程退出（最多 30 秒）
 	local timeout=30
 	while [[ $timeout -gt 0 ]] && ps -p "$pid" >/dev/null 2>&1; do
 		sleep 1
@@ -291,7 +261,6 @@ stop() {
 	done
 	echo
 
-	# 如果还在运行，强制关闭
 	if ps -p "$pid" >/dev/null 2>&1; then
 		log_warn "未响应，强制关闭..."
 		kill -9 "$pid" 2>/dev/null || true
@@ -302,14 +271,12 @@ stop() {
 	log_info "✓ 已停止"
 }
 
-# 重启
 restart() {
 	stop
 	sleep 2
 	bg "${@:-dev}"
 }
 
-# 状态
 status() {
 	local running=false
 	local pid=""
@@ -323,21 +290,13 @@ status() {
 
 	if [[ "$running" == "true" ]]; then
 		log_info "✓ 运行中 (PID: $pid)"
-
-		# 内存使用
 		local mem=$(ps -o rss= -p "$pid" | awk '{printf "%.0f MB", $1/1024}')
 		log_info "内存: $mem"
-
-		# 端口监听
 		local ports=$(lsof -Pan -p "$pid" -i 2>/dev/null | grep LISTEN | awk '{print $9}' | sort -u | tr '\n' ' ')
 		log_info "监听: ${ports:-无}"
-
-		# 健康检查
 		if command -v curl >/dev/null 2>&1; then
 			local health_status=$(curl -s "$HEALTH_URL" 2>/dev/null | jq -r '.status // "unknown"' 2>/dev/null)
-			local uptime=$(curl -s "$HEALTH_URL" 2>/dev/null | jq -r '.duration // "unknown"' 2>/dev/null)
 			log_info "健康: ${health_status:-未检查}"
-			[[ -n "${uptime:-}" ]] && log_info "运行时间: ${uptime}"
 		fi
 	else
 		log_info "✗ 未运行"
@@ -345,7 +304,6 @@ status() {
 	fi
 }
 
-# 日志
 logs() {
 	local follow=${1:-false}
 	if [[ ! -f "$LOG_FILE" ]]; then
@@ -360,27 +318,22 @@ logs() {
 	fi
 }
 
-# 构建
 build() {
 	log_section "🔨 构建 authsrv"
 	./gradlew :authsrv-boot:cleanBootJar --no-daemon "$@"
 	log_info "✓ 构建完成: $JAR_FILE"
 }
 
-# 清理
 clean() {
 	log_info "清理构建产物..."
 	rm -rf build logs
 	log_info "✓ 已清理"
 }
 
-# ------------------------------------
-# 帮助
-# ------------------------------------
 show_help() {
 	cat <<'EOF'
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    Nexora Authsrv - 启动脚本 v2.0
+                    Nexora authsrv - 启动脚本 v2.0
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 用法:
@@ -399,37 +352,18 @@ show_help() {
   clean               清理构建产物
   help                显示帮助
 
-环境配置:
-  创建 .env.{dev|test|prod} 文件配置环境变量
-  开发环境可使用 .env.local 覆盖（不提交到 Git）
-
 必需环境变量:
   NACOS_HOST                 Nacos 服务器地址
-
-可选环境变量:
-  JWT_SECRET                 JWT 密钥（Nacos 配置中使用 ${JWT_SECRET} 占位符）
-  NACOS_PORT          Nacos 端口（默认: 8848）
-  NACOS_NAMESPACE     命名空间
-  NACOS_USERNAME      Nacos 用户名
-  NACOS_PASSWORD      Nacos 密码
-  LAZY_INIT           懒加载（dev 默认: true）
 
 示例:
   ./run.sh dev                    # 开发环境启动
   ./run.sh bg prod                # 生产环境后台启动
   ./run.sh status                 # 查看状态
   ./run.sh logs -f                # 跟踪日志
-  ./run.sh restart test           # 重启测试环境
-  LAZY_INIT=true ./run.sh bg dev  # 懒加载模式启动
-
-更多: https://github.com/nexora/authsrv
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
 }
 
-# ------------------------------------
-# 主入口
-# ------------------------------------
 main() {
 	local command=${1:-help}
 
