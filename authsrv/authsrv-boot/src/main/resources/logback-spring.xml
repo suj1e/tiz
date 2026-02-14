@@ -31,7 +31,7 @@
         </root>
 
         <!-- 开发环境详细日志 -->
-        <logger name="com.nexora" level="DEBUG"/>
+        <logger name="io.github.suj1e" level="DEBUG"/>
         <logger name="org.hibernate.SQL" level="DEBUG"/>
         <logger name="org.springframework.security" level="DEBUG"/>
     </springProfile>
@@ -48,7 +48,7 @@
         </root>
 
         <!-- 生产环境只记录重要日志 -->
-        <logger name="com.nexora" level="INFO"/>
+        <logger name="io.github.suj1e" level="INFO"/>
         <logger name="org.hibernate.SQL" level="WARN"/>
         <logger name="org.springframework.security" level="INFO"/>
     </springProfile>
