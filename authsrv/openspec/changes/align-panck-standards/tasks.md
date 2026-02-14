@@ -21,7 +21,5 @@
 
 ## 4. Verification
 
-- [ ] 4.1 Run `./gradlew clean build` to verify build succeeds
-  - **Blocked**: Requires `io.github.suj1e:nexora-*` dependencies to be published
-- [ ] 4.2 Run `./gradlew test` to verify tests pass
-  - **Blocked**: Requires build to succeed first
+- [x] 4.1 Run `./gradlew clean build` to verify build succeeds
+- [x] 4.2 Run `./gradlew test` to verify tests pass (no tests in project)
