@@ -29,6 +29,19 @@ spring:
         namespace: ${NACOS_NAMESPACE:public}
         ephemeral: true
 
+# Nexora Security & Redis
+nexora:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:default-secret-key-change-in-production}
+      access-token-validity: 900
+      refresh-token-validity: 604800
+  redis:
+    enabled: true
+    mode: single
+    single-server:
+      address: redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}
+
 # Management
 management:
   endpoints:
