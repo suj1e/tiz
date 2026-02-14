@@ -1,24 +1,19 @@
 [versions]
-# Java & Spring
-java = "21"
+# Spring
 spring-boot = "4.0.2"
 springCloud = "2025.1.1"
 springCloudAlibaba = "2025.1.0.0"
-spring-dependency-management = "1.1.7"
 
-# Nexora Starters
-flooc-nexora-starter = "1.0.0"
+# Nexora
+nexora = "1.0.0"
 
 # Database
 flyway = "11.3.4"
 mysql = "9.1.0"
+jakarta-persistence = "3.2.0"
 
 # Security
 jasypt = "3.0.5"
-
-# Caching (managed by nexora-spring-boot-starter-redis)
-
-# Resilience (managed by nexora-spring-boot-starter-resilience)
 
 # Observability
 opentelemetry = "1.58.0"
@@ -29,52 +24,47 @@ springdoc = "2.8.2"
 
 # Code Quality
 lombok = "1.18.34"
-lombokMapstructBinding = "0.2.0"
+lombok-mapstruct-binding = "0.2.0"
 mapstruct = "1.6.0"
 querydsl = "5.1.0"
 
 # Testing
-kafka = "3.8.0"
-quartz = "2.5.0"
-
-# Build
-jib = "3.5.2"
+testcontainers = "1.20.0"
 
 [libraries]
 # Nexora Spring Boot Starters
-nexora-spring-boot-starter-web = { module = "com.nexora:nexora-spring-boot-starter-web", version.ref = "flooc-nexora-starter" }
-nexora-spring-boot-starter-redis = { module = "com.nexora:nexora-spring-boot-starter-redis", version.ref = "flooc-nexora-starter" }
-nexora-spring-boot-starter-kafka = { module = "com.nexora:nexora-spring-boot-starter-kafka", version.ref = "flooc-nexora-starter" }
-nexora-spring-boot-starter-resilience = { module = "com.nexora:nexora-spring-boot-starter-resilience", version.ref = "flooc-nexora-starter" }
-nexora-spring-boot-starter-security = { module = "com.nexora:nexora-spring-boot-starter-security", version.ref = "flooc-nexora-starter" }
-nexora-spring-boot-starter-file-storage = { module = "com.nexora:nexora-spring-boot-starter-file-storage", version.ref = "flooc-nexora-starter" }
-nexora-spring-boot-starter-data-jpa = { module = "com.nexora:nexora-spring-boot-starter-data-jpa", version.ref = "flooc-nexora-starter" }
-nexora-spring-boot-starter-audit = { module = "com.nexora:nexora-spring-boot-starter-audit", version.ref = "flooc-nexora-starter" }
-# nexora-spring-boot-starter-id = { module = "com.nexora:nexora-spring-boot-starter-id", version.ref = "flooc-nexora-starter" }
+nexora-spring-boot-starter-web = { module = "io.github.suj1e:nexora-spring-boot-starter-web", version.ref = "nexora" }
+nexora-spring-boot-starter-redis = { module = "io.github.suj1e:nexora-spring-boot-starter-redis", version.ref = "nexora" }
+nexora-spring-boot-starter-kafka = { module = "io.github.suj1e:nexora-spring-boot-starter-kafka", version.ref = "nexora" }
+nexora-spring-boot-starter-resilience = { module = "io.github.suj1e:nexora-spring-boot-starter-resilience", version.ref = "nexora" }
+nexora-spring-boot-starter-security = { module = "io.github.suj1e:nexora-spring-boot-starter-security", version.ref = "nexora" }
+nexora-spring-boot-starter-file-storage = { module = "io.github.suj1e:nexora-spring-boot-starter-file-storage", version.ref = "nexora" }
+nexora-spring-boot-starter-data-jpa = { module = "io.github.suj1e:nexora-spring-boot-starter-data-jpa", version.ref = "nexora" }
+nexora-spring-boot-starter-audit = { module = "io.github.suj1e:nexora-spring-boot-starter-audit", version.ref = "nexora" }
 
 # Nexora Common
-nexora-common = { module = "com.nexora:nexora-common", version.ref = "flooc-nexora-starter" }
+nexora-common = { module = "io.github.suj1e:nexora-common", version.ref = "nexora" }
 
 # Spring Boot Starters
-spring-boot-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 spring-boot-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-oauth2-resource-server = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server" }
 spring-boot-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-oauth2-client" }
 spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-boot-aop = { module = "org.springframework.boot:spring-boot-starter-aop" }
+spring-boot-quartz = { module = "org.springframework.boot:spring-boot-starter-quartz" }
+spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 
 # Database
-spring-boot-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
 flyway = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
 flyway-mysql = { module = "org.flywaydb:flyway-mysql", version.ref = "flyway" }
 mysql = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
+jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakarta-persistence" }
 
 # Security
 spring-security-crypto = { module = "org.springframework.security:spring-security-crypto" }
+spring-security-test = { module = "org.springframework.security:spring-security-test" }
 jasypt = { module = "com.github.ulisesbocchio:jasypt-spring-boot-starter", version.ref = "jasypt" }
-
-# Resilience (managed by nexora-spring-boot-starter-resilience)
 
 # Observability
 micrometer-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
@@ -85,14 +75,9 @@ logstash-logback = { module = "net.logstash.logback:logstash-logback-encoder", v
 # Documentation
 springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 
-# Lombok
+# Lombok & MapStruct
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
-lombok-mapstruct-binding = { module = "org.projectlombok:lombok-mapstruct-binding", version.ref = "lombokMapstructBinding" }
-
-# Jakarta Persistence
-jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version = "3.2.0" }
-
-# MapStruct
+lombok-mapstruct-binding = { module = "org.projectlombok:lombok-mapstruct-binding", version.ref = "lombok-mapstruct-binding" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 
@@ -103,38 +88,22 @@ querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" 
 # HTTP Client (for @HttpExchange)
 spring-web = { module = "org.springframework:spring-web" }
 
-# Nacos (managed by Spring Cloud Alibaba BOM)
+# Nacos
 spring-cloud-alibaba-nacos-config = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config" }
 spring-cloud-alibaba-nacos-discovery = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery" }
-# Spring Cloud (managed by Spring Cloud BOM)
 spring-cloud-bootstrap = { module = "org.springframework.cloud:spring-cloud-starter-bootstrap" }
 spring-cloud-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer" }
 
-# Event & Messaging
-spring-kafka = { module = "org.springframework.kafka:spring-kafka" }
-
-# Scheduling
-spring-boot-quartz = { module = "org.springframework.boot:spring-boot-starter-quartz" }
-
-# Testing
-spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
-spring-security-test = { module = "org.springframework.security:spring-security-test" }
+# Testcontainers
+testcontainers-kafka = { module = "org.testcontainers:kafka", version.ref = "testcontainers" }
+testcontainers-mysql = { module = "org.testcontainers:mysql", version.ref = "testcontainers" }
+testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 
 [bundles]
-# 安全相关
 security-core = ["spring-boot-security", "spring-security-crypto"]
-# jjwt-runtime bundle removed - managed by nexora-spring-boot-starter-security
-
-# 可观测性
 observability = ["spring-boot-actuator", "micrometer-prometheus", "micrometer-tracing-otel", "opentelemetry-exporter", "logstash-logback"]
-
-# OAuth2
 oauth2 = ["spring-boot-oauth2-resource-server", "spring-boot-oauth2-client"]
-
-# 测试
 testing = ["spring-boot-test", "spring-security-test"]
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
-spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
-jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
