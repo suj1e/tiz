@@ -111,6 +111,22 @@ spring:
               filters:
                 - StripPrefix=2
 
+            # Tiz 核心服务
+            - id: tizsrv
+              uri: lb://tizsrv
+              predicates:
+                - Path=/api/v1/notifications/**,/api/v1/contents/**,/api/v1/categories/**
+              filters:
+                - StripPrefix=2
+
+            # Tiz AI 聊天服务
+            - id: tizbot
+              uri: http://localhost:40009
+              predicates:
+                - Path=/api/v1/chats/**,/api/v1/ai/**
+              filters:
+                - StripPrefix=2
+
   # Redis 配置（用于限流）
   data:
     redis:
