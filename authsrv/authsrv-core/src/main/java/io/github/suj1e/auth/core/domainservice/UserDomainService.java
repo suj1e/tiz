@@ -1,5 +1,7 @@
 package io.github.suj1e.auth.core.domainservice;
 
+import io.github.suj1e.auth.core.domain.User;
+
 /**
  * User domain service interface.
  *
@@ -10,7 +12,7 @@ public interface UserDomainService {
     /**
      * Get user by username.
      */
-    Object getUserByUsername(String username);
+    User getUserByUsername(String username);
 
     /**
      * Update user profile.

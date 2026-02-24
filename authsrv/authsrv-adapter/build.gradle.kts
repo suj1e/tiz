@@ -13,6 +13,11 @@ dependencies {
     implementation(libs.nexora.spring.boot.starter.redis)
     implementation(libs.nexora.spring.boot.starter.resilience)
 
+    // JJWT for JWT token handling
+    implementation(libs.jjwt.api)
+    runtimeOnly(libs.jjwt.impl)
+    runtimeOnly(libs.jjwt.jackson)
+
     // SpringDoc OpenAPI
     implementation(libs.springdoc.openapi)
 

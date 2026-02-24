@@ -28,6 +28,9 @@ querydsl = "5.1.0"
 # Testing
 testcontainers = "1.20.0"
 
+# Security
+jjwt = "0.13.0"
+
 [libraries]
 # Nexora Spring Boot Starters
 nexora-spring-boot-starter-web = { module = "io.github.suj1e:nexora-spring-boot-starter-web", version.ref = "nexora" }
@@ -84,6 +87,11 @@ querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" 
 testcontainers-kafka = { module = "org.testcontainers:kafka", version.ref = "testcontainers" }
 testcontainers-mysql = { module = "org.testcontainers:mysql", version.ref = "testcontainers" }
 testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+
+# JJWT
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 
 [bundles]
 observability = ["spring-boot-actuator", "micrometer-prometheus", "micrometer-tracing-otel", "opentelemetry-exporter", "logstash-logback"]

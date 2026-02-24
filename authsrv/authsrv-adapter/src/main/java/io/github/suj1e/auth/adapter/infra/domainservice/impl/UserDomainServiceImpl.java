@@ -20,7 +20,7 @@ public class UserDomainServiceImpl implements UserDomainService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Object getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }

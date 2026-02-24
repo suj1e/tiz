@@ -1,5 +1,7 @@
 package io.github.suj1e.auth.core.domainservice;
 
+import io.github.suj1e.auth.core.domain.TokenInfo;
+
 /**
  * Authentication domain service interface.
  *
@@ -13,9 +15,9 @@ public interface AuthDomainService {
     void register(String username, String email, String password);
 
     /**
-     * Authenticate user and return access token.
+     * Authenticate user and return token response.
      */
-    String login(String username, String password);
+    TokenInfo login(String username, String password);
 
     /**
      * Logout user.
