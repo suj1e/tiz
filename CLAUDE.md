@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │                                                                      │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
 │  │   tiz-mobile │    │  nexora-web  │    │   Clients    │       │
-│  │   (Flutter)  │    │   (React)    │    │  (Third-party)│       │
+│  │   (Swift)    │    │   (React)    │    │  (Third-party)│       │
 │  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘       │
 │         │                    │                     │                   │
 │         └────────────────────┼─────────────────────┘                   │
@@ -59,7 +59,7 @@ tiz/
 ├── gatewaysrv/       # API Gateway (Spring Cloud Gateway + WebFlux)
 ├── usersrv/          # User service (Spring Boot)
 ├── infra/            # Infrastructure deployment (Docker Compose + K8s)
-├── tiz-mobile/       # Mobile app (Flutter 3.0+)
+├── tiz-mobile/       # Mobile app (Swift 5.9+)
 ├── nexora-web/       # Admin web frontend (React 18 + Vite)
 ├── nexora/          # Shared Spring Boot Starters framework
 ├── optr/            # OPTR plugin for Claude Code
@@ -98,8 +98,8 @@ cd usersrv && ./gradlew bootRun
 
 ```bash
 cd tiz-mobile
-flutter pub get
-flutter run
+swift build
+swift run
 ```
 
 ### 4. Run Web Admin
@@ -147,28 +147,21 @@ All Java services use Gradle 8.11+ with Kotlin DSL and TOML version catalogs:
 
 **Important**: All dependency versions are managed in `gradle/libs.versions.toml`. Never hardcode versions in `build.gradle.kts`.
 
-### Mobile App (Flutter)
+### Mobile App (Swift)
 
 ```bash
-# Install dependencies
-flutter pub get
+# Build the project
+cd tiz-mobile
+swift build
 
-# Run on device/emulator
-flutter run
+# Run the app
+swift run
 
-# Build for iOS
-flutter build ios --release
-
-# Build for Android
-flutter build apk --release
-flutter build appbundle --release
+# Build for macOS
+swift build -c release
 
 # Run tests
-flutter test
-
-# View prototype
-python3 -m http.server 42000 --directory /opt/dev/apps/tiz-mobile
-# Access at http://localhost:42000/prototype.html
+swift test
 ```
 
 ### Web Admin (React/Vite)
@@ -348,11 +341,11 @@ Shared Spring Boot Starters providing zero-configuration auto-configuration:
 | `nexora-spring-boot-starter-data-jpa` | JPA auditing, soft delete |
 | `nexora-spring-boot-starter-audit` | Entity audit logging |
 
-### Mobile (Flutter)
-- **Flutter** 3.0+
-- **Dart** 3.0+
-- **Provider** - State management
-- **Dio** - HTTP client
+### Mobile (Swift)
+- **Swift** 5.9+
+- **Swift Package Manager** - Package management
+- **SwiftUI** - UI framework
+- **Alamofire** - HTTP client
 
 ### Web (React)
 - **React** 18
@@ -476,7 +469,7 @@ Each major component has its own `CLAUDE.md` with detailed guidance:
 
 - `authsrv/CLAUDE.md` - Authentication service architecture
 - `gatewaysrv/CLAUDE.md` - Gateway routing and filters
-- `tiz-mobile/CLAUDE.md` - Flutter app architecture
+- `tiz-mobile/CLAUDE.md` - Swift app architecture
 - `nexora/CLAUDE.md` - Spring Boot Starters framework
 - `infra/CLAUDE.md` - Infrastructure deployment
 
