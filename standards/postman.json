@@ -1,0 +1,702 @@
+{
+  "info": {
+    "name": "tiz API",
+    "description": "tiz AI 知识练习平台 API\n\n- 外部 API: /api/{service}/v1/* (通过网关)\n- 内部 API: /internal/* (服务间调用)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:40004/api"
+    },
+    {
+      "key": "llm_url",
+      "value": "http://localhost:40020"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "session_id",
+      "value": ""
+    },
+    {
+      "key": "knowledge_set_id",
+      "value": ""
+    },
+    {
+      "key": "practice_id",
+      "value": ""
+    },
+    {
+      "key": "quiz_id",
+      "value": ""
+    },
+    {
+      "key": "result_id",
+      "value": ""
+    },
+    {
+      "key": "question_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/v1/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.token) {",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/v1/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/v1/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/v1/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Stream Chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// SSE 响应需要手动提取 session_id"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": null,\n  \"message\": \"我想学习 React Hooks\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/v1/stream",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "stream"]
+            }
+          }
+        },
+        {
+          "name": "Confirm Generate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.knowledge_set_id) {",
+                  "    pm.collectionVariables.set('knowledge_set_id', response.data.knowledge_set_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}\",\n  \"save\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/v1/confirm",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "confirm"]
+            }
+          }
+        },
+        {
+          "name": "Get Chat History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/chat/v1/history/:id",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "history", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{session_id}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "Generate Questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}\",\n  \"save\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/content/v1/generate",
+              "host": ["{{base_url}}"],
+              "path": ["content", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Get Generate Batch",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/content/v1/generate/:id/batch?page=2",
+              "host": ["{{base_url}}"],
+              "path": ["content", "generate", ":id", "batch"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{knowledge_set_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Library List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/content/v1/library?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["content", "library"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "tag",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Library Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/content/v1/library/:id",
+              "host": ["{{base_url}}"],
+              "path": ["content", "library", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{knowledge_set_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Library",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"React Hooks 进阶面试题\",\n  \"tags\": [\"React\", \"Hooks\", \"进阶\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/content/v1/library/:id",
+              "host": ["{{base_url}}"],
+              "path": ["content", "library", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{knowledge_set_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Library",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/content/v1/library/:id",
+              "host": ["{{base_url}}"],
+              "path": ["content", "library", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{knowledge_set_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/content/v1/categories",
+              "host": ["{{base_url}}"],
+              "path": ["content", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get Tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/content/v1/tags",
+              "host": ["{{base_url}}"],
+              "path": ["content", "tags"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Practice",
+      "item": [
+        {
+          "name": "Start Practice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.practice_id) {",
+                  "    pm.collectionVariables.set('practice_id', response.data.practice_id);",
+                  "}",
+                  "if (response.data && response.data.questions && response.data.questions[0]) {",
+                  "    pm.collectionVariables.set('question_id', response.data.questions[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"knowledge_set_id\": \"{{knowledge_set_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/practice/v1/start",
+              "host": ["{{base_url}}"],
+              "path": ["practice", "start"]
+            }
+          }
+        },
+        {
+          "name": "Submit Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question_id\": \"{{question_id}}\",\n  \"answer\": \"B\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/practice/v1/:id/answer",
+              "host": ["{{base_url}}"],
+              "path": ["practice", ":id", "answer"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{practice_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Practice",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/practice/v1/:id/complete",
+              "host": ["{{base_url}}"],
+              "path": ["practice", ":id", "complete"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{practice_id}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quiz",
+      "item": [
+        {
+          "name": "Start Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.quiz_id) {",
+                  "    pm.collectionVariables.set('quiz_id', response.data.quiz_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"knowledge_set_id\": \"{{knowledge_set_id}}\",\n  \"time_limit\": 15,\n  \"question_count\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quiz/v1/start",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "start"]
+            }
+          }
+        },
+        {
+          "name": "Submit Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.result_id) {",
+                  "    pm.collectionVariables.set('result_id', response.data.result_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    { \"question_id\": \"{{question_id}}\", \"answer\": \"B\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quiz/v1/:id/submit",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", ":id", "submit"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quiz_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Quiz Result",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/quiz/v1/result/:id",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "result", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{result_id}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get Settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/v1/settings",
+              "host": ["{{base_url}}"],
+              "path": ["user", "settings"]
+            }
+          }
+        },
+        {
+          "name": "Update Settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"theme\": \"dark\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/v1/settings",
+              "host": ["{{base_url}}"],
+              "path": ["user", "settings"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Internal - LLM Service (llmsrv)",
+      "description": "内部接口，仅供服务间调用",
+      "item": [
+        {
+          "name": "Chat (SSE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": null,\n  \"message\": \"我想学习 React Hooks\",\n  \"history\": []\n}"
+            },
+            "url": {
+              "raw": "{{llm_url}}/internal/ai/chat",
+              "host": ["{{llm_url}}"],
+              "path": ["internal", "ai", "chat"]
+            }
+          }
+        },
+        {
+          "name": "Generate Questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}\",\n  \"batch\": {\n    \"page\": 1,\n    \"page_size\": 10\n  }\n}"
+            },
+            "url": {
+              "raw": "{{llm_url}}/internal/ai/generate",
+              "host": ["{{llm_url}}"],
+              "path": ["internal", "ai", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Grade Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": {\n    \"id\": \"{{question_id}}\",\n    \"content\": \"请解释 useMemo 和 useCallback 的区别\",\n    \"answer\": \"useMemo 返回缓存的值，useCallback 返回缓存的函数...\",\n    \"rubric\": \"回答需要包含：1. 两者的作用 2. 使用场景 3. 性能影响\"\n  },\n  \"user_answer\": \"useMemo 缓存值，useCallback 缓存函数，都用 memoization 优化性能\"\n}"
+            },
+            "url": {
+              "raw": "{{llm_url}}/internal/ai/grade",
+              "host": ["{{llm_url}}"],
+              "path": ["internal", "ai", "grade"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
