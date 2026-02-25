@@ -1,5 +1,5 @@
 # =============================================================================
-# IDE
+# IDE & Editors
 # =============================================================================
 .idea/
 .vscode/
@@ -14,12 +14,6 @@
 .settings/
 
 # =============================================================================
-# Git Worktrees
-# =============================================================================
-.worktrees/
-worktrees/
-
-# =============================================================================
 # OS
 # =============================================================================
 .DS_Store
@@ -31,13 +25,24 @@ Thumbs.db
 ehthumbs.db
 
 # =============================================================================
-# Logs
+# Git Worktrees
+# =============================================================================
+.worktrees/
+worktrees/
+
+# =============================================================================
+# Logs & Temporary
 # =============================================================================
 *.log
 logs/
+*.tmp
+*.bak
+*.cache
+*.temp
+.~n*
 
 # =============================================================================
-# Build outputs
+# Build Outputs
 # =============================================================================
 build/
 dist/
@@ -46,107 +51,32 @@ out/
 bin/
 
 # =============================================================================
-# Environment files
+# Environment & Secrets
 # =============================================================================
 .env
-.env.local
-.env.*.local
-.env.dev
-.env.test
-.env.prod
+.env.*
+!.env.example
 application-local.yml
 application-local.properties
 
 # =============================================================================
-# Temporary files
+# Node.js / Frontend
 # =============================================================================
-*.tmp
-*.bak
-*.cache
-*.temp
-.~n*
+node_modules/
+.npm
+.pnpm-store/
+.yarn/
+coverage/
+.nyc_output/
 
 # =============================================================================
-# Gradle (Java/Kotlin projects)
+# Gradle / Java / Kotlin
 # =============================================================================
 .gradle/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-# Gradle wrapper JAR should be gitignored for security
 gradle/wrapper/gradle-wrapper.jar
-**/gradle/wrapper/gradle-wrapper.jar
 
 # =============================================================================
-# Flutter/Dart
-# =============================================================================
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-pubspec.lock
-.fvm/
-
-# =============================================================================
-# Android
-# =============================================================================
-**/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
-**/android/**/GeneratedPluginRegistrant.java
-**/android/key.properties
-*.jks
-*.keystore
-**/android/.idea
-**/android/*.iml
-**/android/app/*.iml
-**/android/app/build/
-
-# =============================================================================
-# iOS/Xcode
-# =============================================================================
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/profile
-**/ios/**/xcuserdata
-**/ios/.generated/
-**/ios/Flutter/.last_build_id
-**/ios/Flutter/App.framework
-**/ios/Flutter/Flutter.framework
-**/ios/Flutter/Flutter.podspec
-**/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/app.flx
-**/ios/Flutter/app.zip
-**/ios/Flutter/flutter_assets/
-**/ios/Flutter/flutter_export_environment.sh
-**/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
-
-# iOS fastlane
-**/ios/fastlane/report.xml
-**/ios/fastlane/Preview.html
-**/ios/fastlane/screenshots
-**/ios/fastlane/test_output
-
-# =============================================================================
-# Package files (except Gradle wrapper which is now gitignored)
+# Package Files
 # =============================================================================
 *.jar
 *.war
@@ -157,17 +87,8 @@ pubspec.lock
 *.rar
 
 # =============================================================================
-# Test coverage
+# Test & Coverage
 # =============================================================================
 *.exec
 junit-platform.properties
-qa/reports/*.html
-qa/reports/*.json
-
-# =============================================================================
-# Firebase
-# =============================================================================
-google-services.json
-GoogleService-Info.plist
-firebase_options.dart
 
