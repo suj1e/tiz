@@ -1,0 +1,128 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Tiz is an AI-driven knowledge practice platform. Users interact with AI through conversational chat to generate personalized practice questions and quizzes.
+
+## Monorepo Structure
+
+```
+tiz/
+├── tiz-web/           # Frontend (React + TypeScript + Vite)
+├── gatewaysrv/        # API Gateway (Java/Spring Cloud Gateway)
+├── infra/             # Docker Compose infrastructure
+├── standards/         # Development standards (api.md, frontend.md, backend.md)
+└── openspec/          # OpenSpec change management
+```
+
+## Frontend (tiz-web)
+
+### Commands
+
+```bash
+cd tiz-web
+
+# Install dependencies
+pnpm install
+
+# Development with mock data (no backend needed)
+VITE_MOCK=true pnpm dev
+
+# Development connecting to backend
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Lint and fix
+pnpm lint
+
+# Run tests
+pnpm test              # Watch mode
+pnpm test:run          # Single run
+pnpm test:coverage     # With coverage
+```
+
+### Tech Stack
+
+- **React 19** + **TypeScript 5.x** (strict mode)
+- **Vite 7.x** with `@tailwindcss/vite` plugin
+- **Tailwind CSS 4.x** + **shadcn/ui**
+- **Zustand 5.x** for state management
+- **React Router 7.x** with lazy loading
+- **MSW 2.x** for API mocking
+- **Vitest 4.x** + **Testing Library** for testing
+
+### Architecture
+
+**Directory Layout:**
+- `src/app/` - Page components organized by route groups: `(auth)/`, `(main)/`, `chat/`, `landing/`
+- `src/components/` - UI components: `ui/` (shadcn), `layout/`, `chat/`, `question/`, `library/`, `quiz/`, `common/`
+- `src/stores/` - Zustand stores: `authStore`, `chatStore`, `libraryStore`, `practiceStore`, `quizStore`, `uiStore`
+- `src/services/` - API layer with fetch wrapper; chat.ts handles SSE streaming
+- `src/hooks/` - Custom hooks: `useAuth`, `useChat`, `useMediaQuery`, etc.
+- `src/mocks/` - MSW handlers and mock data
+- `src/types/` - TypeScript type definitions
+
+**Path Alias:** `@/` maps to `src/` (configured in vite.config.ts and tsconfig)
+
+**Route Protection:** `ProtectedRoute` component wraps authenticated routes; checks `authStore.isAuthenticated`
+
+### Key Patterns
+
+**API Service Layer:**
+- `src/services/api.ts` provides `api.get()`, `api.post()`, `api.patch()`, `api.delete()`
+- Handles auth token injection and 401 redirect
+- SSE streaming for chat via `src/services/chat.ts`
+
+**State Management:**
+```typescript
+// Zustand store pattern
+interface AuthState {
+  user: User | null
+  isAuthenticated: boolean
+  login: (email: string, password: string) => Promise<void>
+  logout: () => void
+}
+export const useAuthStore = create<AuthState>((set) => ({ ... }))
+```
+
+**Mock Service (MSW):**
+- Enabled via `VITE_MOCK=true` environment variable
+- Handlers in `src/mocks/handlers/`
+- Mock data in `src/mocks/data/`
+- Browser setup in `src/mocks/browser.ts`
+
+**Styling:**
+- Use `cn()` utility from `@/lib/utils` for conditional class merging
+- Tailwind classes with mobile-first responsive design
+- shadcn/ui components in `src/components/ui/`
+
+### Naming Conventions
+
+| Type | Convention | Example |
+|------|------------|---------|
+| Components | PascalCase | `ChatMessage.tsx` |
+| Hooks | camelCase with `use` prefix | `useChat.ts` |
+| Stores | camelCase with `Store` suffix | `authStore.ts` |
+| Directories | kebab-case | `question-card/` |
+
+## Backend (gatewaysrv)
+
+API Gateway routes:
+```
+/api/auth/v1/**     → auth-service
+/api/chat/v1/**     → chat-service
+/api/content/v1/**  → content-service
+/api/practice/v1/** → practice-service
+/api/quiz/v1/**     → quiz-service
+/api/user/v1/**     → user-service
+```
+
+## Development Workflow
+
+1. Frontend development typically uses mock mode (`VITE_MOCK=true`)
+2. For full-stack development, start infra via `docker-compose -f infra/docker-compose-lite.yml up -d`
+3. API specs and contracts are in `standards/api.md`
