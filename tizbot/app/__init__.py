@@ -1,1 +1,0 @@
-"""Tizbot application package."""
