@@ -1,11 +1,11 @@
 #!/bin/bash
-# Docker 镜像预下载脚本
-# 从 docker-compose.yml 动态读取镜像列表
+# Docker 镜像预下载脚本 (Lite 版本)
+# 从 docker-compose-lite.yml 动态读取镜像列表
 
 set -e
 
 echo "=========================================="
-echo "   Nexora 镜像预下载"
+echo "   Nexora 镜像预下载 (Lite)"
 echo "=========================================="
 echo ""
 
@@ -20,22 +20,21 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 cd "$PROJECT_DIR"
 
-# 检查 docker-compose.yml 是否存在
-if [ ! -f "docker-compose.yml" ]; then
-    echo -e "${RED}Error: docker-compose.yml not found in $PROJECT_DIR${NC}"
+# 检查 docker-compose-lite.yml 是否存在
+if [ ! -f "docker-compose-lite.yml" ]; then
+    echo -e "${RED}Error: docker-compose-lite.yml not found in $PROJECT_DIR${NC}"
     exit 1
 fi
 
-# 从 docker-compose.yml 提取镜像列表
-echo -e "${YELLOW}从 docker-compose.yml 读取镜像列表...${NC}"
+# 从 docker-compose-lite.yml 提取镜像列表
+echo -e "${YELLOW}从 docker-compose-lite.yml 读取镜像列表...${NC}"
 echo ""
 
-# 使用 docker compose config 或者直接解析 yml 提取镜像
 # 使用 grep + sed 提取所有 image: 行的值
-IMAGES=$(grep -E "^\s+image:\s" docker-compose.yml | sed 's/.*image:\s*//' | sed 's/\s*$//' | sort -u)
+IMAGES=$(grep -E "^\s+image:\s" docker-compose-lite.yml | sed 's/.*image:\s*//' | sed 's/\s*$//' | sort -u)
 
 if [ -z "$IMAGES" ]; then
-    echo -e "${RED}Error: 未能从 docker-compose.yml 提取到镜像列表${NC}"
+    echo -e "${RED}Error: 未能从 docker-compose-lite.yml 提取到镜像列表${NC}"
     exit 1
 fi
 
@@ -77,5 +76,5 @@ if [ $FAILED_COUNT -gt 0 ]; then
 fi
 echo ""
 echo "下一步："
-echo "  ./scripts/docker/start.sh"
+echo "  ./scripts/docker/start-lite.sh"
 echo ""
