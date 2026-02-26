@@ -84,31 +84,31 @@ export default function HomePage() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-auto">
-        <div className="mx-auto max-w-3xl py-8">
+        <div className="mx-auto max-w-3xl p-4 sm:py-8">
           {messages.length === 0 ? (
-            <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-              <h2 className="mb-2 text-2xl font-semibold">开始学习之旅</h2>
-              <p className="mb-8 text-muted-foreground">
+            <div className="flex min-h-[50vh] flex-col items-center justify-center text-center sm:min-h-[60vh]">
+              <h2 className="mb-2 text-xl font-semibold sm:text-2xl">开始学习之旅</h2>
+              <p className="mb-6 text-sm text-muted-foreground sm:mb-8 sm:text-base">
                 告诉我你想学习什么，我会帮你生成专属练习题
               </p>
-              <div className="grid gap-3">
+              <div className="grid w-full max-w-sm gap-2 sm:gap-3">
                 <Button
                   variant="outline"
-                  className="justify-start"
+                  className="justify-start text-sm"
                   onClick={() => setInput('我想学习 JavaScript 基础知识')}
                 >
                   JavaScript 基础
                 </Button>
                 <Button
                   variant="outline"
-                  className="justify-start"
+                  className="justify-start text-sm"
                   onClick={() => setInput('帮我生成 React 相关的练习题')}
                 >
                   React 框架
                 </Button>
                 <Button
                   variant="outline"
-                  className="justify-start"
+                  className="justify-start text-sm"
                   onClick={() => setInput('我想练习 TypeScript 类型系统')}
                 >
                   TypeScript
@@ -116,7 +116,7 @@ export default function HomePage() {
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {messages.map((message, index) => (
                 <ChatMessage
                   key={message.id}
@@ -135,13 +135,13 @@ export default function HomePage() {
       </div>
 
       <div className="border-t">
-        <div className="mx-auto max-w-3xl py-4">
+        <div className="mx-auto max-w-3xl p-3 sm:p-4">
           <div className="flex gap-2">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="输入你想学习的内容..."
-              className="min-h-[60px] resize-none"
+              className="min-h-14 resize-none text-sm sm:min-h-16 sm:text-base"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault()
@@ -149,7 +149,12 @@ export default function HomePage() {
                 }
               }}
             />
-            <Button onClick={handleSend} disabled={!input.trim() || status === 'streaming'}>
+            <Button
+              onClick={handleSend}
+              disabled={!input.trim() || status === 'streaming'}
+              className="shrink-0"
+              size="icon"
+            >
               <Send className="h-4 w-4" />
             </Button>
           </div>

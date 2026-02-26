@@ -17,13 +17,15 @@ export class ApiError extends Error {
 
 interface RequestOptions extends RequestInit {
   token?: string
+  /** Return raw response without extracting .data */
+  raw?: boolean
 }
 
 async function request<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { token, ...fetchOptions } = options
+  const { token, raw, ...fetchOptions } = options
 
   const headers = new Headers(options.headers)
 
@@ -51,7 +53,8 @@ async function request<T>(
     throw new ApiError(error)
   }
 
-  return (data as ApiResponse<T>).data
+  // Return raw response if requested, otherwise extract .data
+  return raw ? data : (data as ApiResponse<T>).data
 }
 
 export const api = {

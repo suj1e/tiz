@@ -1,7 +1,9 @@
+import React from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { AuthLayout } from '@/components/layout/AuthLayout'
 import { ProtectedRoute } from '@/components/common/ProtectedRoute'
+import { RootErrorBoundary } from '@/components/common/RootErrorBoundary'
 
 // Pages - lazy loaded
 const LandingPage = () => import('@/app/landing/LandingPage')
@@ -16,31 +18,43 @@ const QuizPage = () => import('@/app/(main)/quiz/QuizPage')
 const ResultPage = () => import('@/app/(main)/result/ResultPage')
 const SettingsPage = () => import('@/app/(main)/settings/SettingsPage')
 
-// Lazy load helper
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-muted-foreground">加载中...</div>
+    </div>
+  )
+}
+
+// Lazy load helper with error handling
 const lazy = (loader: () => Promise<{ default: React.ComponentType }>) => {
   const LazyComponent = React.lazy(loader)
   return (
-    <React.Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-muted-foreground">加载中...</div>
-        </div>
-      }
-    >
+    <React.Suspense fallback={<LoadingFallback />}>
       <LazyComponent />
     </React.Suspense>
   )
 }
 
-import React from 'react'
+// Error element for route errors
+function RouteErrorElement() {
+  return (
+    <RootErrorBoundary>
+      <div />
+    </RootErrorBoundary>
+  )
+}
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: lazy(LandingPage),
+    errorElement: <RouteErrorElement />,
   },
   {
     element: <AuthLayout />,
+    errorElement: <RouteErrorElement />,
     children: [
       {
         path: 'login',
@@ -55,6 +69,7 @@ export const router = createBrowserRouter([
   {
     path: '/chat',
     element: lazy(ChatPage),
+    errorElement: <RouteErrorElement />,
   },
   {
     element: (
@@ -62,6 +77,7 @@ export const router = createBrowserRouter([
         <AppLayout />
       </ProtectedRoute>
     ),
+    errorElement: <RouteErrorElement />,
     children: [
       {
         path: 'home',

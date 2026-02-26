@@ -6,6 +6,7 @@ import { LibraryList } from '@/components/library/LibraryList'
 import { LibraryFilter } from '@/components/library/LibraryFilter'
 import { LoadingState } from '@/components/common/LoadingState'
 import { EmptyState } from '@/components/common/EmptyState'
+import { PageError } from '@/components/common/PageError'
 import { useLibraryStore } from '@/stores/libraryStore'
 import { contentService } from '@/services/content'
 import type { KnowledgeSetSummary } from '@/types'
@@ -27,10 +28,12 @@ export default function LibraryPage() {
   } = useLibraryStore()
 
   const [filteredLibraries, setFilteredLibraries] = useState<KnowledgeSetSummary[]>([])
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
+      setError(null)
       try {
         const [libsRes, cats, tagsData] = await Promise.all([
           contentService.getLibraries(),
@@ -41,8 +44,8 @@ export default function LibraryPage() {
         setCategories(cats)
         setTags(tagsData)
       }
-      catch (error) {
-        console.error('Failed to load library:', error)
+      catch (err) {
+        setError(err instanceof Error ? err : new Error('加载失败'))
       }
       finally {
         setLoading(false)
@@ -79,6 +82,19 @@ export default function LibraryPage() {
 
   if (isLoading) {
     return <LoadingState />
+  }
+
+  if (error) {
+    return (
+      <PageError
+        message={error.message}
+        onRetry={() => {
+          setError(null)
+          setLoading(true)
+          contentService.getLibraries().then(res => setLibraries(res.data)).finally(() => setLoading(false))
+        }}
+      />
+    )
   }
 
   return (

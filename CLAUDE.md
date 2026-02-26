@@ -75,7 +75,35 @@ pnpm test:coverage     # With coverage
 **API Service Layer:**
 - `src/services/api.ts` provides `api.get()`, `api.post()`, `api.patch()`, `api.delete()`
 - Handles auth token injection and 401 redirect
+- Use `{ raw: true }` option to get full response (e.g., for pagination)
 - SSE streaming for chat via `src/services/chat.ts`
+
+```typescript
+// Normal request - extracts response.data automatically
+const user = await api.get<User>('/user/v1/me')
+
+// Paginated request - get full response
+const res = await api.get<PaginatedResponse<Library>>('/content/v1/library', { raw: true })
+// res = { data: [...], pagination: {...} }
+```
+
+**Error Handling:**
+- Route level: `RootErrorBoundary` catches lazy loading and route errors
+- Page level: Use `PageError` component with `onRetry` for data loading errors
+- Component level: `ErrorBoundary` class component for React render errors
+
+```tsx
+// Page-level error handling pattern
+const [error, setError] = useState<Error | null>(null)
+
+useEffect(() => {
+  loadData().catch(err => setError(err))
+}, [])
+
+if (error) {
+  return <PageError message={error.message} onRetry={loadData} />
+}
+```
 
 **State Management:**
 ```typescript
@@ -87,6 +115,24 @@ interface AuthState {
   logout: () => void
 }
 export const useAuthStore = create<AuthState>((set) => ({ ... }))
+```
+
+**Theme System:**
+- `ThemeToggle` component available in all pages
+- Theme stored in `uiStore` and persisted to localStorage
+- Add to new pages: `<ThemeToggle theme={theme} onThemeChange={setTheme} />`
+
+**Responsive Design:**
+- Mobile-first approach with Tailwind breakpoints (sm:, md:, lg:, xl:)
+- Avoid hardcoded pixel values; use Tailwind spacing utilities
+- Use dynamic heights like `min-h-[50vh]` instead of `min-h-[400px]`
+
+```tsx
+// ❌ Avoid hardcoded sizes
+<div className="h-[50px] w-[50px] min-h-[400px]">
+
+// ✅ Use responsive utilities
+<div className="h-12 w-12 sm:h-auto sm:w-auto min-h-[50vh]">
 ```
 
 **Mock Service (MSW):**
@@ -108,6 +154,18 @@ export const useAuthStore = create<AuthState>((set) => ({ ... }))
 | Hooks | camelCase with `use` prefix | `useChat.ts` |
 | Stores | camelCase with `Store` suffix | `authStore.ts` |
 | Directories | kebab-case | `question-card/` |
+
+### Common Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `ThemeToggle` | `common/ThemeToggle.tsx` | Dark/light mode switch |
+| `PageError` | `common/PageError.tsx` | Data loading error display |
+| `EmptyState` | `common/EmptyState.tsx` | Empty data placeholder |
+| `LoadingState` | `common/LoadingState.tsx` | Loading spinner |
+| `ErrorBoundary` | `common/ErrorBoundary.tsx` | React error boundary |
+| `RootErrorBoundary` | `common/RootErrorBoundary.tsx` | Route-level error boundary |
+| `ProtectedRoute` | `common/ProtectedRoute.tsx` | Auth route guard |
 
 ## Backend (gatewaysrv)
 

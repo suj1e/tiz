@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { BookOpen, Home, MessageSquare, Settings } from 'lucide-react'
+import { BookOpen, Home, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { useUIStore } from '@/stores/uiStore'
@@ -7,7 +7,6 @@ import { useUIStore } from '@/stores/uiStore'
 const navItems = [
   { path: '/home', label: '首页', icon: Home },
   { path: '/library', label: '题库', icon: BookOpen },
-  { path: '/chat', label: '对话', icon: MessageSquare },
   { path: '/settings', label: '设置', icon: Settings },
 ]
 

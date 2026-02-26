@@ -5,16 +5,17 @@
 | 类别 | 技术 | 版本 |
 |------|------|------|
 | 包管理器 | pnpm | 8.x |
-| 构建工具 | Vite | 5.x |
-| 框架 | React | 18.x |
+| 构建工具 | Vite | 7.x |
+| 框架 | React | 19.x |
 | 语言 | TypeScript | 5.x (strict) |
-| 路由 | React Router | 6.x |
-| 状态管理 | Zustand | 4.x |
-| 样式 | Tailwind CSS | 3.x |
+| 路由 | React Router | 7.x |
+| 状态管理 | Zustand | 5.x |
+| 样式 | Tailwind CSS | 4.x |
 | UI 组件 | shadcn/ui | latest |
 | 图标 | Lucide React | latest |
 | HTTP | 原生 fetch | - |
 | Mock | MSW | 2.x |
+| 测试 | Vitest | 4.x |
 
 ## 目录结构
 
@@ -28,12 +29,12 @@ tiz-web/
 │   │   │   └── register/
 │   │   │       └── RegisterPage.tsx
 │   │   ├── (main)/             # 需要登录的页面
-│   │   │   ├── home/
-│   │   │   ├── library/
-│   │   │   ├── practice/
-│   │   │   ├── quiz/
-│   │   │   ├── result/
-│   │   │   └── settings/
+│   │   │   ├── home/           # 首页（聊天）
+│   │   │   ├── library/        # 题库
+│   │   │   ├── practice/       # 练习
+│   │   │   ├── quiz/           # 测验
+│   │   │   ├── result/         # 结果
+│   │   │   └── settings/       # 设置（含Webhook）
 │   │   ├── chat/               # 试用对话（无需登录）
 │   │   ├── landing/            # 落地页
 │   │   └── not-found/          # 404 页面
@@ -46,34 +47,18 @@ tiz-web/
 │   │   │   ├── Header.tsx
 │   │   │   └── AuthLayout.tsx
 │   │   ├── chat/               # 对话组件
-│   │   │   ├── ChatPanel.tsx
-│   │   │   ├── ChatMessage.tsx
-│   │   │   ├── ChatInput.tsx
-│   │   │   ├── ChatConfirm.tsx
-│   │   │   └── TypingIndicator.tsx
 │   │   ├── question/           # 题目组件
-│   │   │   ├── QuestionCard.tsx
-│   │   │   ├── ChoiceQuestion.tsx
-│   │   │   ├── EssayQuestion.tsx
-│   │   │   ├── QuestionNav.tsx
-│   │   │   ├── QuestionProgress.tsx
-│   │   │   └── AnswerFeedback.tsx
 │   │   ├── library/            # 题库组件
-│   │   │   ├── LibraryList.tsx
-│   │   │   ├── LibraryCard.tsx
-│   │   │   ├── LibraryFilter.tsx
-│   │   │   └── TagList.tsx
 │   │   ├── quiz/               # 测验组件
-│   │   │   ├── QuizTimer.tsx
-│   │   │   ├── QuizResult.tsx
-│   │   │   └── WrongAnswerReview.tsx
 │   │   └── common/             # 通用组件
 │   │       ├── ThemeToggle.tsx
 │   │       ├── UserMenu.tsx
 │   │       ├── EmptyState.tsx
 │   │       ├── LoadingState.tsx
 │   │       ├── PageError.tsx
-│   │       └── ErrorBoundary.tsx
+│   │       ├── ErrorBoundary.tsx
+│   │       ├── RootErrorBoundary.tsx
+│   │       └── ProtectedRoute.tsx
 │   │
 │   ├── hooks/                  # 自定义 Hooks
 │   │   ├── useAuth.ts
@@ -90,69 +75,36 @@ tiz-web/
 │   │   └── uiStore.ts
 │   │
 │   ├── services/               # API 服务
-│   │   ├── api.ts              # 基础请求封装
+│   │   ├── api.ts              # 基础请求封装（支持raw选项）
 │   │   ├── auth.ts             # 认证 API
-│   │   ├── chat.ts             # 对话 API
+│   │   ├── chat.ts             # 对话 API (SSE)
 │   │   ├── content.ts          # 内容 API
 │   │   ├── practice.ts         # 练习 API
 │   │   ├── quiz.ts             # 测验 API
 │   │   └── user.ts             # 用户 API
 │   │
 │   ├── types/                  # TypeScript 类型
-│   │   ├── index.ts
-│   │   ├── user.ts
-│   │   ├── chat.ts
-│   │   ├── question.ts
-│   │   ├── library.ts
-│   │   └── api.ts
-│   │
 │   ├── lib/                    # 工具函数
-│   │   ├── utils.ts
-│   │   ├── cn.ts
-│   │   └── storage.ts
-│   │
 │   ├── mocks/                  # MSW Mock
 │   │   ├── handlers/
-│   │   │   ├── index.ts
-│   │   │   ├── auth.ts
-│   │   │   ├── chat.ts
-│   │   │   ├── content.ts
-│   │   │   ├── practice.ts
-│   │   │   └── quiz.ts
 │   │   ├── data/
-│   │   │   ├── users.ts
-│   │   │   ├── questions.ts
-│   │   │   └── library.ts
 │   │   └── browser.ts
 │   │
 │   ├── main.tsx                # 入口文件
 │   ├── App.tsx                 # 根组件
-│   ├── router.tsx              # 路由配置
-│   └── vite-env.d.ts
+│   └── router.tsx              # 路由配置（含errorElement）
 │
 ├── public/
-│   └── favicon.ico
+│   ├── favicon.svg             # 项目图标
+│   └── vite.svg
 │
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-│
-├── .env.example
-├── .env.development
-├── .env.production
-├── .eslintrc.js
-├── .prettierrc
-├── .gitignore
-├── Dockerfile
-├── nginx.conf
 ├── index.html
 ├── package.json
-├── pnpm-lock.yaml
-├── tailwind.config.js
-├── postcss.config.js
+├── vite.config.ts
+├── vitest.config.ts
 ├── tsconfig.json
-├── tsconfig.node.json
-└── vite.config.ts
+├── Dockerfile
+└── nginx.conf
 ```
 
 ## 命名规范
@@ -167,7 +119,6 @@ tiz-web/
 | 工具文件 | camelCase | `utils.ts`, `storage.ts` |
 | 类型文件 | camelCase | `user.ts`, `chat.ts` |
 | Store 文件 | camelCase + Store 后缀 | `authStore.ts`, `chatStore.ts` |
-| 常量文件 | camelCase | `constants.ts` |
 
 ### 代码命名
 
@@ -178,48 +129,6 @@ tiz-web/
 | 变量 | camelCase | `isLoading`, `currentUser` |
 | 常量 | UPPER_SNAKE_CASE | `API_BASE_URL`, `DEFAULT_PAGE_SIZE` |
 | 类型/接口 | PascalCase | `User`, `ApiResponse`, `ChatMessage` |
-| 枚举 | PascalCase | `Theme`, `QuestionType` |
-| CSS 类 | kebab-case (Tailwind) | `bg-primary`, `text-muted-foreground` |
-
-## TypeScript 规范
-
-### 类型定义
-
-```typescript
-// 优先使用 interface 定义对象类型
-interface User {
-  id: string
-  email: string
-  created_at: string
-}
-
-// 复杂类型使用 type
-type Theme = "light" | "dark" | "system"
-type ApiResponse<T> = {
-  data: T
-}
-
-// Props 必须定义类型
-interface ChatPanelProps {
-  messages: Message[]
-  isLoading: boolean
-  onSend: (message: string) => void
-}
-```
-
-### 严格模式
-
-```json
-// tsconfig.json
-{
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
-  }
-}
-```
 
 ## React 规范
 
@@ -227,11 +136,11 @@ interface ChatPanelProps {
 
 ```tsx
 // 1. 导入
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import { PageError } from "@/components/common/PageError"
 import { useAuthStore } from "@/stores/authStore"
-import type { LoginFormData } from "@/types"
 
 // 2. 类型定义
 interface LoginPageProps {
@@ -246,18 +155,23 @@ export function LoginPage(props: LoginPageProps) {
 
   // 3.2 State
   const [email, setEmail] = useState("")
+  const [error, setError] = useState<Error | null>(null)
 
   // 3.3 派生状态
   const isValid = email.length > 0
 
-  // 3.4 Effects
-  useEffect(() => {
-    // ...
-  }, [])
-
-  // 3.5 Handlers
+  // 3.4 Handlers
   const handleSubmit = async () => {
-    await login(email, password)
+    try {
+      await login(email, password)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('登录失败'))
+    }
+  }
+
+  // 3.5 错误状态处理
+  if (error) {
+    return <PageError message={error.message} onRetry={handleSubmit} />
   }
 
   // 3.6 渲染
@@ -269,61 +183,98 @@ export function LoginPage(props: LoginPageProps) {
 }
 ```
 
-### Hooks 规范
-
-```typescript
-// 自定义 Hook 示例
-export function useChat(sessionId?: string) {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-
-  const sendMessage = useCallback(async (content: string) => {
-    // ...
-  }, [sessionId])
-
-  return {
-    messages,
-    isLoading,
-    sendMessage,
-  }
-}
-```
-
 ## 样式规范
 
-### Tailwind CSS
+### Tailwind CSS 响应式
 
 ```tsx
-// 使用 cn 函数合并类名
-import { cn } from "@/lib/cn"
+// 移动端优先，使用 Tailwind 断点
+// 避免写死尺寸，使用动态值
 
-function Button({ className, ...props }) {
-  return (
-    <button
-      className={cn(
-        "px-4 py-2 rounded-lg font-medium",
-        "bg-primary text-primary-foreground",
-        "hover:bg-primary/90",
-        "transition-colors",
-        className  // 允许外部覆盖
-      )}
-      {...props}
-    />
-  )
-}
+// ❌ 错误：写死尺寸
+<div className="min-h-[400px] h-[50px] w-[50px]">
+
+// ✅ 正确：响应式动态尺寸
+<div className="min-h-[50vh] sm:min-h-[60vh]">
+<div className="h-12 w-12 sm:h-auto sm:w-auto">
+<div className="min-h-14 sm:min-h-16">
 ```
 
 ### 响应式断点
 
+| 断点 | 最小宽度 | 用途 |
+|------|----------|------|
+| (默认) | 0px | 移动端 |
+| `sm:` | 640px | 小屏手机横屏/小平板 |
+| `md:` | 768px | 平板 |
+| `lg:` | 1024px | 桌面 |
+| `xl:` | 1280px | 大屏桌面 |
+
+## 错误处理规范
+
+### 页面级错误处理
+
 ```tsx
-// 移动端优先
-<div className="
-  flex flex-col          // 默认纵向
-  md:flex-row            // md 及以上横向
-  lg:items-center        // lg 及以上居中
-">
-  {/* ... */}
-</div>
+// 使用 PageError 组件处理数据加载错误
+export default function LibraryPage() {
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await contentService.getLibraries()
+        setLibraries(data)
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('加载失败'))
+      }
+    }
+    loadData()
+  }, [])
+
+  if (error) {
+    return <PageError message={error.message} onRetry={loadData} />
+  }
+  // ...
+}
+```
+
+### 路由级错误边界
+
+```tsx
+// router.tsx 已配置 errorElement
+import { RootErrorBoundary } from '@/components/common/RootErrorBoundary'
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: lazy(LandingPage),
+    errorElement: <RouteErrorElement />,
+  },
+  // ...
+])
+```
+
+## API 调用规范
+
+### 基础请求
+
+```typescript
+// services/api.ts
+export const api = {
+  // 普通请求 - 自动提取 response.data
+  get<T>(path: string, options?: RequestOptions): Promise<T>
+
+  // 获取完整响应（含分页等）
+  get<T>(path: string, { raw: true }): Promise<T>
+}
+
+// 示例
+// 普通请求
+const user = await api.get<User>('/user/v1/me')
+
+// 分页请求（需要完整响应）
+const response = await api.get<PaginatedResponse<Library>>('/content/v1/library', { raw: true })
+// response = { data: [...], pagination: {...} }
 ```
 
 ## 状态管理规范
@@ -335,29 +286,23 @@ function Button({ className, ...props }) {
 import { create } from "zustand"
 
 interface AuthState {
-  // State
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-
-  // Actions
   login: (email: string, password: string) => Promise<void>
   logout: () => void
-  fetchUser: () => Promise<void>
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  // 初始状态
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
 
-  // Actions
   login: async (email, password) => {
     set({ isLoading: true })
     try {
-      const { data } = await api.post("/v1/auth/login", { email, password })
-      set({ user: data.user, isAuthenticated: true })
+      const response = await authService.login({ email, password })
+      set({ user: response.user, isAuthenticated: true })
     } finally {
       set({ isLoading: false })
     }
@@ -366,156 +311,34 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: () => {
     set({ user: null, isAuthenticated: false })
   },
-
-  fetchUser: async () => {
-    const { data } = await api.get("/v1/auth/me")
-    set({ user: data.user })
-  },
 }))
 ```
 
-## API 调用规范
+## 开发命令
 
-### 封装请求
+```bash
+# 安装依赖
+pnpm install
 
-```typescript
-// services/api.ts
-const API_BASE = "/api/v1"
+# 开发模式 (Mock)
+VITE_MOCK=true pnpm dev
 
-class ApiError extends Error {
-  constructor(
-    public type: string,
-    public code: string,
-    message: string,
-    public status: number
-  ) {
-    super(message)
-  }
-}
+# 开发模式 (连接后端)
+pnpm dev
 
-export const api = {
-  async request<T>(url: string, options?: RequestInit): Promise<T> {
-    const token = localStorage.getItem("token")
+# 构建
+pnpm build
 
-    const response = await fetch(API_BASE + url, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options?.headers,
-      },
-    })
+# 代码检查
+pnpm lint
 
-    const data = await response.json()
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        localStorage.removeItem("token")
-        window.location.href = "/login"
-      }
-      throw new ApiError(
-        data.error.type,
-        data.error.code,
-        data.error.message,
-        response.status
-      )
-    }
-
-    return data.data
-  },
-
-  get<T>(url: string) {
-    return this.request<T>(url, { method: "GET" })
-  },
-
-  post<T>(url: string, body?: unknown) {
-    return this.request<T>(url, {
-      method: "POST",
-      body: body ? JSON.stringify(body) : undefined,
-    })
-  },
-
-  patch<T>(url: string, body?: unknown) {
-    return this.request<T>(url, {
-      method: "PATCH",
-      body: body ? JSON.stringify(body) : undefined,
-    })
-  },
-
-  delete<T>(url: string) {
-    return this.request<T>(url, { method: "DELETE" })
-  },
-}
-```
-
-### SSE 流式请求
-
-```typescript
-// services/chat.ts
-export async function streamChat(
-  sessionId: string | null,
-  message: string,
-  onMessage: (content: string) => void,
-  onSession: (sessionId: string) => void,
-  onDone: () => void,
-  onError: (error: Error) => void
-) {
-  const token = localStorage.getItem("token")
-
-  const response = await fetch("/api/chat/v1/stream", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify({ session_id: sessionId, message }),
-  })
-
-  const reader = response.body?.getReader()
-  const decoder = new TextDecoder()
-
-  while (reader) {
-    const { done, value } = await reader.read()
-    if (done) break
-
-    const text = decoder.decode(value)
-    const lines = text.split("\n")
-
-    for (const line of lines) {
-      if (line.startsWith("data: ")) {
-        const data = JSON.parse(line.slice(6))
-
-        switch (data.type) {
-          case "session":
-            onSession(data.session_id)
-            break
-          case "message":
-            onMessage(data.content)
-            break
-          case "done":
-            onDone()
-            break
-          case "error":
-            onError(new Error(data.message))
-            break
-        }
-      }
-    }
-  }
-}
+# 测试
+pnpm test
+pnpm test:run
+pnpm test:coverage
 ```
 
 ## Git 规范
-
-### 分支命名
-
-```
-main              主分支
-develop           开发分支
-feature/xxx       功能分支
-fix/xxx           修复分支
-refactor/xxx      重构分支
-```
 
 ### Commit 规范
 
@@ -527,86 +350,9 @@ style: 代码格式
 docs: 文档
 chore: 构建/工具
 test: 测试
-perf: 性能优化
 
 示例:
-feat: 添加对话面板组件
-fix: 修复登录状态丢失问题
-refactor: 重构 API 请求封装
-```
-
-## 开发命令
-
-```bash
-# 安装依赖
-pnpm install
-
-# 开发环境
-pnpm dev
-
-# 开发环境 + Mock
-pnpm dev:mock
-
-# 构建
-pnpm build
-
-# 预览构建结果
-pnpm preview
-
-# 代码检查
-pnpm lint
-pnpm lint:fix
-
-# 类型检查
-pnpm typecheck
-
-# 单元测试
-pnpm test
-pnpm test:watch
-pnpm test:coverage
-
-# E2E 测试
-pnpm test:e2e
-```
-
-## 依赖清单
-
-```json
-{
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0",
-    "zustand": "^4.5.0",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.2.0",
-    "lucide-react": "^0.340.0",
-    "class-variance-authority": "^0.7.0",
-    "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-dropdown-menu": "^2.0.6",
-    "@radix-ui/react-label": "^2.0.2",
-    "@radix-ui/react-slot": "^1.0.2",
-    "@radix-ui/react-switch": "^1.0.3"
-  },
-  "devDependencies": {
-    "vite": "^5.1.0",
-    "typescript": "^5.3.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@vitejs/plugin-react": "^4.2.0",
-    "tailwindcss": "^3.4.0",
-    "autoprefixer": "^10.4.0",
-    "postcss": "^8.4.0",
-    "eslint": "^8.56.0",
-    "@antfu/eslint-config": "^2.6.0",
-    "prettier": "^3.2.0",
-    "husky": "^9.0.0",
-    "lint-staged": "^15.2.0",
-    "msw": "^2.2.0",
-    "vitest": "^1.3.0",
-    "@testing-library/react": "^14.2.0",
-    "@testing-library/jest-dom": "^6.4.0",
-    "@playwright/test": "^1.41.0"
-  }
-}
+feat: 添加 Webhook 配置功能
+fix: 修复题库页面数据加载错误
+refactor: 优化错误处理机制
 ```

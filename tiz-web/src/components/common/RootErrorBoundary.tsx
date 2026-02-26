@@ -1,11 +1,10 @@
 import { Component, type ReactNode } from 'react'
-import { AlertCircle, RefreshCw, Home } from 'lucide-react'
+import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 
 interface Props {
   children: ReactNode
-  fallback?: ReactNode
 }
 
 interface State {
@@ -13,7 +12,7 @@ interface State {
   error?: Error
 }
 
-export class ErrorBoundary extends Component<Props, State> {
+export class RootErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { hasError: false }
@@ -25,41 +24,36 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback
-      }
-
       return (
-        <div className="flex min-h-[50vh] flex-col items-center justify-center p-4">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
           <div className="text-center">
-            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-              <AlertCircle className="h-6 w-6 text-destructive" />
+            <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+              <AlertTriangle className="h-8 w-8 text-destructive" />
             </div>
-            <h2 className="mb-2 text-lg font-semibold">页面出错了</h2>
-            <p className="mb-4 text-sm text-muted-foreground">
-              {this.state.error?.message || '发生了未知错误'}
+            <h1 className="mb-2 text-2xl font-bold">出错了</h1>
+            <p className="mb-2 text-muted-foreground">
+              页面加载时发生了错误
             </p>
             {import.meta.env.DEV && this.state.error && (
-              <pre className="mb-4 max-w-md overflow-auto rounded-lg bg-muted p-3 text-left text-xs text-muted-foreground">
+              <pre className="mb-4 max-w-md overflow-auto rounded-lg bg-muted p-4 text-left text-xs text-muted-foreground">
                 {this.state.error.message}
               </pre>
             )}
             <div className="flex justify-center gap-3">
               <Button
                 variant="outline"
-                size="sm"
                 onClick={() => {
                   this.setState({ hasError: false })
                   window.location.reload()
                 }}
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
-                刷新
+                刷新页面
               </Button>
-              <Link to="/home">
-                <Button size="sm">
+              <Link to="/">
+                <Button>
                   <Home className="mr-2 h-4 w-4" />
-                  首页
+                  返回首页
                 </Button>
               </Link>
             </div>

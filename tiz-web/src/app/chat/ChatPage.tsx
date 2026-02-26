@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ChatMessage } from '@/components/chat/ChatMessage'
 import { TypingIndicator } from '@/components/chat/TypingIndicator'
+import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { useChatStore } from '@/stores/chatStore'
+import { useUIStore } from '@/stores/uiStore'
 import { createChatStream, type SSEEvent } from '@/services/chat'
 import { generateId } from '@/lib/utils'
 
@@ -13,6 +15,8 @@ export default function ChatPage() {
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<{ abort: () => void } | null>(null)
+
+  const { theme, setTheme } = useUIStore()
 
   const {
     sessionId,
@@ -92,6 +96,7 @@ export default function ChatPage() {
             <span>Tiz</span>
           </Link>
           <nav className="flex items-center gap-2 sm:gap-4">
+            <ThemeToggle theme={theme} onThemeChange={setTheme} />
             <Link to="/login">
               <Button variant="ghost" size="sm" className="sm:size-default">登录</Button>
             </Link>

@@ -38,7 +38,7 @@ export const contentService = {
     if (params?.search) searchParams.set('search', params.search)
 
     const query = searchParams.toString()
-    return api.get(`/content/v1/library${query ? `?${query}` : ''}`)
+    return api.get(`/content/v1/library${query ? `?${query}` : ''}`, { raw: true })
   },
 
   getLibrary: (id: string): Promise<KnowledgeSet> => {

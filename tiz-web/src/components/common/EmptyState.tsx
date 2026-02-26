@@ -14,7 +14,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
+    <div className="flex min-h-[50vh] flex-col items-center justify-center text-center p-4">
       <div className="mb-4 text-muted-foreground">
         {icon || <FileQuestion className="h-12 w-12" />}
       </div>

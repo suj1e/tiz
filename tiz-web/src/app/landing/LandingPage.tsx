@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { BookOpen, MessageSquare, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThemeToggle } from '@/components/common/ThemeToggle'
+import { useUIStore } from '@/stores/uiStore'
 
 const features = [
   {
@@ -22,6 +24,8 @@ const features = [
 ]
 
 export default function LandingPage() {
+  const { theme, setTheme } = useUIStore()
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -32,6 +36,7 @@ export default function LandingPage() {
             <span>Tiz</span>
           </Link>
           <nav className="flex items-center gap-4">
+            <ThemeToggle theme={theme} onThemeChange={setTheme} />
             <Link to="/login">
               <Button variant="ghost">登录</Button>
             </Link>
@@ -83,7 +88,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 Tiz. All rights reserved.</p>
+          <p>© 2026 Tiz. All rights reserved.</p>
         </div>
       </footer>
     </div>
