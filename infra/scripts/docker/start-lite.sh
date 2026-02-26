@@ -1,10 +1,10 @@
 #!/bin/bash
-# Nexora 基础设施一键启动脚本 (轻量版)
+# Tiz 基础设施一键启动脚本 (轻量版)
 
 set -e
 
 echo "=========================================="
-echo "   Nexora Infrastructure (Lite)"
+echo "   Tiz Infrastructure (Lite)"
 echo "   Event-Driven Architecture"
 echo "=========================================="
 echo ""
@@ -83,7 +83,7 @@ echo -e "${YELLOW}Waiting for MySQL to be ready (30s)...${NC}"
 sleep 30
 
 # 检查MySQL
-if $DOCKER_COMPOSE -f docker-compose-lite.yml exec -T mysql mysqladmin ping -h localhost -u root -pNexora@2026 &> /dev/null; then
+if $DOCKER_COMPOSE -f docker-compose-lite.yml exec -T mysql mysqladmin ping -h localhost -u root -pTiz@2026 &> /dev/null; then
     echo -e "${GREEN}MySQL is ready!${NC}"
 else
     echo -e "${RED}MySQL failed to start${NC}"
@@ -112,7 +112,7 @@ sleep 60
 
 # 检查Elasticsearch
 for i in {1..10}; do
-    if $DOCKER_COMPOSE -f docker-compose-lite.yml exec -T elasticsearch curl -s -u elastic:Nexora@2026 http://localhost:9200/_cluster/health &> /dev/null; then
+    if $DOCKER_COMPOSE -f docker-compose-lite.yml exec -T elasticsearch curl -s -u elastic:Tiz@2026 http://localhost:9200/_cluster/health &> /dev/null; then
         echo -e "${GREEN}Elasticsearch is ready!${NC}"
         break
     fi
@@ -175,9 +175,9 @@ echo -e "${GREEN}Deployment Complete!${NC}"
 echo "=========================================="
 echo ""
 echo "Access URLs:"
-echo "  MySQL:          localhost:30001 (root/Nexora@2026)"
-echo "  Redis:          localhost:30002 (password: Nexora@2026)"
-echo "  Elasticsearch:  localhost:30003 (elastic/Nexora@2026)"
+echo "  MySQL:          localhost:30001 (root/Tiz@2026)"
+echo "  Redis:          localhost:30002 (password: Tiz@2026)"
+echo "  Elasticsearch:  localhost:30003 (elastic/Tiz@2026)"
 echo "  Nacos:          http://localhost:30006 (nacos/nacos)"
 echo "  Kafka:          localhost:30009"
 echo "  Kafka UI:       http://localhost:30010"

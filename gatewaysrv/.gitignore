@@ -1,8 +1,0 @@
-# Gradle (subproject-specific)
-.gradle/
-build/
-gradle/wrapper/gradle-wrapper.jar
-
-# QA test reports (subproject-specific)
-qa/reports/*.html
-qa/reports/*.json

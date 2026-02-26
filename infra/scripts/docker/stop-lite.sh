@@ -1,10 +1,10 @@
 #!/bin/bash
-# Nexora 基础设施一键停止脚本 (轻量版)
+# Tiz 基础设施一键停止脚本 (轻量版)
 
 set -e
 
 echo "=========================================="
-echo "   Stopping Nexora Infrastructure (Lite)"
+echo "   Stopping Tiz Infrastructure (Lite)"
 echo "=========================================="
 echo ""
 

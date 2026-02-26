@@ -1,5 +1,5 @@
 #!/bin/bash
-# Nexora 基础设施健康检查脚本
+# Tiz 基础设施健康检查脚本
 
 # 颜色定义
 GREEN='\033[0;32m'
@@ -8,7 +8,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 echo "=========================================="
-echo "   Nexora Infrastructure Health Check"
+echo "   Tiz Infrastructure Health Check"
 echo "=========================================="
 echo ""
 
@@ -42,12 +42,12 @@ check_service() {
 }
 
 echo "Database & Cache:"
-check_service "mysql" "$DOCKER_COMPOSE exec -T mysql mysqladmin ping -h localhost -u root -pNexora@2026" "MySQL"
+check_service "mysql" "$DOCKER_COMPOSE exec -T mysql mysqladmin ping -h localhost -u root -pTiz@2026" "MySQL"
 check_service "redis" "$DOCKER_COMPOSE exec -T redis redis-cli ping" "Redis"
 
 echo ""
 echo "Search & Analytics:"
-check_service "elasticsearch" "$DOCKER_COMPOSE exec -T elasticsearch curl -s -u elastic:Nexora@2026 http://localhost:9200/_cluster/health" "Elasticsearch"
+check_service "elasticsearch" "$DOCKER_COMPOSE exec -T elasticsearch curl -s -u elastic:Tiz@2026 http://localhost:9200/_cluster/health" "Elasticsearch"
 check_service "kibana" "$DOCKER_COMPOSE exec -T kibana curl -s http://localhost:5601/api/status" "Kibana"
 
 echo ""
