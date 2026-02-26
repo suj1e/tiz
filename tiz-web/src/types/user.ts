@@ -8,3 +8,11 @@ export interface User {
 export interface UserSettings {
   theme: 'light' | 'dark' | 'system'
 }
+
+export type WebhookEvent = 'practice.complete' | 'quiz.complete' | 'library.update'
+
+export interface WebhookConfig {
+  url: string
+  enabled: boolean
+  events: WebhookEvent[]
+}

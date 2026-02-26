@@ -2,6 +2,14 @@ import { useEffect, useState } from 'react'
 import { Plus, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { LibraryList } from '@/components/library/LibraryList'
 import { LibraryFilter } from '@/components/library/LibraryFilter'
 import { LoadingState } from '@/components/common/LoadingState'
@@ -9,6 +17,7 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { PageError } from '@/components/common/PageError'
 import { useLibraryStore } from '@/stores/libraryStore'
 import { contentService } from '@/services/content'
+import { generateId } from '@/lib/utils'
 import type { KnowledgeSetSummary } from '@/types'
 
 export default function LibraryPage() {
@@ -25,10 +34,15 @@ export default function LibraryPage() {
     setTags,
     setSearchQuery,
     setLoading,
+    setSelectedCategory,
+    toggleTag,
+    addLibrary,
   } = useLibraryStore()
 
   const [filteredLibraries, setFilteredLibraries] = useState<KnowledgeSetSummary[]>([])
   const [error, setError] = useState<Error | null>(null)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [newTitle, setNewTitle] = useState('')
 
   useEffect(() => {
     const loadData = async () => {
@@ -80,6 +94,25 @@ export default function LibraryPage() {
     setFilteredLibraries(filtered)
   }, [libraries, selectedCategory, selectedTags, searchQuery])
 
+  const handleCreate = () => {
+    if (!newTitle.trim()) return
+
+    // 创建空题库（仅本地，mock 模式）
+    const newLibrary: KnowledgeSetSummary = {
+      id: generateId(),
+      title: newTitle.trim(),
+      category: '',
+      tags: [],
+      difficulty: 'medium',
+      question_count: 0,
+      created_at: new Date().toISOString(),
+    }
+
+    addLibrary(newLibrary)
+    setNewTitle('')
+    setCreateOpen(false)
+  }
+
   if (isLoading) {
     return <LoadingState />
   }
@@ -104,7 +137,7 @@ export default function LibraryPage() {
           <h1 className="text-2xl font-semibold">我的题库</h1>
           <p className="text-muted-foreground">管理你保存的练习题</p>
         </div>
-        <Button>
+        <Button onClick={() => setCreateOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           新建题库
         </Button>
@@ -138,9 +171,42 @@ export default function LibraryPage() {
             tags={tags}
             selectedCategory={selectedCategory}
             selectedTags={selectedTags}
+            onCategoryChange={setSelectedCategory}
+            onTagToggle={toggleTag}
           />
         </div>
       </div>
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>新建题库</DialogTitle>
+            <DialogDescription>
+              创建一个空题库，后续可通过对话生成题目添加
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="输入题库名称"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleCreate()
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>
+              取消
+            </Button>
+            <Button onClick={handleCreate} disabled={!newTitle.trim()}>
+              创建
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

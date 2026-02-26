@@ -277,6 +277,21 @@ const response = await api.get<PaginatedResponse<Library>>('/content/v1/library'
 // response = { data: [...], pagination: {...} }
 ```
 
+### 服务层封装
+
+```typescript
+// services/user.ts
+export const userService = {
+  getSettings: () => api.get('/user/v1/settings'),
+  updateSettings: (settings) => api.patch('/user/v1/settings', settings),
+
+  // Webhook 配置
+  getWebhook: () => api.get('/user/v1/webhook'),
+  saveWebhook: (config) => api.post('/user/v1/webhook', config),
+  deleteWebhook: () => api.delete('/user/v1/webhook'),
+}
+```
+
 ## 状态管理规范
 
 ### Zustand Store

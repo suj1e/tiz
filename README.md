@@ -139,6 +139,11 @@ docker-compose -f docker-compose-lite.yml up -d
 - Webhook 配置（事件通知）
 - 账户信息（邮箱、密码、删除账户）
 
+### 题库管理
+- 支持新建空题库（Dialog 交互）
+- 分类和标签筛选
+- 搜索功能
+
 ## 开发规范
 
 详细规范请参阅 `standards/` 目录：

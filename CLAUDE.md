@@ -115,6 +115,28 @@ interface AuthState {
   logout: () => void
 }
 export const useAuthStore = create<AuthState>((set) => ({ ... }))
+
+// Library store with filter actions
+interface LibraryState {
+  libraries: KnowledgeSetSummary[]
+  selectedCategory: string | null
+  selectedTags: string[]
+  setSelectedCategory: (category: string | null) => void
+  toggleTag: (tag: string) => void
+  addLibrary: (library: KnowledgeSetSummary) => void
+}
+```
+
+**User Service:**
+```typescript
+// src/services/user.ts
+export const userService = {
+  getSettings: () => api.get('/user/v1/settings'),
+  updateSettings: (settings) => api.patch('/user/v1/settings', settings),
+  getWebhook: () => api.get('/user/v1/webhook'),
+  saveWebhook: (config) => api.post('/user/v1/webhook', config),
+  deleteWebhook: () => api.delete('/user/v1/webhook'),
+}
 ```
 
 **Theme System:**

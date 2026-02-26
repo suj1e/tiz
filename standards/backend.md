@@ -502,6 +502,19 @@ CREATE TABLE quiz_attempts (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (knowledge_set_id) REFERENCES knowledge_sets(id)
 );
+
+-- Webhook 配置表
+CREATE TABLE webhook_configs (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    url VARCHAR(500) NOT NULL,
+    enabled BOOLEAN DEFAULT true,
+    events JSON NOT NULL,       -- ['practice.complete', 'quiz.complete', 'library.update']
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT uk_webhook_user UNIQUE (user_id)
+);
 ```
 
 ## Git 规范

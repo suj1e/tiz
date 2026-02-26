@@ -814,6 +814,103 @@ PATCH /api/user/v1/settings
 
 ---
 
+### 获取 Webhook 配置
+
+```
+GET /api/user/v1/webhook
+认证: 是
+```
+
+**成功响应** `200`
+
+```json
+{
+  "data": {
+    "webhook": {
+      "url": "https://your-server.com/webhook",
+      "enabled": true,
+      "events": ["practice.complete", "quiz.complete"]
+    }
+  }
+}
+```
+
+**无配置时**
+
+```json
+{
+  "data": {
+    "webhook": null
+  }
+}
+```
+
+---
+
+### 保存 Webhook 配置
+
+```
+POST /api/user/v1/webhook
+认证: 是
+```
+
+**请求体**
+
+```json
+{
+  "url": "https://your-server.com/webhook",
+  "enabled": true,
+  "events": ["practice.complete", "quiz.complete", "library.update"]
+}
+```
+
+**events 可选值**
+
+| 值 | 说明 |
+|---|---|
+| `practice.complete` | 练习完成 |
+| `quiz.complete` | 测验完成 |
+| `library.update` | 题库更新 |
+
+**成功响应** `200`
+
+```json
+{
+  "data": {
+    "webhook": {
+      "url": "https://your-server.com/webhook",
+      "enabled": true,
+      "events": ["practice.complete", "quiz.complete"]
+    }
+  }
+}
+```
+
+**错误响应**
+
+| type | code | message | HTTP |
+|------|------|---------|------|
+| validation_error | invalid_url | URL 格式错误 | 400 |
+
+---
+
+### 删除 Webhook 配置
+
+```
+DELETE /api/user/v1/webhook
+认证: 是
+```
+
+**成功响应** `200`
+
+```json
+{
+  "data": null
+}
+```
+
+---
+
 ## AI 服务接口 (llmsrv - 内部)
 
 > 这些接口仅供内部服务调用，不对外暴露
