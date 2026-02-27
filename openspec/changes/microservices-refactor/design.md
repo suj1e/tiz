@@ -36,11 +36,11 @@ tiz-backend/
 
 ### 1. 目录结构
 
-**决定**: 每个服务是独立的 Gradle 项目
+**决定**: 每个服务是独立的 Gradle 项目，使用 api + app 子模块结构
 
 ```
 tiz-backend/
-├── common/                          # 精简的共享库
+├── common/                          # 精简的共享库（无子模块）
 │   ├── build.gradle.kts
 │   ├── settings.gradle.kts
 │   ├── gradle/
@@ -55,38 +55,53 @@ tiz-backend/
 │       ├── response/                # ApiResponse, PagedResponse
 │       └── util/                    # 工具类
 │
-├── contentsrv/                      # 独立 Gradle 项目
-│   ├── build.gradle.kts
-│   ├── settings.gradle.kts
+├── contentsrv/                      # 独立 Gradle 项目（api + app 子模块）
+│   ├── settings.gradle.kts          # include("api", "app")
+│   ├── build.gradle.kts             # 父配置
 │   ├── gradle/
 │   │   ├── libs.versions.toml
 │   │   └── wrapper/
-│   └── src/main/java/io/github/suj1e/content/
-│       ├── api/                     # 公开 API
-│       │   ├── client/              # ContentClient
-│       │   └── dto/                 # QuestionResponse, etc.
-│       └── internal/                # 内部实现
+│   ├── api/                         # 公开 API（发布到 Maven Local）
+│   │   ├── build.gradle.kts
+│   │   └── src/main/java/io/github/suj1e/content/
+│   │       ├── client/              # ContentClient
+│   │       └── dto/                 # QuestionResponse, etc.
+│   └── app/                         # 内部实现（不发布）
+│       ├── build.gradle.kts
+│       └── src/main/java/io/github/suj1e/content/
 │           ├── ContentApplication.java
 │           ├── controller/
 │           ├── service/
 │           └── repository/
 │
-└── ...其他服务同理
+├── gatewaysrv/                      # 网关不需要 api（不对外提供接口）
+│   ├── build.gradle.kts
+│   ├── settings.gradle.kts
+│   └── src/...
+│
+└── ...其他服务同理（authsrv, chatsrv, practicesrv, quizsrv, usersrv）
 ```
 
-**替代方案**:
-- api/service 分开为子模块 → 拒绝，对当前规模过度设计
-- 完全独立仓库 → 拒绝，增加管理成本
+**api + app 子模块的优势**:
+- api 模块独立发布到 Maven Local，其他服务依赖
+- app 模块不发布，包含所有内部实现
+- 清晰的公开/私有边界
+- 支持并行开发（api 契约先定，app 实现后补）
+
+**例外**:
+- `common` 不需要子模块（纯共享库）
+- `gatewaysrv` 不需要 api（不对外提供接口）
+- `llmsrv` 是 Python 服务，其 Java api 在独立的 `llmsrv-api` 项目中
 
 ### 2. Client 位置
 
-**决定**: Client 放在服务提供方的 `api` 包下
+**决定**: Client 放在服务提供方的 `api` 子模块中
 
 | Client | 移动到 |
 |--------|--------|
-| ContentClient | contentsrv/src/.../api/client/ |
-| UserClient | usersrv/src/.../api/client/ |
-| WebhookClient | usersrv/src/.../api/client/ |
+| ContentClient | contentsrv/api/src/.../client/ |
+| UserClient | usersrv/api/src/.../client/ |
+| WebhookClient | usersrv/api/src/.../client/ |
 
 **理由**: 契约由服务提供方维护，调用方依赖提供方的 api。
 
@@ -95,33 +110,37 @@ tiz-backend/
 **决定**: 通过 Maven Local 传递依赖
 
 ```kotlin
-// practicesrv/build.gradle.kts
+// practicesrv/app/build.gradle.kts
 dependencies {
-    implementation(project(":common"))           // 本地 common
-    implementation("io.github.suj1e:contentsrv:1.0.0-SNAPSHOT")  // Maven Local
-    implementation("io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT")  // Python 服务的 Java api
+    implementation(project(":api"))              // 本地 api 子模块
+    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    implementation("io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT")  // Maven Local
+    implementation("io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT")      // Python 服务的 Java api
 }
 ```
 
 **构建顺序**:
 1. `common:publishToMavenLocal`
-2. `contentsrv:publishToMavenLocal`
-3. `usersrv:publishToMavenLocal`
-4. 其他服务
+2. `llmsrv-api:publishToMavenLocal`
+3. 各服务的 `api:publishToMavenLocal`（可并行）
+4. 各服务的 `app:compileJava`（可并行）
 
 ### 4. 包结构
 
-**决定**: 使用 `api` 和 `internal` 包区分公开和私有
+**决定**: api 和 app 子模块使用相同的包名，但目录分离
 
 ```java
-// 公开 API（其他服务可依赖）
-io.github.suj1e.content.api.client.ContentClient
-io.github.suj1e.content.api.dto.QuestionResponse
+// api 子模块（发布到 Maven Local）
+io.github.suj1e.content.client.ContentClient
+io.github.suj1e.content.dto.QuestionResponse
 
-// 内部实现（不对外暴露）
-io.github.suj1e.content.internal.ContentApplication
-io.github.suj1e.content.internal.service.LibraryService
+// app 子模块（不发布）
+io.github.suj1e.content.ContentApplication
+io.github.suj1e.content.service.LibraryService
+io.github.suj1e.content.entity.Question
 ```
+
+**注意**: DTO 中不能依赖 entity 类（api 模块无法访问 app 模块的代码）
 
 ## Risks / Trade-offs
 
