@@ -276,3 +276,22 @@ pixi run dev
 1. Frontend development typically uses mock mode (`VITE_MOCK=true`)
 2. For full-stack development, start infra via `docker-compose -f infra/docker-compose-lite.yml up -d`
 3. API specs and contracts are in `standards/api.md`
+4. Postman collection available at `standards/postman.json`
+
+### Postman Collection Notes
+
+When editing `standards/postman.json`, the `url.path` array must include `v1`:
+```json
+// ❌ Wrong - v1 missing in path array
+"url": {
+  "raw": "{{base_url}}/auth/v1/login",
+  "path": ["auth", "login"]
+}
+
+// ✅ Correct - v1 included in path array
+"url": {
+  "raw": "{{base_url}}/auth/v1/login",
+  "path": ["auth", "v1", "login"]
+}
+```
+Postman imports URL from `path` array, not `raw` field. Missing `v1` in `path` causes version to be lost on import.
