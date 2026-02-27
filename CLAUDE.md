@@ -11,18 +11,28 @@ Tiz is an AI-driven knowledge practice platform. Users interact with AI through 
 ```
 tiz/
 ├── tiz-web/           # Frontend (React + TypeScript + Vite)
-├── tiz-backend/       # Backend microservices
-│   ├── common/        # Shared Java module
-│   ├── authsrv/       # Authentication service (:8101)
-│   ├── chatsrv/       # Chat service (:8102)
-│   ├── contentsrv/    # Content service (:8103)
-│   ├── practicesrv/   # Practice service (:8104)
-│   ├── quizsrv/       # Quiz service (:8105)
+├── tiz-backend/       # Backend microservices (independent Gradle projects)
+│   ├── common/        # Shared utilities (published to Maven Local)
 │   ├── llmsrv/        # AI service (Python/FastAPI) (:8106)
+│   ├── authsrv/       # Authentication service (:8101)
+│   │   ├── api/       # DTOs & client interfaces (published to Maven Local)
+│   │   └── app/       # Service implementation
+│   ├── chatsrv/       # Chat service (:8102)
+│   │   ├── api/       # DTOs & client interfaces
+│   │   └── app/       # Service implementation
+│   ├── contentsrv/    # Content service (:8103)
+│   │   ├── api/       # DTOs & client interfaces
+│   │   └── app/       # Service implementation
+│   ├── practicesrv/   # Practice service (:8104)
+│   │   ├── api/       # DTOs & client interfaces
+│   │   └── app/       # Service implementation
+│   ├── quizsrv/       # Quiz service (:8105)
+│   │   ├── api/       # DTOs & client interfaces
+│   │   └── app/       # Service implementation
 │   ├── usersrv/       # User service (:8107)
-│   ├── gatewaysrv/    # API Gateway (:8080)
-│   ├── build.gradle.kts
-│   └── settings.gradle.kts
+│   │   ├── api/       # DTOs & client interfaces
+│   │   └── app/       # Service implementation
+│   └── gatewaysrv/    # API Gateway (:8080)
 ├── infra/             # Docker Compose infrastructure
 ├── standards/         # Development standards (api.md, frontend.md, backend.md)
 └── openspec/          # OpenSpec change management
@@ -202,7 +212,9 @@ export const userService = {
 
 ## Backend (tiz-backend)
 
-All backend services are in the `tiz-backend/` directory.
+Each Java service is an independent Gradle project with api + app subproject structure:
+- **api/**: DTOs and client interfaces (published to Maven Local for inter-service communication)
+- **app/**: Service implementation with Spring Boot
 
 ### Tech Stack
 
@@ -215,14 +227,26 @@ All backend services are in the `tiz-backend/` directory.
 ### Quick Start
 
 ```bash
-cd tiz-backend
+# Build and publish common module first
+cd tiz-backend/common
+gradle publishToMavenLocal
 
-# Build all services
-./gradlew build
+# Build and publish a service's API
+cd tiz-backend/contentsrv
+gradle :api:publishToMavenLocal
 
-# Run a service
-./gradlew :authsrv:bootRun
+# Build and run a service
+cd tiz-backend/contentsrv
+gradle :app:bootRun
 ```
+
+### Service Dependencies
+
+Services depend on each other via Maven Local:
+- `io.github.suj1e:common:1.0.0-SNAPSHOT` - Shared utilities
+- `io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT` - Content service DTOs
+- `io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT` - LLM service DTOs
+- etc.
 
 ### AI Service (llmsrv)
 

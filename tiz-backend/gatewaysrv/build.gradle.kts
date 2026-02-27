@@ -17,26 +17,19 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-    maven {
-        url = uri("https://maven.aliyun.com/repository/public")
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom(libs.spring.cloud.dependencies.get().toString())
-        mavenBom(libs.spring.cloud.alibaba.dependencies.get().toString())
-    }
-}
-
 dependencies {
-    // Common module
-    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    // BOMs
+    implementation(platform(libs.spring.cloud.dependencies))
+    implementation(platform(libs.spring.cloud.alibaba.dependencies))
 
-    // Spring Cloud Gateway
+    // Common module (exclude servlet-based dependencies for reactive gateway)
+    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-data-jpa")
+        exclude(group = "com.mysql", module = "mysql-connector-j")
+    }
+
+    // Spring Cloud Gateway (reactive)
     implementation(libs.spring.boot.starter.webflux)
     implementation(libs.spring.cloud.starter.gateway)
     implementation(libs.spring.cloud.loadbalancer)
