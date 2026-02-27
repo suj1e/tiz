@@ -11,7 +11,18 @@ Tiz is an AI-driven knowledge practice platform. Users interact with AI through 
 ```
 tiz/
 ├── tiz-web/           # Frontend (React + TypeScript + Vite)
-├── gatewaysrv/        # API Gateway (Java/Spring Cloud Gateway)
+├── tiz-backend/       # Backend microservices
+│   ├── common/        # Shared Java module
+│   ├── authsrv/       # Authentication service (:8101)
+│   ├── chatsrv/       # Chat service (:8102)
+│   ├── contentsrv/    # Content service (:8103)
+│   ├── practicesrv/   # Practice service (:8104)
+│   ├── quizsrv/       # Quiz service (:8105)
+│   ├── llmsrv/        # AI service (Python/FastAPI) (:8106)
+│   ├── usersrv/       # User service (:8107)
+│   ├── gatewaysrv/    # API Gateway (:8080)
+│   ├── build.gradle.kts
+│   └── settings.gradle.kts
 ├── infra/             # Docker Compose infrastructure
 ├── standards/         # Development standards (api.md, frontend.md, backend.md)
 └── openspec/          # OpenSpec change management
@@ -189,16 +200,31 @@ export const userService = {
 | `RootErrorBoundary` | `common/RootErrorBoundary.tsx` | Route-level error boundary |
 | `ProtectedRoute` | `common/ProtectedRoute.tsx` | Auth route guard |
 
-## Backend (gatewaysrv)
+## Backend (tiz-backend)
 
-API Gateway routes:
+All backend services are in the `tiz-backend/` directory. See `BACKEND_DEV.md` for details.
+
+### Quick Start
+
+```bash
+cd tiz-backend
+
+# Build all services
+./gradlew build
+
+# Run a service
+./gradlew :authsrv:bootRun
 ```
-/api/auth/v1/**     → auth-service
-/api/chat/v1/**     → chat-service
-/api/content/v1/**  → content-service
-/api/practice/v1/** → practice-service
-/api/quiz/v1/**     → quiz-service
-/api/user/v1/**     → user-service
+
+### API Gateway Routes
+
+```
+/api/auth/v1/**     → authsrv:8101
+/api/chat/v1/**     → chatsrv:8102
+/api/content/v1/**  → contentsrv:8103
+/api/practice/v1/** → practicesrv:8104
+/api/quiz/v1/**     → quizsrv:8105
+/api/user/v1/**     → usersrv:8107
 ```
 
 ## Development Workflow

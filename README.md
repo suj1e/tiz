@@ -7,7 +7,16 @@ Tiz 是一个基于 AI 的知识练习平台，用户通过对话式交互与 AI
 ```
 tiz/
 ├── tiz-web/           # 前端项目 (React + TypeScript + Vite)
-├── gatewaysrv/        # API 网关服务 (Java/Spring Cloud Gateway)
+├── tiz-backend/       # 后端微服务
+│   ├── common/        # 公共模块 (Java)
+│   ├── authsrv/       # 认证服务 (:8101)
+│   ├── chatsrv/       # 对话服务 (:8102)
+│   ├── contentsrv/    # 内容服务 (:8103)
+│   ├── practicesrv/   # 练习服务 (:8104)
+│   ├── quizsrv/       # 测验服务 (:8105)
+│   ├── llmsrv/        # AI 服务 (Python/FastAPI) (:8106)
+│   ├── usersrv/       # 用户服务 (:8107)
+│   └── gatewaysrv/    # API 网关 (:8080)
 ├── infra/             # 基础设施配置 (Docker Compose)
 ├── standards/         # 开发规范文档
 │   ├── api.md         # API 接口文档
@@ -40,12 +49,13 @@ tiz/
 | Mock | MSW 2.x |
 | 测试 | Vitest 4.x + Testing Library |
 
-### 后端 (gatewaysrv)
+### 后端 (tiz-backend)
 | 类别 | 技术 |
 |------|------|
-| 框架 | Spring Cloud Gateway |
-| 语言 | Java 21 |
-| 构建 | Gradle |
+| 框架 | Spring Boot 4.0.2 / Spring Cloud Gateway |
+| 语言 | Java 21 / Python 3.11+ |
+| 构建 | Gradle / pixi |
+| AI | LangGraph + LangChain |
 
 ## 快速开始
 
@@ -73,13 +83,28 @@ pnpm build
 ### 后端开发
 
 ```bash
-cd gatewaysrv
+cd tiz-backend
 
-# 构建
+# 构建所有服务
 ./gradlew build
 
-# 运行
-./run.sh
+# 构建单个服务
+./gradlew :authsrv:build
+
+# 运行服务
+./gradlew :authsrv:bootRun
+```
+
+### AI 服务 (llmsrv)
+
+```bash
+cd tiz-backend/llmsrv
+
+# 安装依赖
+pixi install
+
+# 运行开发服务器
+pixi run dev
 ```
 
 ### 基础设施
@@ -109,40 +134,13 @@ docker-compose -f docker-compose-lite.yml up -d
 ## API 网关路由
 
 ```
-/api/auth/v1/**     → auth-service
-/api/chat/v1/**     → chat-service
-/api/content/v1/**  → content-service
-/api/practice/v1/** → practice-service
-/api/quiz/v1/**     → quiz-service
-/api/user/v1/**     → user-service
+/api/auth/v1/**     → authsrv:8101
+/api/chat/v1/**     → chatsrv:8102
+/api/content/v1/**  → contentsrv:8103
+/api/practice/v1/** → practicesrv:8104
+/api/quiz/v1/**     → quizsrv:8105
+/api/user/v1/**     → usersrv:8107
 ```
-
-## 前端特性
-
-### 主题系统
-- 全站支持亮色/暗色主题切换
-- 所有页面（包括登录、注册、落地页）均可切换主题
-
-### 错误处理
-- 路由级 `RootErrorBoundary` 捕获加载错误
-- 页面级 `PageError` 组件处理数据加载失败
-- 友好的错误提示和重试机制
-
-### 响应式设计
-- 移动端优先的响应式布局
-- 支持手机、平板、桌面多种设备
-- 动态尺寸适配，避免写死像素值
-
-### 设置页功能
-- 外观设置（主题切换）
-- 通知设置（推送通知）
-- Webhook 配置（事件通知）
-- 账户信息（邮箱、密码、删除账户）
-
-### 题库管理
-- 支持新建空题库（Dialog 交互）
-- 分类和标签筛选
-- 搜索功能
 
 ## 开发规范
 
@@ -151,6 +149,7 @@ docker-compose -f docker-compose-lite.yml up -d
 - [API 文档](standards/api.md)
 - [后端规范](standards/backend.md)
 - [前端规范](standards/frontend.md)
+- [后端开发指南](BACKEND_DEV.md)
 
 ## 许可证
 
