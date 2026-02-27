@@ -1,5 +1,127 @@
 # tiz 后端开发规范
 
+## 项目结构
+
+每个 Java 服务都是独立的 Gradle 项目，采用 api + app 子模块结构：
+
+```
+tiz-backend/
+├── common/                    # 公共模块 (发布到 Maven Local)
+│   ├── build.gradle.kts
+│   └── src/main/java/
+│
+├── llmsrv/                    # AI 服务 (Python/FastAPI)
+│
+├── authsrv/                   # 认证服务
+│   ├── settings.gradle.kts    # include("api", "app")
+│   ├── build.gradle.kts       # 父配置
+│   ├── api/                   # DTO 和客户端接口
+│   │   ├── build.gradle.kts   # maven-publish
+│   │   └── src/main/java/
+│   │       └── io/github/suj1e/auth/dto/
+│   └── app/                   # 服务实现
+│       ├── build.gradle.kts   # spring-boot
+│       └── src/main/java/
+│           └── io/github/suj1e/auth/
+│               ├── controller/
+│               ├── service/
+│               ├── repository/
+│               └── entity/
+│
+├── chatsrv/                   # 对话服务 (api + app)
+├── contentsrv/                # 内容服务 (api + app)
+├── practicesrv/               # 练习服务 (api + app)
+├── quizsrv/                   # 测验服务 (api + app)
+├── usersrv/                   # 用户服务 (api + app)
+│
+└── gatewaysrv/                # API 网关 (无 api 子模块)
+    ├── build.gradle.kts
+    └── src/main/java/
+```
+
+### api 子模块
+
+- 包含 DTO 类和客户端接口
+- 发布到 Maven Local 供其他服务依赖
+- 不包含业务逻辑或实现
+
+```kotlin
+// api/build.gradle.kts
+plugins {
+    `java-library`
+    `maven-publish`
+}
+
+dependencies {
+    api("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    api("jakarta.validation:jakarta.validation-api:3.0.2")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "contentsrv-api"
+        }
+    }
+}
+```
+
+### app 子模块
+
+- 包含服务实现、控制器、业务逻辑
+- 依赖本地 api 模块和其他服务的 api
+
+```kotlin
+// app/build.gradle.kts
+plugins {
+    java
+    alias(libs.plugins.spring.boot)
+}
+
+dependencies {
+    // 本地 api 模块
+    implementation(project(":api"))
+
+    // Common module (from Maven Local)
+    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+
+    // Service APIs (from Maven Local)
+    implementation("io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT")
+    implementation("io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT")
+
+    // Spring Boot Starters
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.data.jpa)
+    // ...
+}
+```
+
+### 构建流程
+
+```bash
+# 1. 首先发布 common 模块
+cd tiz-backend/common
+gradle publishToMavenLocal
+
+# 2. 发布服务 API (如果其他服务依赖它)
+cd tiz-backend/contentsrv
+gradle :api:publishToMavenLocal
+
+# 3. 构建并运行服务
+cd tiz-backend/contentsrv
+gradle :app:bootRun
+```
+
+### 服务间依赖
+
+| 服务 | 依赖 |
+|------|------|
+| chatsrv | contentsrv-api, llmsrv-api |
+| practicesrv | contentsrv-api, llmsrv-api |
+| quizsrv | contentsrv-api, llmsrv-api |
+| gatewaysrv | common |
+
 ## 微服务架构
 
 ```
