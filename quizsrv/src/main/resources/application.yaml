@@ -1,0 +1,76 @@
+server:
+  port: 8105
+
+spring:
+  application:
+    name: quizsrv
+  datasource:
+    url: jdbc:mysql://localhost:30001/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: Tiz@2026
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:30006
+        namespace: tiz
+      config:
+        server-addr: localhost:30006
+        namespace: tiz
+        file-extension: yaml
+  kafka:
+    bootstrap-servers: localhost:30009
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+    consumer:
+      group-id: quizsrv
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+# HTTP Client for contentsrv
+content:
+  service:
+    url: http://contentsrv:8103
+
+# HTTP Client for llmsrv
+llm:
+  service:
+    url: http://llmsrv:8106
+
+# Outbox configuration
+outbox:
+  scan-interval: 5000
+  batch-size: 100
+  max-retries: 3
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# Logging
+logging:
+  level:
+    root: INFO
+    io.github.suj1e: DEBUG
+    org.hibernate.SQL: DEBUG
