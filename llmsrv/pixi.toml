@@ -1,0 +1,28 @@
+[project]
+name = "llmsrv"
+version = "0.1.0"
+description = "Tiz AI Service"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[dependencies]
+python = ">=3.11,<3.13"
+
+[pypi-dependencies]
+fastapi = ">=0.109.0"
+uvicorn = { version = ">=0.27.0", extras = ["standard"] }
+langgraph = ">=0.2.0"
+langchain = ">=0.3.0"
+langchain-openai = ">=0.2.0"
+langchain-core = ">=0.3.0"
+pydantic = ">=2.5.0"
+pydantic-settings = ">=2.1.0"
+httpx = ">=0.26.0"
+python-dotenv = ">=1.0.0"
+pytest = ">=7.4.0"
+pytest-asyncio = ">=0.23.0"
+
+[tasks]
+dev = "uvicorn app.main:app --reload --host 0.0.0.0 --port 8106"
+start = "uvicorn app.main:app --host 0.0.0.0 --port 8106"
+test = "pytest tests/ -v"
