@@ -1,16 +1,15 @@
 rootProject.name = "usersrv"
 
+include("api")
+include("app")
+
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         mavenCentral()
         mavenLocal()
         maven {
             url = uri("https://maven.aliyun.com/repository/public")
-        }
-    }
-    versionCatalogs {
-        create("libs") {
-            from(files("gradle/libs.versions.toml"))
         }
     }
 }

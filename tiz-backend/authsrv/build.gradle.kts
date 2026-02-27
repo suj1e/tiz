@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.spring.cloud.nacos.config)
 
     // QueryDSL
-    implementation(libs.querydsl.jpa)
+    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
 
     // Security (JWT already in common)
     implementation(libs.bundles.jjwt)

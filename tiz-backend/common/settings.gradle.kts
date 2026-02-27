@@ -1,9 +1,12 @@
+rootProject.name = "common"
+
 dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("gradle/libs.versions.toml"))
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url = uri("https://maven.aliyun.com/repository/public")
         }
     }
 }
-
-rootProject.name = "common"

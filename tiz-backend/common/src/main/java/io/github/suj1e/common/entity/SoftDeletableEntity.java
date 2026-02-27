@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.data.annotation.DeletedDate;
 
 import java.time.Instant;
 
@@ -20,7 +19,6 @@ import java.time.Instant;
 @SQLRestriction("deleted_at IS NULL")
 public abstract class SoftDeletableEntity extends BaseEntity {
 
-    @DeletedDate
     @Column(name = "deleted_at")
     private Instant deletedAt;
 }

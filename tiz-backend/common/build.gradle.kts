@@ -1,7 +1,6 @@
 plugins {
     `java-library`
     `maven-publish`
-    alias(libs.plugins.spring.dependency.management)
 }
 
 group = "io.github.suj1e"
@@ -11,24 +10,11 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
     maven {
         url = uri("https://maven.aliyun.com/repository/public")
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom(libs.spring.cloud.dependencies.get().toString())
-        mavenBom(libs.spring.cloud.alibaba.dependencies.get().toString())
     }
 }
 
@@ -40,10 +26,9 @@ dependencies {
     api(libs.spring.boot.starter.validation)
     api(libs.spring.boot.starter.security)
     api(libs.spring.boot.starter.actuator)
-    api(libs.spring.boot.starter.aop)
 
-    // QueryDSL
-    api(libs.querydsl.jpa)
+    // QueryDSL (Jakarta)
+    api("com.querydsl:querydsl-jpa:5.1.0:jakarta")
 
     // Security
     api(libs.bundles.jjwt)

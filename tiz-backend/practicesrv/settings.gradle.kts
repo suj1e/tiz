@@ -1,16 +1,12 @@
 rootProject.name = "practicesrv"
 
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         mavenCentral()
         mavenLocal()
         maven {
             url = uri("https://maven.aliyun.com/repository/public")
-        }
-    }
-    versionCatalogs {
-        create("libs") {
-            from(files("gradle/libs.versions.toml"))
         }
     }
 }

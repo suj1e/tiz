@@ -38,7 +38,7 @@ dependencies {
     implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
 
     // Service APIs (from Maven Local)
-    implementation("io.github.suj1e:contentsrv:1.0.0-SNAPSHOT")
+    implementation("io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT")
     implementation("io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT")
 
     // Spring Boot Starters
@@ -55,7 +55,7 @@ dependencies {
     implementation(libs.spring.cloud.nacos.config)
 
     // QueryDSL
-    implementation(libs.querydsl.jpa)
+    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
 
     // Security (JWT already in common)
     implementation(libs.bundles.jjwt)
