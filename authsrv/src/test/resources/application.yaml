@@ -1,0 +1,40 @@
+server:
+  port: 8101
+
+spring:
+  application:
+    name: authsrv-test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+
+  autoconfigure:
+    exclude:
+      - org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration
+
+jwt:
+  secret: TizJwtSecretKey2026VeryLongSecretKeyForSecurity
+  access-token-expiration: 1800
+  refresh-token-expiration: 604800
+
+logging:
+  level:
+    io.github.suj1e: DEBUG

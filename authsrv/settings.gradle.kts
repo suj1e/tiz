@@ -1,9 +1,9 @@
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            from(files("gradle/libs.versions.toml"))
+            from(files("../common/gradle/libs.versions.toml"))
         }
     }
 }
 
-rootProject.name = "common"
+rootProject.name = "authsrv"
