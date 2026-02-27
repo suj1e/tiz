@@ -18,4 +18,9 @@ dependencyResolutionManagement {
             url = uri("https://maven.aliyun.com/repository/public")
         }
     }
+    versionCatalogs {
+        create("libs") {
+            from(files("common/gradle/libs.versions.toml"))
+        }
+    }
 }
