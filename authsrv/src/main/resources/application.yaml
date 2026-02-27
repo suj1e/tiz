@@ -1,0 +1,50 @@
+server:
+  port: 8101
+
+spring:
+  application:
+    name: authsrv
+
+  datasource:
+    url: jdbc:mysql://localhost:30001/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: Tiz@2026
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  data:
+    redis:
+      host: localhost
+      port: 30002
+      password: Tiz@2026
+      timeout: 3000ms
+
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+        server-addr: localhost:30006
+      config:
+        enabled: false
+        server-addr: localhost:30006
+
+jwt:
+  secret: TizJwtSecretKey2026VeryLongSecretKeyForSecurity
+  access-token-expiration: 1800    # 30 minutes in seconds
+  refresh-token-expiration: 604800 # 7 days in seconds
+
+logging:
+  level:
+    io.github.suj1e: DEBUG
+    org.springframework.security: DEBUG
