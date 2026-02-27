@@ -1,7 +1,14 @@
-rootProject.name = "contentsrv-root"
+rootProject.name = "tiz-backend"
 
 include("common")
+include("authsrv")
+include("chatsrv")
 include("contentsrv")
+include("gatewaysrv")
+include("llmsrv")
+include("practicesrv")
+include("quizsrv")
+include("usersrv")
 
 dependencyResolutionManagement {
     repositories {
