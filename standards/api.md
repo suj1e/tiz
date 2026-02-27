@@ -1,5 +1,25 @@
 # tiz API 文档
 
+## 服务架构
+
+每个服务都是独立的 Gradle 项目，采用 api + app 子模块结构：
+
+| 服务 | 端口 | 职责 | 依赖服务 |
+|------|------|------|----------|
+| gatewaysrv | 8080 | API 网关、路由、鉴权 | - |
+| authsrv | 8101 | 用户注册、登录、Token 管理 | - |
+| chatsrv | 8102 | 对话入口、会话管理 | llmsrv |
+| contentsrv | 8103 | 题库、题目、分类、标签 | llmsrv |
+| practicesrv | 8104 | 练习记录、答案 | contentsrv, llmsrv |
+| quizsrv | 8105 | 测验、结果 | contentsrv, llmsrv |
+| usersrv | 8107 | 用户设置、偏好、Webhook | - |
+| llmsrv | 8106 | AI 对话、题目生成、评分 | - |
+
+### 服务间通信
+
+- **Java ↔ Java**: 通过 Maven Local 共享 DTO (xxx-api 模块)
+- **Java ↔ llmsrv**: HTTP/WebClient (SSE 流式)
+
 ## 概述
 
 - **Base URL**: `/api/v1`
