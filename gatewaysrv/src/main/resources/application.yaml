@@ -1,0 +1,93 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gatewaysrv
+
+  cloud:
+    gateway:
+      routes:
+        # Auth Service
+        - id: auth-service
+          uri: lb://authsrv
+          predicates:
+            - Path=/api/auth/v1/**
+          filters:
+            - StripPrefix=0
+
+        # User Service
+        - id: user-service
+          uri: lb://usersrv
+          predicates:
+            - Path=/api/user/v1/**
+
+        # Chat Service
+        - id: chat-service
+          uri: lb://chatsrv
+          predicates:
+            - Path=/api/chat/v1/**
+
+        # Content Service
+        - id: content-service
+          uri: lb://contentsrv
+          predicates:
+            - Path=/api/content/v1/**
+
+        # Practice Service
+        - id: practice-service
+          uri: lb://practicesrv
+          predicates:
+            - Path=/api/practice/v1/**
+
+        # Quiz Service
+        - id: quiz-service
+          uri: lb://quizsrv
+          predicates:
+            - Path=/api/quiz/v1/**
+
+    nacos:
+      discovery:
+        enabled: false
+        server-addr: localhost:30006
+        namespace: public
+      config:
+        enabled: false
+        server-addr: localhost:30006
+        namespace: public
+        file-extension: yaml
+
+# JWT Configuration
+jwt:
+  secret: TizJwtSecretKey2026VeryLongSecretKeyForSecurity
+
+# CORS Configuration
+cors:
+  allowed-origins: http://localhost:5173,http://localhost:3000
+  allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+  allowed-headers: Authorization,Content-Type,X-*
+  allow-credentials: true
+  max-age: 3600
+
+# Whitelist paths (no authentication required)
+gateway:
+  whitelist:
+    - /api/auth/v1/login
+    - /api/auth/v1/register
+    - /api/auth/v1/refresh
+    - /actuator/**
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    io.github.suj1e: DEBUG
+    org.springframework.cloud.gateway: DEBUG
