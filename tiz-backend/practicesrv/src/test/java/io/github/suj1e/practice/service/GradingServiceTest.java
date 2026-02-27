@@ -1,7 +1,10 @@
 package io.github.suj1e.practice.service;
 
-import io.github.suj1e.common.client.ContentClient;
-import io.github.suj1e.common.client.LlmClient;
+import io.github.suj1e.content.api.client.ContentClient;
+import io.github.suj1e.content.api.dto.QuestionResponse;
+import io.github.suj1e.llm.api.client.LlmClient;
+import io.github.suj1e.llm.api.dto.GradeResponse;
+import io.github.suj1e.llm.api.dto.GradeRequest;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.practice.exception.GradingException;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +51,7 @@ class GradingServiceTest {
         @DisplayName("Should return correct when answer matches exactly")
         void shouldReturnCorrectWhenExactMatch() {
             // Given
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "choice", "What is 2+2?", List.of("3", "4", "5", "6"),
                 "4", "Basic addition", null
             );
@@ -67,7 +70,7 @@ class GradingServiceTest {
         @DisplayName("Should return correct when answer matches with different case")
         void shouldReturnCorrectWhenCaseInsensitive() {
             // Given
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "choice", "Capital of France?", List.of("London", "Paris", "Berlin"),
                 "PARIS", "Geography", null
             );
@@ -84,7 +87,7 @@ class GradingServiceTest {
         @DisplayName("Should return correct when answer matches with whitespace")
         void shouldReturnCorrectWithWhitespace() {
             // Given
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "choice", "Select option A", List.of("A", "B", "C"),
                 "A", "Test", null
             );
@@ -101,7 +104,7 @@ class GradingServiceTest {
         @DisplayName("Should return incorrect when answer does not match")
         void shouldReturnIncorrectWhenNoMatch() {
             // Given
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "choice", "What is 2+2?", List.of("3", "4", "5", "6"),
                 "4", "Basic addition", null
             );
@@ -124,15 +127,15 @@ class GradingServiceTest {
         @DisplayName("Should call LLM service and return graded result")
         void shouldCallLlmServiceForEssayGrading() {
             // Given
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "essay", "Explain dependency injection", null,
                 "Dependency injection is...", "Key concepts: IoC, DI types", "Rubric content"
             );
 
-            LlmClient.GradeResponse llmResponse = new LlmClient.GradeResponse(
+            GradeResponse llmResponse = new GradeResponse(
                 8, 10, true, "Good explanation but could be more detailed"
             );
-            when(llmClient.gradeAnswer(any(LlmClient.GradeRequest.class)))
+            when(llmClient.gradeAnswer(any(GradeRequest.class)))
                 .thenReturn(ApiResponse.of(llmResponse));
 
             // When
@@ -146,19 +149,19 @@ class GradingServiceTest {
             assertEquals(new BigDecimal("10"), result.maxScore());
             assertEquals("Good explanation but could be more detailed", result.feedback());
 
-            verify(llmClient).gradeAnswer(any(LlmClient.GradeRequest.class));
+            verify(llmClient).gradeAnswer(any(GradeRequest.class));
         }
 
         @Test
         @DisplayName("Should return incorrect when LLM returns null")
         void shouldReturnIncorrectWhenLlmReturnsNull() {
             // Given
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "essay", "Explain Spring Boot", null,
                 "Spring Boot is...", "Auto-configuration", "Rubric"
             );
 
-            when(llmClient.gradeAnswer(any(LlmClient.GradeRequest.class)))
+            when(llmClient.gradeAnswer(any(GradeRequest.class)))
                 .thenReturn(new ApiResponse<>(null));
 
             // When
@@ -175,12 +178,12 @@ class GradingServiceTest {
         @DisplayName("Should throw GradingException when LLM service fails")
         void shouldThrowExceptionWhenLlmFails() {
             // Given
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "essay", "Explain microservices", null,
                 "Microservices are...", "Key points", "Rubric"
             );
 
-            when(llmClient.gradeAnswer(any(LlmClient.GradeRequest.class)))
+            when(llmClient.gradeAnswer(any(GradeRequest.class)))
                 .thenThrow(new RuntimeException("LLM service unavailable"));
 
             // When & Then
@@ -197,7 +200,7 @@ class GradingServiceTest {
         @DisplayName("Should throw exception for unknown question type")
         void shouldThrowExceptionForUnknownType() {
             // Given
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "unknown", "Invalid question", null,
                 "Answer", "Explanation", null
             );

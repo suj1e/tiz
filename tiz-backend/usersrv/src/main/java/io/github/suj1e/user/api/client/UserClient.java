@@ -1,5 +1,7 @@
-package io.github.suj1e.common.client;
+package io.github.suj1e.user.api.client;
 
+import io.github.suj1e.user.api.dto.TokenValidationResponse;
+import io.github.suj1e.user.api.dto.UserResponse;
 import io.github.suj1e.common.response.ApiResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,22 +21,4 @@ public interface UserClient {
 
     @GetExchange("/internal/auth/v1/users/validate")
     ApiResponse<TokenValidationResponse> validateToken(@RequestParam String token);
-
-    /**
-     * 用户响应.
-     */
-    record UserResponse(
-        UUID id,
-        String email,
-        String status
-    ) {}
-
-    /**
-     * Token 验证响应.
-     */
-    record TokenValidationResponse(
-        boolean valid,
-        UUID userId,
-        String email
-    ) {}
 }

@@ -1,6 +1,8 @@
 package io.github.suj1e.practice.service;
 
-import io.github.suj1e.common.client.ContentClient;
+import io.github.suj1e.content.api.client.ContentClient;
+import io.github.suj1e.content.api.dto.KnowledgeSetResponse;
+import io.github.suj1e.content.api.dto.QuestionResponse;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.practice.dto.*;
 import io.github.suj1e.practice.entity.PracticeAnswer;
@@ -53,18 +55,18 @@ public class PracticeService {
         }
 
         // 获取题库信息
-        ApiResponse<ContentClient.KnowledgeSetResponse> ksResponse =
+        ApiResponse<KnowledgeSetResponse> ksResponse =
             contentClient.getKnowledgeSet(knowledgeSetId);
         if (ksResponse.data() == null) {
             throw new PracticeException(PracticeErrorCode.SESSION_NOT_FOUND,
                 "Knowledge set not found: " + knowledgeSetId);
         }
-        ContentClient.KnowledgeSetResponse knowledgeSet = ksResponse.data();
+        KnowledgeSetResponse knowledgeSet = ksResponse.data();
 
         // 获取题目列表
-        ApiResponse<List<ContentClient.QuestionResponse>> questionsResponse =
+        ApiResponse<List<QuestionResponse>> questionsResponse =
             contentClient.getQuestions(knowledgeSetId, null);
-        List<ContentClient.QuestionResponse> questions = questionsResponse.data();
+        List<QuestionResponse> questions = questionsResponse.data();
         if (questions == null || questions.isEmpty()) {
             throw new PracticeException(PracticeErrorCode.SESSION_NOT_FOUND,
                 "No questions found in knowledge set: " + knowledgeSetId);
@@ -89,7 +91,7 @@ public class PracticeService {
         // 构建响应 (不包含答案)
         List<StartPracticeResponse.QuestionResponse> questionResponses = new ArrayList<>();
         for (int i = 0; i < questions.size(); i++) {
-            ContentClient.QuestionResponse q = questions.get(i);
+            QuestionResponse q = questions.get(i);
             questionResponses.add(new StartPracticeResponse.QuestionResponse(
                 q.id(),
                 q.type(),
@@ -128,13 +130,13 @@ public class PracticeService {
         }
 
         // 获取题目信息
-        ApiResponse<ContentClient.QuestionResponse> questionResponse =
+        ApiResponse<QuestionResponse> questionResponse =
             contentClient.getQuestion(request.questionId());
         if (questionResponse.data() == null) {
             throw new PracticeException(PracticeErrorCode.ANSWER_NOT_FOUND,
                 "Question not found: " + request.questionId());
         }
-        ContentClient.QuestionResponse question = questionResponse.data();
+        QuestionResponse question = questionResponse.data();
 
         // 评分
         GradingService.GradingResult result = gradingService.grade(question, request.answer());
@@ -244,7 +246,7 @@ public class PracticeService {
         PracticeSession session = getSessionAndValidate(userId, sessionId);
 
         // 获取题库信息
-        ApiResponse<ContentClient.KnowledgeSetResponse> ksResponse =
+        ApiResponse<KnowledgeSetResponse> ksResponse =
             contentClient.getKnowledgeSet(session.getKnowledgeSetId());
         String knowledgeSetTitle = ksResponse.data() != null
             ? ksResponse.data().title()
@@ -256,9 +258,9 @@ public class PracticeService {
         // 获取题目详情用于构建响应
         List<SessionResponse.AnswerResponse> answerResponses = new ArrayList<>();
         for (PracticeAnswer answer : answers) {
-            ApiResponse<ContentClient.QuestionResponse> qResponse =
+            ApiResponse<QuestionResponse> qResponse =
                 contentClient.getQuestion(answer.getQuestionId());
-            ContentClient.QuestionResponse question = qResponse.data();
+            QuestionResponse question = qResponse.data();
 
             answerResponses.add(new SessionResponse.AnswerResponse(
                 answer.getQuestionId(),

@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `maven-publish`
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
 }
@@ -33,8 +34,12 @@ dependencyManagement {
 }
 
 dependencies {
-    // Common module
-    implementation(project(":common"))
+    // Common module (from Maven Local)
+    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+
+    // Service APIs (from Maven Local)
+    implementation("io.github.suj1e:contentsrv:1.0.0-SNAPSHOT")
+    implementation("io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT")
 
     // Spring Boot Starters
     implementation(libs.spring.boot.starter.web)
@@ -80,4 +85,13 @@ tasks.withType<JavaCompile> {
         "-Amapstruct.defaultComponentModel=spring",
         "-Amapstruct.unmappedTargetPolicy=IGNORE"
     ))
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "practicesrv"
+        }
+    }
 }

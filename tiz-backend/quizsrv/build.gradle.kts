@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `maven-publish`
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
 }
@@ -33,43 +34,47 @@ dependencyManagement {
 }
 
 dependencies {
-    // Common module
-    implementation(project(":common"))
+    // Common module (from Maven Local)
+    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+
+    // Service APIs (from Maven Local)
+    implementation("io.github.suj1e:contentsrv:1.0.0-SNAPSHOT")
+    implementation("io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT")
 
     // Spring Boot Starters
     implementation(libs.spring.boot.starter.web)
-    implementation(libs.spring.boot.starter.data.jpa)
-    implementation(libs.spring.boot.starter.validation)
-    implementation(libs.spring.boot.starter.actuator)
-    implementation(libs.spring.boot.starter.aop)
     implementation(libs.spring.boot.starter.webflux)
-    implementation(libs.spring.boot.starter.kafka)
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.data.redis)
+    implementation(libs.spring.boot.starter.validation)
+    implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.boot.starter.actuator)
 
     // Spring Cloud
-    implementation(libs.spring.cloud.starter.openfeign)
     implementation(libs.spring.cloud.nacos.discovery)
     implementation(libs.spring.cloud.nacos.config)
-    implementation(libs.spring.cloud.loadbalancer)
 
     // QueryDSL
     implementation(libs.querydsl.jpa)
-    annotationProcessor(libs.querydsl.jpa)
-    annotationProcessor(libs.jakarta.persistence.api)
+
+    // Security (JWT already in common)
+    implementation(libs.bundles.jjwt)
+
+    // Database
+    runtimeOnly(libs.mysql.connector.j)
+
+    // Lombok
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
 
     // MapStruct
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
     annotationProcessor(libs.lombok.mapstruct.binding)
 
-    // Lombok
-    compileOnly(libs.lombok)
-    annotationProcessor(libs.lombok)
-
-    // Database
-    runtimeOnly(libs.mysql.connector.j)
-
     // Testing
     testImplementation(libs.bundles.testing)
+    testRuntimeOnly("com.h2database:h2")
 }
 
 tasks.withType<Test> {
@@ -81,4 +86,13 @@ tasks.withType<JavaCompile> {
         "-Amapstruct.defaultComponentModel=spring",
         "-Amapstruct.unmappedTargetPolicy=IGNORE"
     ))
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "quizsrv"
+        }
+    }
 }

@@ -1,7 +1,9 @@
 package io.github.suj1e.quiz.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.suj1e.common.client.ContentClient;
+import io.github.suj1e.content.api.client.ContentClient;
+import io.github.suj1e.content.api.dto.KnowledgeSetResponse;
+import io.github.suj1e.content.api.dto.QuestionResponse;
 import io.github.suj1e.common.exception.BusinessException;
 import io.github.suj1e.common.exception.NotFoundException;
 import io.github.suj1e.common.response.ApiResponse;
@@ -66,15 +68,15 @@ class QuizServiceTest {
 
     private UUID userId;
     private UUID knowledgeSetId;
-    private ContentClient.KnowledgeSetResponse knowledgeSet;
-    private List<ContentClient.QuestionResponse> questions;
+    private KnowledgeSetResponse knowledgeSet;
+    private List<QuestionResponse> questions;
 
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
         knowledgeSetId = UUID.randomUUID();
 
-        knowledgeSet = new ContentClient.KnowledgeSetResponse(
+        knowledgeSet = new KnowledgeSetResponse(
             knowledgeSetId,
             "Test Knowledge Set",
             null,
@@ -86,7 +88,7 @@ class QuizServiceTest {
         );
 
         questions = List.of(
-            new ContentClient.QuestionResponse(
+            new QuestionResponse(
                 UUID.randomUUID(),
                 "choice",
                 "What is 1+1?",
@@ -95,7 +97,7 @@ class QuizServiceTest {
                 "Basic math",
                 null
             ),
-            new ContentClient.QuestionResponse(
+            new QuestionResponse(
                 UUID.randomUUID(),
                 "choice",
                 "What is 2+2?",

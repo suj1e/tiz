@@ -1,6 +1,6 @@
 package io.github.suj1e.practice.config;
 
-import io.github.suj1e.common.client.LlmClient;
+import io.github.suj1e.llm.api.client.LlmClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

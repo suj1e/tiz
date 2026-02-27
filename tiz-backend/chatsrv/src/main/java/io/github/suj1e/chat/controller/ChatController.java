@@ -7,7 +7,7 @@ import io.github.suj1e.chat.dto.HistoryResponse;
 import io.github.suj1e.chat.service.ChatHistoryService;
 import io.github.suj1e.chat.service.ChatService;
 import io.github.suj1e.chat.sse.SseEmitterService;
-import io.github.suj1e.common.client.LlmClient;
+import io.github.suj1e.llm.api.client.LlmClient;
 import io.github.suj1e.common.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

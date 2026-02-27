@@ -1,7 +1,10 @@
 package io.github.suj1e.practice.service;
 
-import io.github.suj1e.common.client.ContentClient;
-import io.github.suj1e.common.client.LlmClient;
+import io.github.suj1e.content.api.client.ContentClient;
+import io.github.suj1e.content.api.dto.QuestionResponse;
+import io.github.suj1e.llm.api.client.LlmClient;
+import io.github.suj1e.llm.api.dto.GradeResponse;
+import io.github.suj1e.llm.api.dto.GradeRequest;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.practice.error.PracticeErrorCode;
 import io.github.suj1e.practice.exception.GradingException;
@@ -57,7 +60,7 @@ public class GradingService {
      * @param userAnswer     用户答案
      * @return 评分结果
      */
-    public GradingResult grade(ContentClient.QuestionResponse question, String userAnswer) {
+    public GradingResult grade(QuestionResponse question, String userAnswer) {
         return switch (question.type().toLowerCase()) {
             case CHOICE_TYPE -> gradeChoice(question.answer(), userAnswer);
             case ESSAY_TYPE -> gradeEssay(question, userAnswer);
@@ -84,9 +87,9 @@ public class GradingService {
      * 评分简答题.
      * 调用 LLM 服务进行 AI 评分.
      */
-    private GradingResult gradeEssay(ContentClient.QuestionResponse question, String userAnswer) {
+    private GradingResult gradeEssay(QuestionResponse question, String userAnswer) {
         try {
-            LlmClient.GradeRequest request = new LlmClient.GradeRequest(
+            GradeRequest request = new GradeRequest(
                 question.id(),
                 question.content(),
                 question.answer(),
@@ -94,8 +97,8 @@ public class GradingService {
                 userAnswer
             );
 
-            ApiResponse<LlmClient.GradeResponse> response = llmClient.gradeAnswer(request);
-            LlmClient.GradeResponse data = response.data();
+            ApiResponse<GradeResponse> response = llmClient.gradeAnswer(request);
+            GradeResponse data = response.data();
 
             if (data == null) {
                 log.error("LLM grading returned null data for question {}", question.id());

@@ -1,9 +1,16 @@
+rootProject.name = "authsrv"
+
 dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url = uri("https://maven.aliyun.com/repository/public")
+        }
+    }
     versionCatalogs {
         create("libs") {
-            from(files("../common/gradle/libs.versions.toml"))
+            from(files("gradle/libs.versions.toml"))
         }
     }
 }
-
-rootProject.name = "authsrv"

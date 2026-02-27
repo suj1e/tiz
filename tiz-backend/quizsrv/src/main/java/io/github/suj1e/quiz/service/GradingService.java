@@ -2,8 +2,11 @@ package io.github.suj1e.quiz.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.suj1e.common.client.ContentClient;
-import io.github.suj1e.common.client.LlmClient;
+import io.github.suj1e.content.api.client.ContentClient;
+import io.github.suj1e.content.api.dto.QuestionResponse;
+import io.github.suj1e.llm.api.client.LlmClient;
+import io.github.suj1e.llm.api.dto.GradeResponse;
+import io.github.suj1e.llm.api.dto.GradeRequest;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.quiz.dto.SubmitQuizRequest;
 import io.github.suj1e.quiz.entity.QuizAnswer;
@@ -46,13 +49,13 @@ public class GradingService {
     public List<QuizResultDetail> gradeAnswers(UUID resultId, UUID sessionId, UUID knowledgeSetId,
                                                 List<SubmitQuizRequest.AnswerItem> answers) {
         // 获取题目列表
-        ApiResponse<List<ContentClient.QuestionResponse>> response =
+        ApiResponse<List<QuestionResponse>> response =
             contentClient.getQuestions(knowledgeSetId, null);
-        List<ContentClient.QuestionResponse> questions = response.data();
+        List<QuestionResponse> questions = response.data();
 
         // 构建题目映射
-        Map<UUID, ContentClient.QuestionResponse> questionMap = questions.stream()
-            .collect(Collectors.toMap(ContentClient.QuestionResponse::id, Function.identity()));
+        Map<UUID, QuestionResponse> questionMap = questions.stream()
+            .collect(Collectors.toMap(QuestionResponse::id, Function.identity()));
 
         // 保存答案
         saveAnswers(sessionId, answers);
@@ -60,7 +63,7 @@ public class GradingService {
         // 评分
         List<QuizResultDetail> details = new ArrayList<>();
         for (SubmitQuizRequest.AnswerItem answerItem : answers) {
-            ContentClient.QuestionResponse question = questionMap.get(answerItem.questionId());
+            QuestionResponse question = questionMap.get(answerItem.questionId());
             if (question == null) {
                 log.warn("Question not found: {}", answerItem.questionId());
                 continue;
@@ -76,7 +79,7 @@ public class GradingService {
     /**
      * 评分单个题目.
      */
-    private QuizResultDetail gradeQuestion(UUID resultId, ContentClient.QuestionResponse question,
+    private QuizResultDetail gradeQuestion(UUID resultId, QuestionResponse question,
                                            String userAnswer) {
         QuizResultDetail detail = new QuizResultDetail();
         detail.setResultId(resultId);
@@ -94,7 +97,7 @@ public class GradingService {
         } else {
             // 简答题：调用 LLM 评分
             try {
-                LlmClient.GradeRequest gradeRequest = new LlmClient.GradeRequest(
+                GradeRequest gradeRequest = new GradeRequest(
                     question.id(),
                     question.content(),
                     question.answer(),
@@ -102,8 +105,8 @@ public class GradingService {
                     userAnswer
                 );
 
-                ApiResponse<LlmClient.GradeResponse> gradeResponse = llmClient.gradeAnswer(gradeRequest);
-                LlmClient.GradeResponse grade = gradeResponse.data();
+                ApiResponse<GradeResponse> gradeResponse = llmClient.gradeAnswer(gradeRequest);
+                GradeResponse grade = gradeResponse.data();
 
                 detail.setIsCorrect(grade.correct());
                 detail.setScore(BigDecimal.valueOf(grade.score()));

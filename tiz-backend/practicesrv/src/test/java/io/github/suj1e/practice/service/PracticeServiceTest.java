@@ -1,7 +1,9 @@
 package io.github.suj1e.practice.service;
 
-import io.github.suj1e.common.client.ContentClient;
-import io.github.suj1e.common.client.LlmClient;
+import io.github.suj1e.content.api.client.ContentClient;
+import io.github.suj1e.content.api.dto.KnowledgeSetResponse;
+import io.github.suj1e.content.api.dto.QuestionResponse;
+import io.github.suj1e.llm.api.client.LlmClient;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.practice.dto.StartPracticeRequest;
 import io.github.suj1e.practice.dto.StartPracticeResponse;
@@ -80,14 +82,14 @@ class PracticeServiceTest {
                 userId, knowledgeSetId, SessionStatus.IN_PROGRESS))
                 .thenReturn(false);
 
-            ContentClient.KnowledgeSetResponse ksResponse = new ContentClient.KnowledgeSetResponse(
+            KnowledgeSetResponse ksResponse = new KnowledgeSetResponse(
                 knowledgeSetId, "Test Knowledge Set", "Category", List.of("tag1"), "medium", 2
             );
             when(contentClient.getKnowledgeSet(knowledgeSetId))
                 .thenReturn(ApiResponse.of(ksResponse));
 
-            List<ContentClient.QuestionResponse> questions = List.of(
-                new ContentClient.QuestionResponse(
+            List<QuestionResponse> questions = List.of(
+                new QuestionResponse(
                     questionId, "choice", "What is 1+1?", List.of("1", "2", "3", "4"),
                     "2", "Basic math", null
                 )
@@ -159,7 +161,7 @@ class PracticeServiceTest {
                 userId, knowledgeSetId, SessionStatus.IN_PROGRESS))
                 .thenReturn(false);
 
-            ContentClient.KnowledgeSetResponse ksResponse = new ContentClient.KnowledgeSetResponse(
+            KnowledgeSetResponse ksResponse = new KnowledgeSetResponse(
                 knowledgeSetId, "Test Knowledge Set", "Category", List.of("tag1"), "medium", 0
             );
             when(contentClient.getKnowledgeSet(knowledgeSetId))
@@ -186,7 +188,7 @@ class PracticeServiceTest {
             PracticeSession session = createInProgressSession();
             when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "choice", "What is 1+1?", List.of("1", "2", "3", "4"),
                 "2", "Basic math", null
             );
@@ -220,7 +222,7 @@ class PracticeServiceTest {
             PracticeSession session = createInProgressSession();
             when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
-            ContentClient.QuestionResponse question = new ContentClient.QuestionResponse(
+            QuestionResponse question = new QuestionResponse(
                 questionId, "essay", "Explain Spring Boot", null,
                 "Spring Boot is...", "It provides auto-configuration", "Key points: 1, 2, 3"
             );

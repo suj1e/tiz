@@ -2,7 +2,9 @@ package io.github.suj1e.quiz.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.suj1e.common.client.ContentClient;
+import io.github.suj1e.content.api.client.ContentClient;
+import io.github.suj1e.content.api.dto.KnowledgeSetResponse;
+import io.github.suj1e.content.api.dto.QuestionResponse;
 import io.github.suj1e.common.exception.NotFoundException;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.quiz.dto.QuizCompletedEvent;
@@ -58,14 +60,14 @@ public class QuizService {
     @Transactional
     public StartQuizResponse startQuiz(UUID userId, UUID knowledgeSetId, Integer timeLimit) {
         // 获取题库信息
-        ApiResponse<ContentClient.KnowledgeSetResponse> ksResponse =
+        ApiResponse<KnowledgeSetResponse> ksResponse =
             contentClient.getKnowledgeSet(knowledgeSetId);
-        ContentClient.KnowledgeSetResponse knowledgeSet = ksResponse.data();
+        KnowledgeSetResponse knowledgeSet = ksResponse.data();
 
         // 获取题目列表
-        ApiResponse<List<ContentClient.QuestionResponse>> questionsResponse =
+        ApiResponse<List<QuestionResponse>> questionsResponse =
             contentClient.getQuestions(knowledgeSetId, null);
-        List<ContentClient.QuestionResponse> questions = questionsResponse.data();
+        List<QuestionResponse> questions = questionsResponse.data();
 
         // 创建测验会话
         QuizSession session = new QuizSession();
@@ -206,7 +208,7 @@ public class QuizService {
         // 获取题库信息
         String title = "";
         try {
-            ApiResponse<ContentClient.KnowledgeSetResponse> ksResponse =
+            ApiResponse<KnowledgeSetResponse> ksResponse =
                 contentClient.getKnowledgeSet(result.getKnowledgeSetId());
             title = ksResponse.data().title();
         } catch (Exception e) {
@@ -239,7 +241,7 @@ public class QuizService {
      * 转换为详情项.
      */
     private QuizResultResponse.ResultDetailItem toDetailItem(QuizResultDetail detail) {
-        ContentClient.QuestionResponse question = parseQuestionSnapshot(detail.getQuestionSnapshot());
+        QuestionResponse question = parseQuestionSnapshot(detail.getQuestionSnapshot());
 
         return new QuizResultResponse.ResultDetailItem(
             detail.getQuestionId(),
@@ -258,12 +260,12 @@ public class QuizService {
     /**
      * 解析题目快照.
      */
-    private ContentClient.QuestionResponse parseQuestionSnapshot(String snapshot) {
+    private QuestionResponse parseQuestionSnapshot(String snapshot) {
         if (snapshot == null || snapshot.isEmpty()) {
             return null;
         }
         try {
-            return objectMapper.readValue(snapshot, ContentClient.QuestionResponse.class);
+            return objectMapper.readValue(snapshot, QuestionResponse.class);
         } catch (JsonProcessingException e) {
             log.error("Failed to parse question snapshot", e);
             return null;

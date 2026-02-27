@@ -1,7 +1,8 @@
 package io.github.suj1e.chat.sse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.suj1e.common.client.LlmClient;
+import io.github.suj1e.llm.api.client.LlmClient;
+import io.github.suj1e.llm.api.dto.ChatEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,7 @@ public class SseEmitterService {
     /**
      * 发送 LLM 事件.
      */
-    public void sendLlmEvent(SseEmitter emitter, LlmClient.ChatEvent event) {
+    public void sendLlmEvent(SseEmitter emitter, ChatEvent event) {
         try {
             emitter.send(SseEmitter.event()
                 .name(event.type())
@@ -60,7 +61,7 @@ public class SseEmitterService {
     /**
      * 发送事件流.
      */
-    public SseEmitter sendFlux(Flux<LlmClient.ChatEvent> eventFlux) {
+    public SseEmitter sendFlux(Flux<ChatEvent> eventFlux) {
         SseEmitter emitter = createEmitter();
 
         executor.submit(() -> {

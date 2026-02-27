@@ -1,0 +1,21 @@
+[versions]
+# Java & Spring
+java = "21"
+spring-boot = "4.0.2"
+spring-dependency-management = "1.1.7"
+
+# Utility
+lombok = "1.18.36"
+
+[libraries]
+# Spring Boot Starters (minimal for API client)
+spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+
+# Common (from Maven Local)
+# common is declared as dependency in build.gradle.kts
+
+# Lombok
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+
+[plugins]
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }

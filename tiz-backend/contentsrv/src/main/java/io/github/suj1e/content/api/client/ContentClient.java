@@ -1,5 +1,7 @@
-package io.github.suj1e.common.client;
+package io.github.suj1e.content.api.client;
 
+import io.github.suj1e.content.api.dto.KnowledgeSetResponse;
+import io.github.suj1e.content.api.dto.QuestionResponse;
 import io.github.suj1e.common.response.ApiResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,29 +28,4 @@ public interface ContentClient {
 
     @GetExchange("/internal/content/v1/questions/{id}")
     ApiResponse<QuestionResponse> getQuestion(@PathVariable UUID id);
-
-    /**
-     * 题库响应.
-     */
-    record KnowledgeSetResponse(
-        UUID id,
-        String title,
-        String category,
-        List<String> tags,
-        String difficulty,
-        Integer questionCount
-    ) {}
-
-    /**
-     * 题目响应.
-     */
-    record QuestionResponse(
-        UUID id,
-        String type,
-        String content,
-        List<String> options,
-        String answer,
-        String explanation,
-        String rubric
-    ) {}
 }

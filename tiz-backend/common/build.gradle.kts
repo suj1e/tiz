@@ -33,7 +33,7 @@ dependencyManagement {
 }
 
 dependencies {
-    // Spring Boot Starters
+    // Spring Boot Starters (core only)
     api(libs.spring.boot.starter.web)
     api(libs.spring.boot.starter.data.jpa)
     api(libs.spring.boot.starter.data.redis)
@@ -41,13 +41,6 @@ dependencies {
     api(libs.spring.boot.starter.security)
     api(libs.spring.boot.starter.actuator)
     api(libs.spring.boot.starter.aop)
-    api(libs.spring.boot.starter.webflux)
-
-    // Spring Cloud
-    api(libs.spring.cloud.starter.openfeign)
-    api(libs.spring.cloud.nacos.discovery)
-    api(libs.spring.cloud.nacos.config)
-    api(libs.spring.cloud.loadbalancer)
 
     // QueryDSL
     api(libs.querydsl.jpa)

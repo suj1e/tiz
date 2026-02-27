@@ -1,6 +1,6 @@
 package io.github.suj1e.practice.service;
 
-import io.github.suj1e.common.client.ContentClient;
+import io.github.suj1e.content.api.client.ContentClient;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.practice.dto.CompletePracticeResponse;
 import io.github.suj1e.practice.entity.PracticeAnswer;

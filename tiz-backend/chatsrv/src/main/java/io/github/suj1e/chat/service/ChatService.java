@@ -6,8 +6,13 @@ import io.github.suj1e.chat.entity.ChatSession;
 import io.github.suj1e.chat.error.ChatErrorCode;
 import io.github.suj1e.chat.repository.ChatMessageRepository;
 import io.github.suj1e.chat.repository.ChatSessionRepository;
-import io.github.suj1e.common.client.ContentClient;
-import io.github.suj1e.common.client.LlmClient;
+import io.github.suj1e.content.api.client.ContentClient;
+import io.github.suj1e.llm.api.client.LlmClient;
+import io.github.suj1e.llm.api.dto.GenerateResponse;
+import io.github.suj1e.llm.api.dto.GenerateRequest;
+import io.github.suj1e.llm.api.dto.ChatRequest;
+import io.github.suj1e.llm.api.dto.ChatMessage;
+import io.github.suj1e.llm.api.dto.ChatEvent;
 import io.github.suj1e.common.exception.BusinessException;
 import io.github.suj1e.common.exception.NotFoundException;
 import io.github.suj1e.common.response.ApiResponse;
@@ -43,7 +48,7 @@ public class ChatService {
      * @return SSE 事件流
      */
     @Transactional
-    public Flux<LlmClient.ChatEvent> chat(UUID userId, UUID sessionId, String message) {
+    public Flux<ChatEvent> chat(UUID userId, UUID sessionId, String message) {
         // 获取或创建会话
         ChatSession session = getOrCreateSession(userId, sessionId);
 
@@ -55,15 +60,15 @@ public class ChatService {
 
         // 获取历史消息
         List<ChatMessage> history = messageRepository.findBySessionIdOrderByCreatedAtAsc(session.getId());
-        List<LlmClient.ChatMessage> chatHistory = history.stream()
-            .map(m -> new LlmClient.ChatMessage(
+        List<ChatMessage> chatHistory = history.stream()
+            .map(m -> new ChatMessage(
                 m.getRole().name().toLowerCase(),
                 m.getContent()
             ))
             .toList();
 
         // 构建请求
-        LlmClient.ChatRequest request = new LlmClient.ChatRequest(
+        ChatRequest request = new ChatRequest(
             session.getId(),
             message,
             chatHistory
@@ -112,13 +117,13 @@ public class ChatService {
         }
 
         // 调用 LLM 服务生成题目
-        LlmClient.GenerateRequest generateRequest = new LlmClient.GenerateRequest(
+        GenerateRequest generateRequest = new GenerateRequest(
             sessionId,
             10,  // batchSize
             1    // batchNumber
         );
 
-        ApiResponse<LlmClient.GenerateResponse> generateResponse;
+        ApiResponse<GenerateResponse> generateResponse;
         try {
             generateResponse = llmClient.generateQuestions(generateRequest);
         } catch (Exception e) {
