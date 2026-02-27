@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "tiz API",
-    "description": "tiz AI 知识练习平台 API\n\n- 外部 API: /api/{service}/v1/* (通过网关)\n- 内部 API: /internal/* (服务间调用)",
+    "description": "tiz AI 知识练习平台 API\n\n## 服务架构\n每个服务都是独立的 Gradle 项目 (api + app 子模块)\n\n| 服务 | 端口 | 职责 |\n|------|------|------|\n| gatewaysrv | 8080 | API 网关 |\n| authsrv | 8101 | 认证服务 |\n| chatsrv | 8102 | 对话服务 |\n| contentsrv | 8103 | 内容服务 |\n| practicesrv | 8104 | 练习服务 |\n| quizsrv | 8105 | 测验服务 |\n| llmsrv | 8106 | AI 服务 |\n| usersrv | 8107 | 用户服务 |\n\n- 外部 API: /api/{service}/v1/* (通过网关)\n- 内部 API: /internal/* (服务间调用)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -17,11 +17,11 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:40004/api"
+      "value": "http://localhost:8080/api"
     },
     {
       "key": "llm_url",
-      "value": "http://localhost:40020"
+      "value": "http://localhost:8106"
     },
     {
       "key": "token",
