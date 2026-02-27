@@ -2,37 +2,37 @@
 
 ## 项目初始化
 
-- [ ] 创建项目结构
-- [ ] 配置 build.gradle.kts
-- [ ] 配置 application.yaml
+- [x] 创建项目结构
+- [x] 配置 build.gradle.kts
+- [x] 配置 application.yaml
 
 ## 实体和 Repository
 
-- [ ] User 实体
-- [ ] RefreshToken 实体
-- [ ] UserRepository
-- [ ] RefreshTokenRepository
+- [x] User 实体
+- [x] RefreshToken 实体
+- [x] UserRepository
+- [x] RefreshTokenRepository
 
 ## 服务层
 
-- [ ] AuthService (注册/登录/登出)
-- [ ] TokenService (Token 生成/验证)
-- [ ] UserService (用户查询)
+- [x] AuthService (注册/登录/登出)
+- [x] TokenService (Token 生成/验证)
+- [x] UserService (用户查询)
 
 ## 控制器
 
-- [ ] AuthController
-- [ ] InternalUserController
+- [x] AuthController
+- [x] InternalUserController
 
 ## 安全配置
 
-- [ ] SecurityConfig
-- [ ] JwtTokenProvider
-- [ ] JWT 过滤器
+- [x] SecurityConfig
+- [x] JwtTokenProvider
+- [x] JWT 过滤器
 
 ## 测试
 
-- [ ] 注册测试
-- [ ] 登录测试
-- [ ] Token 刷新测试
-- [ ] 登出测试
+- [x] 注册测试
+- [x] 登录测试
+- [x] Token 刷新测试
+- [x] 登出测试
