@@ -149,7 +149,6 @@ docker-compose -f docker-compose-lite.yml up -d
 - [API 文档](standards/api.md)
 - [后端规范](standards/backend.md)
 - [前端规范](standards/frontend.md)
-- [后端开发指南](BACKEND_DEV.md)
 
 ## 许可证
 

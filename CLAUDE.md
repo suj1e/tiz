@@ -202,7 +202,15 @@ export const userService = {
 
 ## Backend (tiz-backend)
 
-All backend services are in the `tiz-backend/` directory. See `BACKEND_DEV.md` for details.
+All backend services are in the `tiz-backend/` directory.
+
+### Tech Stack
+
+- **Java 21** + **Spring Boot 4.0.2**
+- **Spring Cloud Gateway** (API Gateway)
+- **Spring Data JPA** + **QueryDSL**
+- **MySQL 9.2** + **Redis 7.4** + **Kafka 7.8**
+- **Python 3.11+** + **FastAPI** + **LangGraph** (llmsrv)
 
 ### Quick Start
 
@@ -214,6 +222,18 @@ cd tiz-backend
 
 # Run a service
 ./gradlew :authsrv:bootRun
+```
+
+### AI Service (llmsrv)
+
+```bash
+cd tiz-backend/llmsrv
+
+# Install dependencies
+pixi install
+
+# Run dev server
+pixi run dev
 ```
 
 ### API Gateway Routes
