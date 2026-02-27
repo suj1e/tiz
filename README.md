@@ -7,15 +7,27 @@ Tiz 是一个基于 AI 的知识练习平台，用户通过对话式交互与 AI
 ```
 tiz/
 ├── tiz-web/           # 前端项目 (React + TypeScript + Vite)
-├── tiz-backend/       # 后端微服务
-│   ├── common/        # 公共模块 (Java)
-│   ├── authsrv/       # 认证服务 (:8101)
-│   ├── chatsrv/       # 对话服务 (:8102)
-│   ├── contentsrv/    # 内容服务 (:8103)
-│   ├── practicesrv/   # 练习服务 (:8104)
-│   ├── quizsrv/       # 测验服务 (:8105)
+├── tiz-backend/       # 后端微服务 (独立 Gradle 项目)
+│   ├── common/        # 公共模块 (发布到 Maven Local)
 │   ├── llmsrv/        # AI 服务 (Python/FastAPI) (:8106)
+│   ├── authsrv/       # 认证服务 (:8101)
+│   │   ├── api/       # DTO 和客户端接口 (发布到 Maven Local)
+│   │   └── app/       # 服务实现
+│   ├── chatsrv/       # 对话服务 (:8102)
+│   │   ├── api/       # DTO 和客户端接口
+│   │   └── app/       # 服务实现
+│   ├── contentsrv/    # 内容服务 (:8103)
+│   │   ├── api/       # DTO 和客户端接口
+│   │   └── app/       # 服务实现
+│   ├── practicesrv/   # 练习服务 (:8104)
+│   │   ├── api/       # DTO 和客户端接口
+│   │   └── app/       # 服务实现
+│   ├── quizsrv/       # 测验服务 (:8105)
+│   │   ├── api/       # DTO 和客户端接口
+│   │   └── app/       # 服务实现
 │   ├── usersrv/       # 用户服务 (:8107)
+│   │   ├── api/       # DTO 和客户端接口
+│   │   └── app/       # 服务实现
 │   └── gatewaysrv/    # API 网关 (:8080)
 ├── infra/             # 基础设施配置 (Docker Compose)
 ├── standards/         # 开发规范文档
@@ -82,18 +94,31 @@ pnpm build
 
 ### 后端开发
 
+每个 Java 服务都是独立的 Gradle 项目，采用 api + app 子模块结构：
+- **api/**: DTO 和客户端接口（发布到 Maven Local 供其他服务依赖）
+- **app/**: 服务实现
+
 ```bash
-cd tiz-backend
+# 首先发布 common 模块
+cd tiz-backend/common
+gradle publishToMavenLocal
 
-# 构建所有服务
-./gradlew build
+# 发布服务 API（如果其他服务依赖它）
+cd tiz-backend/contentsrv
+gradle :api:publishToMavenLocal
 
-# 构建单个服务
-./gradlew :authsrv:build
-
-# 运行服务
-./gradlew :authsrv:bootRun
+# 构建并运行服务
+cd tiz-backend/contentsrv
+gradle :app:bootRun
 ```
+
+### 服务间依赖
+
+服务通过 Maven Local 相互依赖：
+- `io.github.suj1e:common:1.0.0-SNAPSHOT` - 公共工具类
+- `io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT` - 内容服务 DTO
+- `io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT` - AI 服务 DTO
+- 等等...
 
 ### AI 服务 (llmsrv)
 
