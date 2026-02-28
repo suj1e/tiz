@@ -24,8 +24,6 @@ COPY tiz-backend/${SERVICE_NAME}/build.gradle.kts .
 COPY tiz-backend/${SERVICE_NAME}/api/ api/
 COPY tiz-backend/${SERVICE_NAME}/app/ app/
 COPY tiz-backend/common/ ../common/
-COPY tiz-backend/gradle.properties ../
-COPY tiz-backend/buildSrc/ ../buildSrc/
 
 # Build and publish common module to Maven Local (needed by services)
 RUN if [ -d "../common" ]; then \
