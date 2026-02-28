@@ -25,37 +25,51 @@ jobs:
           - service: gatewaysrv
             context: .
             dockerfile: tiz-backend/docker/Dockerfile.java
-            build_args: SERVICE_NAME=gatewaysrv,PORT=8080
+            build_args: |
+              SERVICE_NAME=gatewaysrv
+              PORT=8080
             port: 8080
           - service: authsrv
             context: .
             dockerfile: tiz-backend/docker/Dockerfile.java
-            build_args: SERVICE_NAME=authsrv,PORT=8101
+            build_args: |
+              SERVICE_NAME=authsrv
+              PORT=8101
             port: 8101
           - service: chatsrv
             context: .
             dockerfile: tiz-backend/docker/Dockerfile.java
-            build_args: SERVICE_NAME=chatsrv,PORT=8102
+            build_args: |
+              SERVICE_NAME=chatsrv
+              PORT=8102
             port: 8102
           - service: contentsrv
             context: .
             dockerfile: tiz-backend/docker/Dockerfile.java
-            build_args: SERVICE_NAME=contentsrv,PORT=8103
+            build_args: |
+              SERVICE_NAME=contentsrv
+              PORT=8103
             port: 8103
           - service: practicesrv
             context: .
             dockerfile: tiz-backend/docker/Dockerfile.java
-            build_args: SERVICE_NAME=practicesrv,PORT=8104
+            build_args: |
+              SERVICE_NAME=practicesrv
+              PORT=8104
             port: 8104
           - service: quizsrv
             context: .
             dockerfile: tiz-backend/docker/Dockerfile.java
-            build_args: SERVICE_NAME=quizsrv,PORT=8105
+            build_args: |
+              SERVICE_NAME=quizsrv
+              PORT=8105
             port: 8105
           - service: usersrv
             context: .
             dockerfile: tiz-backend/docker/Dockerfile.java
-            build_args: SERVICE_NAME=usersrv,PORT=8107
+            build_args: |
+              SERVICE_NAME=usersrv
+              PORT=8107
             port: 8107
           # Frontend
           - service: tiz-web
