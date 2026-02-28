@@ -24,13 +24,19 @@ COPY tiz-backend/${SERVICE_NAME}/settings.gradle.kts .
 COPY tiz-backend/${SERVICE_NAME}/build.gradle.kts .
 COPY tiz-backend/${SERVICE_NAME}/api/ api/
 COPY tiz-backend/${SERVICE_NAME}/app/ app/
-COPY tiz-backend/common/ ../common/
+
+# Copy common module
+COPY tiz-backend/common/gradle/wrapper/ /common/gradle/wrapper/
+COPY tiz-backend/common/gradle/libs.versions.toml /common/gradle/
+COPY tiz-backend/common/gradlew /common/
+COPY tiz-backend/common/settings.gradle.kts /common/
+COPY tiz-backend/common/build.gradle.kts /common/
+COPY tiz-backend/common/src/ /common/src/
 
 # Build and publish common module to Maven Local (needed by services)
-RUN if [ -d "../common" ]; then \
-    cd ../common && \
-    ./gradlew publishToMavenLocal --no-daemon --quiet; \
-    fi
+RUN chmod +x /common/gradlew && \
+    cd /common && \
+    ./gradlew publishToMavenLocal --no-daemon --quiet
 
 # Build the service bootJar
 RUN ./gradlew :app:bootJar --no-daemon --quiet
