@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+build
+
+# Development files
+.env.local
+.env.*.local
+.vscode
+.idea
+*.log
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing
+coverage
+.nyc_output
+.vitest
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Docs
+README.md
+CHANGELOG.md
+*.md
+
+# Misc
+.DS_Store
+*.pem

@@ -208,6 +208,33 @@ GET /api/content/v1/library?page_size=10&page_token=
 { "data": { "categories": [{ "name": "前端开发", "count": 15 }] } }
 ```
 
+## 部署
+
+### 前置要求
+- Docker & Docker Compose
+- GitHub CLI
+
+### GitHub Secrets 配置
+| Secret | 说明 |
+|--------|------|
+| SERVER_HOST | 服务器 IP 或域名 |
+| SERVER_USER | SSH 用户名 |
+| SSH_PRIVATE_KEY | SSH 私钥 |
+| DEPLOY_PATH | 部署目录 (/opt/dev/apps/tiz) |
+
+### 部署命令
+```bash
+# 打 tag 触发部署
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+### 手动部署
+```bash
+cd /opt/dev/apps/tiz
+docker-compose -f infra/docker-compose-app.yml up -d
+```
+
 ## 许可证
 
 私有项目，保留所有权利。

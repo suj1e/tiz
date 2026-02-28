@@ -278,6 +278,28 @@ pixi run dev
 3. API specs and contracts are in `standards/api.md`
 4. Postman collection available at `standards/postman.json`
 
+### Deployment
+
+**GitHub Secrets Configuration:**
+| Secret | Description |
+|--------|-------------|
+| SERVER_HOST | Server IP or domain |
+| SERVER_USER | SSH username |
+| SSH_PRIVATE_KEY | SSH private key |
+| DEPLOY_PATH | Deployment directory (/opt/dev/apps/tiz) |
+
+**Deploy via Git Tag:**
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+**Manual Deployment:**
+```bash
+cd /opt/dev/apps/tiz
+docker-compose -f infra/docker-compose-app.yml up -d
+```
+
 ### Postman Collection Notes
 
 When editing `standards/postman.json`, the `url.path` array must include `v1`:
