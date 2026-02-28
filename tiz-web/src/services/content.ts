@@ -53,10 +53,10 @@ export const contentService = {
   },
 
   getCategories: (): Promise<Category[]> => {
-    return api.get('/content/v1/categories', { raw: true }).then((res) => res.data.categories)
+    return api.get<{ data: { categories: Category[] } }>('/content/v1/categories', { raw: true }).then((res) => res.data.categories)
   },
 
   getTags: (): Promise<Tag[]> => {
-    return api.get('/content/v1/tags', { raw: true }).then((res) => res.data.tags)
+    return api.get<{ data: { tags: Tag[] } }>('/content/v1/tags', { raw: true }).then((res) => res.data.tags)
   },
 }

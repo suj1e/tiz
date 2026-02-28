@@ -42,10 +42,8 @@ export const contentHandlers = [
     })
   }),
 
-  http.get('/api/content/v1/library', async ({ request }) => {
+  http.get('/api/content/v1/library', async () => {
     await delay(300)
-    const url = new URL(request.url)
-    const pageSize = Number.parseInt(url.searchParams.get('page_size') || '10')
 
     const libraries = mockLibrary.map((lib) => ({
       id: lib.id,

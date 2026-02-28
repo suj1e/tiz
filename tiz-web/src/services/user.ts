@@ -3,7 +3,7 @@ import type { UserSettings, WebhookConfig } from '@/types'
 
 export const userService = {
   getSettings: (): Promise<UserSettings> => {
-    return api.get('/user/v1/settings', { raw: true }).then((res) => res.data.settings)
+    return api.get<{ data: { settings: UserSettings } }>('/user/v1/settings', { raw: true }).then((res) => res.data.settings)
   },
 
   updateSettings: (settings: Partial<UserSettings>): Promise<void> => {
