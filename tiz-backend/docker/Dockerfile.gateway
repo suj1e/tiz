@@ -18,13 +18,14 @@ WORKDIR /build
 
 # Copy Gradle wrapper and build files first for better caching
 COPY tiz-backend/${SERVICE_NAME}/gradle/wrapper/ gradle/wrapper/
+COPY tiz-backend/${SERVICE_NAME}/gradle/libs.versions.toml gradle/
 COPY tiz-backend/${SERVICE_NAME}/gradlew .
 COPY tiz-backend/${SERVICE_NAME}/settings.gradle.kts .
 COPY tiz-backend/${SERVICE_NAME}/build.gradle.kts .
 COPY tiz-backend/${SERVICE_NAME}/src/ src/
 
 # Build the bootJar
-RUN gradle bootJar --no-daemon --quiet
+RUN ./gradlew bootJar --no-daemon --quiet
 
 # ============================================================================
 # Stage 2: Runtime

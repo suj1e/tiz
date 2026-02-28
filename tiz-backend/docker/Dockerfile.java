@@ -18,6 +18,7 @@ WORKDIR /build
 
 # Copy Gradle wrapper and build files first for better caching
 COPY tiz-backend/${SERVICE_NAME}/gradle/wrapper/ gradle/wrapper/
+COPY tiz-backend/${SERVICE_NAME}/gradle/libs.versions.toml gradle/
 COPY tiz-backend/${SERVICE_NAME}/gradlew .
 COPY tiz-backend/${SERVICE_NAME}/settings.gradle.kts .
 COPY tiz-backend/${SERVICE_NAME}/build.gradle.kts .
@@ -28,11 +29,11 @@ COPY tiz-backend/common/ ../common/
 # Build and publish common module to Maven Local (needed by services)
 RUN if [ -d "../common" ]; then \
     cd ../common && \
-    gradle publishToMavenLocal --no-daemon --quiet; \
+    ./gradlew publishToMavenLocal --no-daemon --quiet; \
     fi
 
 # Build the service bootJar
-RUN gradle :app:bootJar --no-daemon --quiet
+RUN ./gradlew :app:bootJar --no-daemon --quiet
 
 # ============================================================================
 # Stage 2: Runtime
