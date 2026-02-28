@@ -186,22 +186,6 @@ jobs:
           echo "Created .env file"
           ENDSSH
 
-      - name: Start infrastructure services
-        run: |
-          ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
-          set -e
-          cd ${{ secrets.DEPLOY_PATH }}/infra
-
-          # Start infrastructure services (MySQL, Redis, Nacos, Kafka, etc.)
-          docker-compose -f docker-compose-lite.yml up -d
-
-          echo "Waiting for infrastructure services to be healthy..."
-          sleep 30
-
-          # Check infrastructure status
-          docker-compose -f docker-compose-lite.yml ps
-          ENDSSH
-
       - name: Deploy to server
         run: |
           ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
