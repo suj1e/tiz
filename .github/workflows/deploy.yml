@@ -24,7 +24,7 @@ jobs:
           # Java Services
           - service: gatewaysrv
             context: .
-            dockerfile: tiz-backend/docker/Dockerfile.java
+            dockerfile: tiz-backend/docker/Dockerfile.gateway
             build_args: |
               SERVICE_NAME=gatewaysrv
               PORT=8080
