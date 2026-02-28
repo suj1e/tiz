@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Tiz Java Services
 # Usage: docker build --build-arg SERVICE_NAME=authsrv --build-arg PORT=8101 -f tiz-backend/docker/Dockerfile.java -t tiz/authsrv:latest .
 
-ARG BUILD_IMAGE=gradle:8.12-jdk21
+ARG BUILD_IMAGE=gradle:9.0.0-jdk21
 ARG RUNTIME_IMAGE=eclipse-temurin:21-jre-alpine
 
 # ============================================================================
@@ -19,60 +19,51 @@ WORKDIR /build
 # ============================================================================
 # Step 1: Build and publish common module to Maven Local
 # ============================================================================
-COPY tiz-backend/common/gradle/wrapper/ /common/gradle/wrapper/
 COPY tiz-backend/common/gradle/libs.versions.toml /common/gradle/
-COPY tiz-backend/common/gradlew /common/
 COPY tiz-backend/common/settings.gradle.kts /common/
 COPY tiz-backend/common/build.gradle.kts /common/
 COPY tiz-backend/common/src/ /common/src/
 
-RUN chmod +x /common/gradlew && \
-    cd /common && \
-    ./gradlew publishToMavenLocal --no-daemon --quiet
+RUN cd /common && \
+    gradle publishToMavenLocal --no-daemon --quiet
 
 # ============================================================================
 # Step 2: Build and publish llmsrv-api to Maven Local (needed by multiple services)
 # ============================================================================
-COPY tiz-backend/llmsrv-api/gradle/wrapper/ /llmsrv-api/gradle/wrapper/
 COPY tiz-backend/llmsrv-api/gradle/libs.versions.toml /llmsrv-api/gradle/
-COPY tiz-backend/llmsrv-api/gradlew /llmsrv-api/
 COPY tiz-backend/llmsrv-api/settings.gradle.kts /llmsrv-api/
 COPY tiz-backend/llmsrv-api/build.gradle.kts /llmsrv-api/
 COPY tiz-backend/llmsrv-api/src/ /llmsrv-api/src/
 
-RUN chmod +x /llmsrv-api/gradlew && \
-    cd /llmsrv-api && \
-    ./gradlew publishToMavenLocal --no-daemon --quiet
+RUN cd /llmsrv-api && \
+    gradle publishToMavenLocal --no-daemon --quiet
 
 # ============================================================================
 # Step 3: Build and publish contentsrv-api to Maven Local (needed by multiple services)
 # Note: contentsrv/api is a subproject, so we need the parent's gradle setup
+# We create an empty app directory because settings.gradle.kts includes it
 # ============================================================================
-COPY tiz-backend/contentsrv/gradle/wrapper/ /contentsrv/gradle/wrapper/
 COPY tiz-backend/contentsrv/gradle/libs.versions.toml /contentsrv/gradle/
-COPY tiz-backend/contentsrv/gradlew /contentsrv/
 COPY tiz-backend/contentsrv/settings.gradle.kts /contentsrv/
 COPY tiz-backend/contentsrv/build.gradle.kts /contentsrv/
 COPY tiz-backend/contentsrv/api/ /contentsrv/api/
+RUN mkdir -p /contentsrv/app
 
-RUN chmod +x /contentsrv/gradlew && \
-    cd /contentsrv && \
-    ./gradlew :api:publishToMavenLocal --no-daemon --quiet
+RUN cd /contentsrv && \
+    gradle :api:publishToMavenLocal --no-daemon --quiet
 
 # ============================================================================
 # Step 4: Build the target service
 # ============================================================================
-# Copy Gradle wrapper and build files first for better caching
-COPY tiz-backend/${SERVICE_NAME}/gradle/wrapper/ gradle/wrapper/
+# Copy Gradle build files
 COPY tiz-backend/${SERVICE_NAME}/gradle/libs.versions.toml gradle/
-COPY tiz-backend/${SERVICE_NAME}/gradlew .
 COPY tiz-backend/${SERVICE_NAME}/settings.gradle.kts .
 COPY tiz-backend/${SERVICE_NAME}/build.gradle.kts .
 COPY tiz-backend/${SERVICE_NAME}/api/ api/
 COPY tiz-backend/${SERVICE_NAME}/app/ app/
 
-# Build the service bootJar
-RUN ./gradlew :app:bootJar --no-daemon --quiet
+# Build the service bootJar using container's gradle
+RUN gradle :app:bootJar --no-daemon --quiet
 
 # ============================================================================
 # Stage 2: Runtime
