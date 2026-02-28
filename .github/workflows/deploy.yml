@@ -143,7 +143,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
           set -e
-          cd ${{ secrets.DEPLOY_PATH }}/infra
+          cd ${{ secrets.DEPLOY_PATH }}
 
           # Create unified .env file for all services
           cat > .env << 'EOF'
@@ -193,10 +193,10 @@ jobs:
           cd ${{ secrets.DEPLOY_PATH }}
 
           # Pull latest images
-          docker-compose -f infra/docker-compose-app.yml pull
+          docker-compose -f deploy/docker-compose.yml --env-file .env pull
 
           # Restart services
-          docker-compose -f infra/docker-compose-app.yml up -d
+          docker-compose -f deploy/docker-compose.yml --env-file .env up -d
 
           # Cleanup old images
           docker image prune -f
@@ -212,7 +212,7 @@ jobs:
           cd ${{ secrets.DEPLOY_PATH }}
 
           # Check all services are healthy
-          docker-compose -f infra/docker-compose-app.yml ps
+          docker-compose -f deploy/docker-compose.yml --env-file .env ps
 
           echo "All services deployed and running"
           ENDSSH
