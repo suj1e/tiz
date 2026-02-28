@@ -80,6 +80,37 @@ class TagServiceTest {
     }
 
     @Nested
+    @DisplayName("getAllTagsWithCount")
+    class GetAllTagsWithCount {
+
+        @Test
+        @DisplayName("should return all tags with count")
+        void shouldReturnAllTagsWithCount() {
+            // Arrange
+            Tag tag2 = new Tag();
+            tag2.setId(java.util.UUID.randomUUID());
+            tag2.setName("Python");
+
+            when(tagRepository.findAllByOrderByNameAsc())
+                .thenReturn(List.of(testTag, tag2));
+            when(tagRepository.countKnowledgeSetsByTagId(testTag.getId()))
+                .thenReturn(10L);
+            when(tagRepository.countKnowledgeSetsByTagId(tag2.getId()))
+                .thenReturn(5L);
+
+            // Act
+            List<TagResponse> result = tagService.getAllTagsWithCount();
+
+            // Assert
+            assertThat(result).hasSize(2);
+            assertThat(result.get(0).name()).isEqualTo("Java");
+            assertThat(result.get(0).count()).isEqualTo(10L);
+            assertThat(result.get(1).name()).isEqualTo("Python");
+            assertThat(result.get(1).count()).isEqualTo(5L);
+        }
+    }
+
+    @Nested
     @DisplayName("getOrCreateTags")
     class GetOrCreateTags {
 

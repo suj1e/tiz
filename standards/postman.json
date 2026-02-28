@@ -283,17 +283,19 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/content/v1/library?page=1&limit=10",
+              "raw": "{{base_url}}/content/v1/library?page_size=10&page_token=",
               "host": ["{{base_url}}"],
               "path": ["content", "v1", "library"],
               "query": [
                 {
-                  "key": "page",
-                  "value": "1"
+                  "key": "page_size",
+                  "value": "10",
+                  "description": "每页数量，默认 10，最大 100"
                 },
                 {
-                  "key": "limit",
-                  "value": "10"
+                  "key": "page_token",
+                  "value": "",
+                  "description": "游标，来自上次响应的 next_token"
                 },
                 {
                   "key": "category",

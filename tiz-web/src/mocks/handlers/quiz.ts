@@ -16,6 +16,7 @@ export const quizHandlers = [
         quiz_id: `quiz-${Date.now()}`,
         questions,
         time_limit: 600, // 10 minutes
+        started_at: new Date().toISOString(),
       },
     })
   }),

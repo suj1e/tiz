@@ -2,7 +2,7 @@ package io.github.suj1e.content.service;
 
 import io.github.suj1e.common.dto.PageRequest;
 import io.github.suj1e.common.exception.NotFoundException;
-import io.github.suj1e.common.response.PagedResponse;
+import io.github.suj1e.common.response.CursorResponse;
 import io.github.suj1e.content.dto.*;
 import io.github.suj1e.content.entity.Category;
 import io.github.suj1e.content.entity.KnowledgeSet;
@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +36,7 @@ public class LibraryService {
      * 分页查询用户的题库列表.
      */
     @Transactional(readOnly = true)
-    public PagedResponse<LibrarySummaryResponse> getLibraries(UUID userId, LibraryFilterRequest filter) {
+    public CursorResponse<LibrarySummaryResponse> getLibraries(UUID userId, LibraryFilterRequest filter) {
         Pageable pageable = filter.toPageable();
 
         Page<KnowledgeSet> page = knowledgeSetRepository.findByUserIdWithFilters(
@@ -49,11 +51,24 @@ public class LibraryService {
             .map(this::toSummaryResponse)
             .toList();
 
-        return PagedResponse.of(
-            items,
-            page.getTotalElements(),
-            filter.getPage(),
-            filter.getPageSize()
+        boolean hasMore = page.hasNext();
+        String nextToken = null;
+
+        if (hasMore && !items.isEmpty()) {
+            // Create a simple token based on the last item's ID
+            LibrarySummaryResponse lastItem = items.get(items.size() - 1);
+            nextToken = encodeToken(lastItem.id().toString());
+        }
+
+        return CursorResponse.of(items, hasMore, nextToken);
+    }
+
+    /**
+     * Encode token for cursor pagination.
+     */
+    private String encodeToken(String value) {
+        return Base64.getEncoder().encodeToString(
+            ("{\"id\":\"" + value + "\"}").getBytes(StandardCharsets.UTF_8)
         );
     }
 

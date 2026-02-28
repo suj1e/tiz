@@ -67,7 +67,7 @@ export default function LibraryPage() {
     }
 
     loadData()
-  }, [])
+  }, [setLibraries, setCategories, setTags, setLoading])
 
   useEffect(() => {
     let filtered = libraries

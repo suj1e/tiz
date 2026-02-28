@@ -82,8 +82,6 @@ class QuizServiceTest {
             null,
             null,
             null,
-            null,
-            null,
             null
         );
 
@@ -362,7 +360,7 @@ class QuizServiceTest {
             assertEquals(knowledgeSetId, response.knowledgeSetId());
             assertEquals(BigDecimal.valueOf(2), response.score());
             assertEquals(2, response.correctCount());
-            assertEquals(2, response.totalCount());
+            assertEquals(BigDecimal.valueOf(2), response.total());
         }
 
         @Test

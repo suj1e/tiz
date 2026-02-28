@@ -5,6 +5,7 @@ interface StartQuizResponse {
   quiz_id: string
   questions: QuestionWithAnswer[]
   time_limit: number | null
+  started_at: string
 }
 
 export const quizService = {

@@ -86,6 +86,38 @@ class CategoryServiceTest {
     }
 
     @Nested
+    @DisplayName("getAllCategoriesWithCount")
+    class GetAllCategoriesWithCount {
+
+        @Test
+        @DisplayName("should return all categories with count")
+        void shouldReturnAllCategoriesWithCount() {
+            // Arrange
+            Category category2 = new Category();
+            category2.setId(UUID.randomUUID());
+            category2.setName("Backend");
+            category2.setSortOrder(2);
+
+            when(categoryRepository.findAllByOrderBySortOrderAsc())
+                .thenReturn(List.of(testCategory, category2));
+            when(categoryRepository.countKnowledgeSetsById(testCategory.getId()))
+                .thenReturn(5L);
+            when(categoryRepository.countKnowledgeSetsById(category2.getId()))
+                .thenReturn(3L);
+
+            // Act
+            List<CategoryResponse> result = categoryService.getAllCategoriesWithCount();
+
+            // Assert
+            assertThat(result).hasSize(2);
+            assertThat(result.get(0).name()).isEqualTo("Frontend");
+            assertThat(result.get(0).count()).isEqualTo(5L);
+            assertThat(result.get(1).name()).isEqualTo("Backend");
+            assertThat(result.get(1).count()).isEqualTo(3L);
+        }
+    }
+
+    @Nested
     @DisplayName("getCategoryById")
     class GetCategoryById {
 

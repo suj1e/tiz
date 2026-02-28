@@ -7,9 +7,10 @@ interface StartPracticeResponse {
 }
 
 interface SubmitAnswerResponse {
-  is_correct: boolean
+  correct: boolean
   score?: number
   explanation?: string
+  ai_feedback?: string
 }
 
 interface CompletePracticeResponse {

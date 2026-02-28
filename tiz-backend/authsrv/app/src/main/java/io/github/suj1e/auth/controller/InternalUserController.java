@@ -1,6 +1,7 @@
 package io.github.suj1e.auth.controller;
 
 import io.github.suj1e.auth.dto.UserResponse;
+import io.github.suj1e.auth.dto.UserSettingsResponse;
 import io.github.suj1e.auth.entity.User;
 import io.github.suj1e.auth.service.UserService;
 import io.github.suj1e.common.response.ApiResponse;
@@ -52,8 +53,8 @@ public class InternalUserController {
         return new UserResponse(
             user.getId(),
             user.getEmail(),
-            user.getStatus().name().toLowerCase(),
-            user.getCreatedAt()
+            user.getCreatedAt(),
+            UserSettingsResponse.defaultSettings()
         );
     }
 }

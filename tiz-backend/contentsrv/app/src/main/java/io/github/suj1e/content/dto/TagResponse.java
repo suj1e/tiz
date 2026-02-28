@@ -7,5 +7,13 @@ import java.util.UUID;
  */
 public record TagResponse(
     UUID id,
-    String name
-) {}
+    String name,
+    long count
+) {
+    /**
+     * 简化构造函数 (用于内部 API).
+     */
+    public TagResponse(UUID id, String name) {
+        this(id, name, 0);
+    }
+}

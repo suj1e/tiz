@@ -26,4 +26,9 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
      * 检查名称是否存在.
      */
     boolean existsByName(String name);
+
+    /**
+     * 统计指定分类下的题库数量.
+     */
+    long countKnowledgeSetsById(UUID categoryId);
 }

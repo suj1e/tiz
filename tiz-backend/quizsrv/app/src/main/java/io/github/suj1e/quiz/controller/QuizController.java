@@ -3,11 +3,11 @@ package io.github.suj1e.quiz.controller;
 import io.github.suj1e.common.annotation.CurrentUserId;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.quiz.dto.QuizResultResponse;
+import io.github.suj1e.quiz.dto.StartQuizRequest;
 import io.github.suj1e.quiz.dto.StartQuizResponse;
 import io.github.suj1e.quiz.dto.SubmitQuizRequest;
 import io.github.suj1e.quiz.service.QuizService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +26,16 @@ public class QuizController {
     /**
      * 开始测验.
      *
-     * @param userId         用户 ID (从 JWT 获取)
-     * @param knowledgeSetId 题库 ID
-     * @param timeLimit      时间限制 (分钟)
+     * @param userId  用户 ID (从 JWT 获取)
+     * @param request 开始测验请求
      * @return 开始测验响应
      */
     @PostMapping("/start")
     public ApiResponse<StartQuizResponse> startQuiz(
         @CurrentUserId UUID userId,
-        @RequestParam @NotNull UUID knowledgeSetId,
-        @RequestParam(required = false) Integer timeLimit
+        @Valid @RequestBody StartQuizRequest request
     ) {
-        return ApiResponse.of(quizService.startQuiz(userId, knowledgeSetId, timeLimit));
+        return ApiResponse.of(quizService.startQuiz(userId, request.knowledgeSetId(), request.timeLimit()));
     }
 
     /**

@@ -33,6 +33,17 @@ public class CategoryService {
     }
 
     /**
+     * 获取所有分类（带题库计数）.
+     */
+    @Transactional(readOnly = true)
+    public List<CategoryResponse> getAllCategoriesWithCount() {
+        return categoryRepository.findAllByOrderBySortOrderAsc()
+            .stream()
+            .map(this::toResponseWithCount)
+            .toList();
+    }
+
+    /**
      * 根据ID获取分类.
      */
     @Transactional(readOnly = true)
@@ -57,6 +68,17 @@ public class CategoryService {
             category.getName(),
             category.getDescription(),
             category.getSortOrder()
+        );
+    }
+
+    private CategoryResponse toResponseWithCount(Category category) {
+        long count = categoryRepository.countKnowledgeSetsById(category.getId());
+        return new CategoryResponse(
+            category.getId(),
+            category.getName(),
+            category.getDescription(),
+            category.getSortOrder(),
+            count
         );
     }
 }

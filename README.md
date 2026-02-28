@@ -175,6 +175,39 @@ docker-compose -f docker-compose-lite.yml up -d
 - [后端规范](standards/backend.md)
 - [前端规范](standards/frontend.md)
 
+## API 变更记录
+
+### 2026-02 游标分页迁移
+
+题库列表接口 (`GET /api/content/v1/library`) 已从传统的页码分页迁移到游标分页：
+
+**旧版 (已废弃)**:
+```
+GET /api/content/v1/library?page=1&limit=10
+响应: { "data": [...], "pagination": { "page": 1, "total_pages": 5, "total_count": 50 } }
+```
+
+**新版 (当前)**:
+```
+GET /api/content/v1/library?page_size=10&page_token=
+响应: { "data": [...], "has_more": true, "next_token": "eyJ..." }
+```
+
+**变更说明**:
+- `page` 参数改为 `page_token`（游标字符串，首次请求为空）
+- `limit` 参数改为 `page_size`
+- 响应移除 `pagination` 对象，改为 `has_more` 和 `next_token` 字段
+- 当 `has_more` 为 `false` 时，`next_token` 不存在
+
+**分类/标签响应格式更新**:
+```json
+// 旧版
+{ "data": { "categories": ["前端开发", "后端开发"] } }
+
+// 新版（包含 count 字段）
+{ "data": { "categories": [{ "name": "前端开发", "count": 15 }] } }
+```
+
 ## 许可证
 
 私有项目，保留所有权利。

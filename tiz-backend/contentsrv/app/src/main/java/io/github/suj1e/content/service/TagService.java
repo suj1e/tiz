@@ -30,6 +30,17 @@ public class TagService {
     }
 
     /**
+     * 获取所有标签（带题库计数）.
+     */
+    @Transactional(readOnly = true)
+    public List<TagResponse> getAllTagsWithCount() {
+        return tagRepository.findAllByOrderByNameAsc()
+            .stream()
+            .map(this::toResponseWithCount)
+            .toList();
+    }
+
+    /**
      * 根据名称列表获取或创建标签.
      */
     @Transactional
@@ -61,5 +72,10 @@ public class TagService {
 
     private TagResponse toResponse(Tag tag) {
         return new TagResponse(tag.getId(), tag.getName());
+    }
+
+    private TagResponse toResponseWithCount(Tag tag) {
+        long count = tagRepository.countKnowledgeSetsByTagId(tag.getId());
+        return new TagResponse(tag.getId(), tag.getName(), count);
     }
 }

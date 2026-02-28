@@ -8,15 +8,16 @@ tiz-web 前端与 tiz-backend 后端存在多处 API 契约不一致，导致前
 
 - **BREAKING** `quizsrv`: QuizController `/start` 接口改用 `@RequestBody` 接收 JSON，替代 `@RequestParam`
 - **BREAKING** `authsrv`: 登录/注册响应改为返回 `{ token, user }` 组合结构，替代分离的 `accessToken/user`
-- **BREAKING** `common`: PagedResponse 字段重命名 `items → data`，`limit → page_size`，新增 `total_pages`
+- **BREAKING** `common`: 分页改为游标分页，新增 CursorResponse (data, has_more, next_token)，删除 PagedResponse
 - **BREAKING** `contentsrv`: CategoryResponse/TagResponse 增加 `count` 字段
 - `contentsrv`: 新增 GenerateController，实现 `/content/v1/generate` 和 `/content/v1/generate/:id/batch`
 
 ### 前端变更
 
 - `content.ts`: 新增对 `/content/v1/generate` 接口的调用（当前只有 MSW mock）
-- `types/api.ts`: PaginatedResponse 字段名已正确，无需修改
+- `types/api.ts`: PaginatedResponse 改为 CursorResponse (data, has_more, next_token)
 - `types/library.ts`: Category/Tag 类型已包含 `count`，无需修改
+- 分页组件: 改为无限滚动，支持游标分页
 
 ### 规范文档
 
@@ -32,7 +33,7 @@ tiz-web 前端与 tiz-backend 后端存在多处 API 契约不一致，导致前
 
 - `auth-api`: 认证接口响应格式变更，登录/注册返回 `{ token, user }` 组合
 - `quiz-api`: 测验启动接口参数格式变更，从 query params 改为 JSON body
-- `pagination`: 分页响应格式标准化，统一字段命名
+- `pagination`: 分页改为游标分页（Cursor-based），支持移动端无限滚动
 - `content-api`: 内容接口扩展，分类/标签响应增加统计字段
 
 ## Impact
@@ -45,7 +46,8 @@ tiz-web 前端与 tiz-backend 后端存在多处 API 契约不一致，导致前
 | quizsrv | StartQuizRequest.java (新增) | DTO 新增 |
 | authsrv | AuthController.java | 响应结构调整 |
 | authsrv | LoginResponse.java (新增或修改) | DTO 修改 |
-| common | PagedResponse.java | 字段重命名 |
+| common | CursorResponse.java (新增) | 游标分页响应 |
+| common | PagedResponse.java (删除) | 移除旧分页 |
 | contentsrv | GenerateController.java (新增) | 控制器新增 |
 | contentsrv | GenerateService.java (新增) | 服务新增 |
 | contentsrv | CategoryResponse.java | 增加 count |

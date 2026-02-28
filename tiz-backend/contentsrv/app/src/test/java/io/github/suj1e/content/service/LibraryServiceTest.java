@@ -9,7 +9,7 @@ import io.github.suj1e.content.entity.Category;
 import io.github.suj1e.content.entity.KnowledgeSet;
 import io.github.suj1e.content.entity.Tag;
 import io.github.suj1e.content.repository.KnowledgeSetRepository;
-import io.github.suj1e.common.response.PagedResponse;
+import io.github.suj1e.common.response.CursorResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -87,12 +87,12 @@ class LibraryServiceTest {
             )).thenReturn(page);
 
             // Act
-            PagedResponse<LibrarySummaryResponse> result = libraryService.getLibraries(userId, filter);
+            CursorResponse<LibrarySummaryResponse> result = libraryService.getLibraries(userId, filter);
 
             // Assert
-            assertThat(result.items()).hasSize(1);
-            assertThat(result.items().get(0).title()).isEqualTo("Test Knowledge Set");
-            assertThat(result.total()).isEqualTo(1);
+            assertThat(result.data()).hasSize(1);
+            assertThat(result.data().get(0).title()).isEqualTo("Test Knowledge Set");
+            assertThat(result.hasMore()).isFalse();
         }
 
         @Test
@@ -111,10 +111,10 @@ class LibraryServiceTest {
             )).thenReturn(page);
 
             // Act
-            PagedResponse<LibrarySummaryResponse> result = libraryService.getLibraries(userId, filter);
+            CursorResponse<LibrarySummaryResponse> result = libraryService.getLibraries(userId, filter);
 
             // Assert
-            assertThat(result.items()).hasSize(1);
+            assertThat(result.data()).hasSize(1);
             verify(knowledgeSetRepository).findByUserIdWithFilters(
                 eq(userId), eq(categoryId), any(), any(), any(Pageable.class)
             );

@@ -37,7 +37,7 @@ export function LibraryFilter({
           </button>
           {categories.map((category) => (
             <button
-              key={category.id}
+              key={category.name}
               type="button"
               onClick={() => onCategoryChange?.(category.name)}
               className={cn(
@@ -59,7 +59,7 @@ export function LibraryFilter({
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <button
-              key={tag.id}
+              key={tag.name}
               type="button"
               onClick={() => onTagToggle?.(tag.name)}
               className={cn(

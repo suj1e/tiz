@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -23,8 +24,9 @@ public class CategoryController {
      * 获取所有分类.
      */
     @GetMapping
-    public ApiResponse<List<CategoryResponse>> getAllCategories() {
-        return ApiResponse.of(categoryService.getAllCategories());
+    public ApiResponse<Map<String, List<CategoryResponse>>> getAllCategories() {
+        List<CategoryResponse> categories = categoryService.getAllCategoriesWithCount();
+        return ApiResponse.of(Map.of("categories", categories));
     }
 
     /**

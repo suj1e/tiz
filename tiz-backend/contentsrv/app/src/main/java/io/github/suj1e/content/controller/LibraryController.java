@@ -2,7 +2,7 @@ package io.github.suj1e.content.controller;
 
 import io.github.suj1e.common.annotation.CurrentUserId;
 import io.github.suj1e.common.response.ApiResponse;
-import io.github.suj1e.common.response.PagedResponse;
+import io.github.suj1e.common.response.CursorResponse;
 import io.github.suj1e.content.dto.*;
 import io.github.suj1e.content.service.LibraryService;
 import jakarta.validation.Valid;
@@ -25,11 +25,11 @@ public class LibraryController {
      * 获取题库列表.
      */
     @GetMapping
-    public ApiResponse<PagedResponse<LibrarySummaryResponse>> getLibraries(
+    public CursorResponse<LibrarySummaryResponse> getLibraries(
         @CurrentUserId UUID userId,
         @Valid LibraryFilterRequest filter
     ) {
-        return ApiResponse.of(libraryService.getLibraries(userId, filter));
+        return libraryService.getLibraries(userId, filter);
     }
 
     /**

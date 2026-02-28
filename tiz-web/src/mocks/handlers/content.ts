@@ -4,20 +4,40 @@ import { mockLibrary } from '../data/library'
 export const contentHandlers = [
   http.post('/api/content/v1/generate', async () => {
     await delay(1000)
+    const library = mockLibrary[0]
     return HttpResponse.json({
       data: {
-        knowledge_set_id: 'ks-1',
-        questions: mockLibrary[0].questions.slice(0, 3),
+        knowledge_set: {
+          id: library.id,
+          title: library.title,
+          category: library.category,
+          tags: library.tags,
+          difficulty: library.difficulty,
+        },
+        questions: library.questions.slice(0, 3),
+        batch: {
+          current: 1,
+          total: 2,
+          has_more: true,
+        },
       },
     })
   }),
 
-  http.get('/api/content/v1/generate/:id/batch', async () => {
+  http.get('/api/content/v1/generate/:id/batch', async ({ request }) => {
     await delay(500)
+    const url = new URL(request.url)
+    const page = Number.parseInt(url.searchParams.get('page') || '2')
+    const library = mockLibrary[0]
+
     return HttpResponse.json({
       data: {
-        questions: mockLibrary[0].questions.slice(3, 6),
-        has_more: false,
+        questions: library.questions.slice(3, 6),
+        batch: {
+          current: page,
+          total: 2,
+          has_more: false,
+        },
       },
     })
   }),
@@ -25,25 +45,22 @@ export const contentHandlers = [
   http.get('/api/content/v1/library', async ({ request }) => {
     await delay(300)
     const url = new URL(request.url)
-    const page = Number.parseInt(url.searchParams.get('page') || '1')
     const pageSize = Number.parseInt(url.searchParams.get('page_size') || '10')
 
+    const libraries = mockLibrary.map((lib) => ({
+      id: lib.id,
+      title: lib.title,
+      category: lib.category,
+      tags: lib.tags,
+      difficulty: lib.difficulty,
+      question_count: lib.question_count,
+      created_at: lib.created_at,
+    }))
+
+    // For mock, return all data with has_more: false
     return HttpResponse.json({
-      data: mockLibrary.map((lib) => ({
-        id: lib.id,
-        title: lib.title,
-        category: lib.category,
-        tags: lib.tags,
-        difficulty: lib.difficulty,
-        question_count: lib.question_count,
-        created_at: lib.created_at,
-      })),
-      pagination: {
-        page,
-        page_size: pageSize,
-        total: mockLibrary.length,
-        total_pages: 1,
-      },
+      data: libraries,
+      has_more: false,
     })
   }),
 
@@ -98,23 +115,27 @@ export const contentHandlers = [
   http.get('/api/content/v1/categories', async () => {
     await delay(200)
     return HttpResponse.json({
-      data: [
-        { id: 'cat-1', name: '编程基础', count: 5 },
-        { id: 'cat-2', name: '前端开发', count: 3 },
-        { id: 'cat-3', name: '后端开发', count: 2 },
-      ],
+      data: {
+        categories: [
+          { name: '编程基础', count: 5 },
+          { name: '前端开发', count: 3 },
+          { name: '后端开发', count: 2 },
+        ],
+      },
     })
   }),
 
   http.get('/api/content/v1/tags', async () => {
     await delay(200)
     return HttpResponse.json({
-      data: [
-        { id: 'tag-1', name: 'JavaScript', count: 8 },
-        { id: 'tag-2', name: 'TypeScript', count: 5 },
-        { id: 'tag-3', name: 'React', count: 4 },
-        { id: 'tag-4', name: 'CSS', count: 3 },
-      ],
+      data: {
+        tags: [
+          { name: 'JavaScript', count: 8 },
+          { name: 'TypeScript', count: 5 },
+          { name: 'React', count: 4 },
+          { name: 'CSS', count: 3 },
+        ],
+      },
     })
   }),
 ]

@@ -387,7 +387,7 @@ GET /api/content/v1/generate/:id/batch?page=2
 ### 获取题库列表
 
 ```
-GET /api/content/v1/library?page=1&limit=10&category=&tag=&keyword=
+GET /api/content/v1/library?page_size=10&page_token=&category=&tag=&keyword=
 认证: 是
 ```
 
@@ -395,8 +395,8 @@ GET /api/content/v1/library?page=1&limit=10&category=&tag=&keyword=
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| page | int | 否 | 页码，默认 1 |
-| limit | int | 否 | 每页数量，默认 10 |
+| page_size | int | 否 | 每页数量，默认 10，最大 100 |
+| page_token | string | 否 | 游标，来自上次响应的 next_token |
 | category | string | 否 | 分类筛选 |
 | tag | string | 否 | 标签筛选 |
 | keyword | string | 否 | 关键词搜索 |
@@ -405,22 +405,28 @@ GET /api/content/v1/library?page=1&limit=10&category=&tag=&keyword=
 
 ```json
 {
-  "data": {
-    "items": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440002",
-        "title": "React Hooks 面试题",
-        "category": "前端开发",
-        "tags": ["React", "Hooks"],
-        "difficulty": "medium",
-        "question_count": 15,
-        "created_at": "2024-02-26T00:00:00Z"
-      }
-    ],
-    "total": 50,
-    "page": 1,
-    "limit": 10
-  }
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "title": "React Hooks 面试题",
+      "category": "前端开发",
+      "tags": ["React", "Hooks"],
+      "difficulty": "medium",
+      "question_count": 15,
+      "created_at": "2024-02-26T00:00:00Z"
+    }
+  ],
+  "has_more": true,
+  "next_token": "eyJpZDoiNTUwZTg0MDAtZTI5Yi00MWRkLWE3MTYtNDQ2NjU1NDQwMDAyIn0="
+}
+```
+
+**最后一页响应**
+
+```json
+{
+  "data": [...],
+  "has_more": false
 }
 ```
 
@@ -527,7 +533,12 @@ GET /api/content/v1/categories
 ```json
 {
   "data": {
-    "categories": ["前端开发", "后端开发", "数据库", "系统设计"]
+    "categories": [
+      { "name": "前端开发", "count": 15 },
+      { "name": "后端开发", "count": 12 },
+      { "name": "数据库", "count": 8 },
+      { "name": "系统设计", "count": 5 }
+    ]
   }
 }
 ```
@@ -546,7 +557,13 @@ GET /api/content/v1/tags
 ```json
 {
   "data": {
-    "tags": ["React", "Vue", "Node.js", "TypeScript", "Python"]
+    "tags": [
+      { "name": "React", "count": 25 },
+      { "name": "Vue", "count": 18 },
+      { "name": "Node.js", "count": 14 },
+      { "name": "TypeScript", "count": 22 },
+      { "name": "Python", "count": 30 }
+    ]
   }
 }
 ```

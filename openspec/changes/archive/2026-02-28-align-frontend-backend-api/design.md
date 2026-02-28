@@ -83,32 +83,40 @@ public ResponseEntity<ApiResponse<LoginResponse>> login(...) {
 }
 ```
 
-### D3: 分页响应格式
+### D3: 分页响应格式（游标分页）
 
-**决策**: 修改 `PagedResponse` 字段名
+**决策**: 采用游标分页（Cursor-based Pagination）
 
-| 原字段 | 新字段 |
-|--------|--------|
-| items | data |
-| limit | page_size |
-| - | total_pages (新增) |
+**请求参数**:
+| 参数 | 说明 |
+|------|------|
+| page_size | 每页数量，默认 10，最大 100 |
+| page_token | 游标，来自上次响应的 next_token |
+
+**响应格式**:
+```json
+{
+  "data": [...],
+  "has_more": true,
+  "next_token": "eyJpZDoxMDA..."
+}
+```
 
 **理由**:
-- 前端已使用此命名
-- `page_size` 比 `limit` 更明确
-- `total_pages` 便于前端分页控件
+- 项目以移动端为主，无限滚动是标准交互
+- 大厂（Stripe/Google/AWS）都采用游标分页
+- 性能更好，不随数据量增加而变慢
+- 实时数据不会出现漏数据或重复
 
 **实现**:
 ```java
-public record PagedResponse<T>(
-    List<T> data,        // 原 items
-    long total,
-    int page,
-    int pageSize,        // 原 limit
-    int totalPages       // 新增
+public record CursorResponse<T>(
+    List<T> data,
+    boolean hasMore,
+    String nextToken
 ) {
-    public static <T> PagedResponse<T> of(List<T> data, long total, int page, int pageSize) {
-        return new PagedResponse<>(data, total, page, pageSize, (int) Math.ceil((double) total / pageSize));
+    public static <T> CursorResponse<T> of(List<T> data, boolean hasMore, String nextToken) {
+        return new CursorResponse<>(data, hasMore, hasMore ? nextToken : null);
     }
 }
 ```

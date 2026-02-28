@@ -1,5 +1,7 @@
 package io.github.suj1e.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -9,7 +11,7 @@ import java.util.UUID;
 public record UserResponse(
     UUID id,
     String email,
-    String status,
-    Instant createdAt
+    @JsonProperty("created_at") Instant createdAt,
+    UserSettingsResponse settings
 ) {
 }

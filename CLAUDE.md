@@ -96,16 +96,16 @@ pnpm test:coverage     # With coverage
 **API Service Layer:**
 - `src/services/api.ts` provides `api.get()`, `api.post()`, `api.patch()`, `api.delete()`
 - Handles auth token injection and 401 redirect
-- Use `{ raw: true }` option to get full response (e.g., for pagination)
+- Use `{ raw: true }` option to get full response (e.g., for cursor pagination)
 - SSE streaming for chat via `src/services/chat.ts`
 
 ```typescript
 // Normal request - extracts response.data automatically
 const user = await api.get<User>('/user/v1/me')
 
-// Paginated request - get full response
-const res = await api.get<PaginatedResponse<Library>>('/content/v1/library', { raw: true })
-// res = { data: [...], pagination: {...} }
+// Cursor paginated request - get full response
+const res = await api.get<CursorResponse<Library>>('/content/v1/library', { raw: true })
+// res = { data: [...], has_more: true, next_token: "eyJ..." }
 ```
 
 **Error Handling:**

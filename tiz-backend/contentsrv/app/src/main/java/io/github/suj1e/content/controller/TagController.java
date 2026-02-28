@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 标签控制器 (对外 API).
@@ -22,7 +23,8 @@ public class TagController {
      * 获取所有标签.
      */
     @GetMapping
-    public ApiResponse<List<TagResponse>> getAllTags() {
-        return ApiResponse.of(tagService.getAllTags());
+    public ApiResponse<Map<String, List<TagResponse>>> getAllTags() {
+        List<TagResponse> tags = tagService.getAllTagsWithCount();
+        return ApiResponse.of(Map.of("tags", tags));
     }
 }

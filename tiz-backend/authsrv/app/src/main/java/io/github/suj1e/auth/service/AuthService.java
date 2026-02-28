@@ -1,9 +1,6 @@
 package io.github.suj1e.auth.service;
 
-import io.github.suj1e.auth.dto.LoginRequest;
-import io.github.suj1e.auth.dto.RegisterRequest;
-import io.github.suj1e.auth.dto.TokenResponse;
-import io.github.suj1e.auth.dto.UserResponse;
+import io.github.suj1e.auth.dto.*;
 import io.github.suj1e.auth.entity.User;
 import io.github.suj1e.auth.error.AuthErrorCode;
 import io.github.suj1e.auth.error.AuthException;
@@ -32,7 +29,7 @@ public class AuthService {
      * 用户注册.
      */
     @Transactional
-    public UserResponse register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
         // 检查邮箱是否已存在
         if (userRepository.existsByEmail(request.email())) {
             throw new AuthException(AuthErrorCode.AUTH_1002);
@@ -47,16 +44,19 @@ public class AuthService {
 
         user = userRepository.save(user);
 
+        // 生成 Token
+        TokenResponse tokens = tokenService.generateTokens(user);
+
         log.info("User registered: {}", user.getEmail());
 
-        return toUserResponse(user);
+        return new RegisterResponse(tokens.accessToken(), toUserResponse(user));
     }
 
     /**
      * 用户登录.
      */
     @Transactional
-    public TokenResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         // 查找用户
         User user = userRepository.findByEmail(request.email())
             .orElseThrow(() -> new AuthException(AuthErrorCode.AUTH_1001));
@@ -76,7 +76,7 @@ public class AuthService {
 
         log.info("User logged in: {}", user.getEmail());
 
-        return tokens;
+        return new LoginResponse(tokens.accessToken(), toUserResponse(user));
     }
 
     /**
@@ -117,8 +117,8 @@ public class AuthService {
         return new UserResponse(
             user.getId(),
             user.getEmail(),
-            user.getStatus().name().toLowerCase(),
-            user.getCreatedAt()
+            user.getCreatedAt(),
+            UserSettingsResponse.defaultSettings()
         );
     }
 }

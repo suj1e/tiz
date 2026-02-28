@@ -56,12 +56,11 @@ class TokenServiceTest {
     @BeforeEach
     void setUp() {
         testUserId = UUID.randomUUID();
-        testUser = User.builder()
-            .id(testUserId)
-            .email("test@example.com")
-            .passwordHash("hashedPassword")
-            .status(User.UserStatus.ACTIVE)
-            .build();
+        testUser = new User();
+        testUser.setId(testUserId);
+        testUser.setEmail("test@example.com");
+        testUser.setPasswordHash("hashedPassword");
+        testUser.setStatus(User.UserStatus.ACTIVE);
 
         lenient().when(jwtProperties.getSecret()).thenReturn(TEST_SECRET);
         lenient().when(jwtProperties.getAccessTokenExpiration()).thenReturn(1800L);
@@ -100,7 +99,7 @@ class TokenServiceTest {
         RefreshToken storedToken = RefreshToken.builder()
             .id(UUID.randomUUID())
             .userId(testUserId)
-            .tokenHash(anyString())
+            .tokenHash("someHashValue")
             .expiresAt(Instant.now().plusSeconds(604800))
             .revoked(false)
             .build();

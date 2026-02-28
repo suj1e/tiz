@@ -27,7 +27,7 @@ export const practiceHandlers = [
 
     return HttpResponse.json({
       data: {
-        is_correct: isCorrect,
+        correct: isCorrect,
         score: isCorrect ? 1 : 0,
         explanation: isCorrect ? '回答正确！' : '回答错误，正确答案见解析。',
       },

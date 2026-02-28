@@ -25,13 +25,11 @@ export interface KnowledgeSetSummary {
 }
 
 export interface Category {
-  id: string
   name: string
   count: number
 }
 
 export interface Tag {
-  id: string
   name: string
   count: number
 }

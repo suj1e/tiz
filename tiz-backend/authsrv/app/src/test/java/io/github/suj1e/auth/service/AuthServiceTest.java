@@ -1,7 +1,9 @@
 package io.github.suj1e.auth.service;
 
 import io.github.suj1e.auth.dto.LoginRequest;
+import io.github.suj1e.auth.dto.LoginResponse;
 import io.github.suj1e.auth.dto.RegisterRequest;
+import io.github.suj1e.auth.dto.RegisterResponse;
 import io.github.suj1e.auth.dto.TokenResponse;
 import io.github.suj1e.auth.entity.User;
 import io.github.suj1e.auth.error.AuthErrorCode;
@@ -47,12 +49,11 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         testUserId = UUID.randomUUID();
-        testUser = User.builder()
-            .id(testUserId)
-            .email("test@example.com")
-            .passwordHash("hashedPassword")
-            .status(User.UserStatus.ACTIVE)
-            .build();
+        testUser = new User();
+        testUser.setId(testUserId);
+        testUser.setEmail("test@example.com");
+        testUser.setPasswordHash("hashedPassword");
+        testUser.setStatus(User.UserStatus.ACTIVE);
     }
 
     @Test
@@ -60,18 +61,21 @@ class AuthServiceTest {
     void register_Success() {
         // Arrange
         RegisterRequest request = new RegisterRequest("test@example.com", "password123");
+        TokenResponse tokenResponse = new TokenResponse("accessToken", "refreshToken", 1800L);
 
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("hashedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
+        when(tokenService.generateTokens(any(User.class))).thenReturn(tokenResponse);
 
         // Act
-        var response = authService.register(request);
+        RegisterResponse response = authService.register(request);
 
         // Assert
         assertNotNull(response);
-        assertEquals("test@example.com", response.email());
-        assertEquals("active", response.status());
+        assertEquals("accessToken", response.token());
+        assertNotNull(response.user());
+        assertEquals("test@example.com", response.user().email());
         verify(userRepository).save(any(User.class));
     }
 
@@ -103,12 +107,13 @@ class AuthServiceTest {
         when(tokenService.generateTokens(testUser)).thenReturn(tokenResponse);
 
         // Act
-        TokenResponse response = authService.login(request);
+        LoginResponse response = authService.login(request);
 
         // Assert
         assertNotNull(response);
-        assertEquals("accessToken", response.accessToken());
-        assertEquals("refreshToken", response.refreshToken());
+        assertEquals("accessToken", response.token());
+        assertNotNull(response.user());
+        assertEquals("test@example.com", response.user().email());
     }
 
     @Test
@@ -146,12 +151,11 @@ class AuthServiceTest {
     @DisplayName("登录 - 用户已被禁用")
     void login_UserBanned() {
         // Arrange
-        User bannedUser = User.builder()
-            .id(testUserId)
-            .email("banned@example.com")
-            .passwordHash("hashedPassword")
-            .status(User.UserStatus.BANNED)
-            .build();
+        User bannedUser = new User();
+        bannedUser.setId(testUserId);
+        bannedUser.setEmail("banned@example.com");
+        bannedUser.setPasswordHash("hashedPassword");
+        bannedUser.setStatus(User.UserStatus.BANNED);
 
         LoginRequest request = new LoginRequest("banned@example.com", "password123");
         when(userRepository.findByEmail("banned@example.com")).thenReturn(Optional.of(bannedUser));

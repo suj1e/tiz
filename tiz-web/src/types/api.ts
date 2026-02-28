@@ -10,15 +10,14 @@ export interface ApiError {
   }
 }
 
-export interface PaginatedResponse<T> {
+export interface CursorResponse<T> {
   data: T[]
-  pagination: {
-    page: number
-    page_size: number
-    total: number
-    total_pages: number
-  }
+  has_more: boolean
+  next_token?: string
 }
+
+/** @deprecated Use CursorResponse instead */
+export type PaginatedResponse<T> = CursorResponse<T>
 
 export interface LoginRequest {
   email: string
