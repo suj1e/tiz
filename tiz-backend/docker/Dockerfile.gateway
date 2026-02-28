@@ -16,7 +16,20 @@ ARG PORT=8080
 # Set working directory
 WORKDIR /build
 
-# Copy Gradle wrapper and build files first for better caching
+# Copy common module first (needed by gateway)
+COPY tiz-backend/common/gradle/wrapper/ /common/gradle/wrapper/
+COPY tiz-backend/common/gradle/libs.versions.toml /common/gradle/
+COPY tiz-backend/common/gradlew /common/
+COPY tiz-backend/common/settings.gradle.kts /common/
+COPY tiz-backend/common/build.gradle.kts /common/
+COPY tiz-backend/common/src/ /common/src/
+
+# Build and publish common module to Maven Local
+RUN chmod +x /common/gradlew && \
+    cd /common && \
+    ./gradlew publishToMavenLocal --no-daemon --quiet
+
+# Copy Gradle wrapper and build files for gateway
 COPY tiz-backend/${SERVICE_NAME}/gradle/wrapper/ gradle/wrapper/
 COPY tiz-backend/${SERVICE_NAME}/gradle/libs.versions.toml gradle/
 COPY tiz-backend/${SERVICE_NAME}/gradlew .
