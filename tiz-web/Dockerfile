@@ -1,4 +1,5 @@
 # Build stage
+# v2 - Force cache refresh for TypeScript fixes
 FROM node:20-alpine AS builder
 
 WORKDIR /app
