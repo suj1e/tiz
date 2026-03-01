@@ -45,4 +45,14 @@ publishing {
             artifactId = "llmsrv-api"
         }
     }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/suj1e/tiz")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: "token"
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }

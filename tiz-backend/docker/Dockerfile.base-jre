@@ -1,0 +1,20 @@
+# Base JRE image for Tiz Java services
+# Build: docker build -f Dockerfile.base-jre -t ghcr.io/suj1e/tiz/base-jre:21 .
+
+FROM eclipse-temurin:21-jre-alpine
+
+LABEL maintainer="tiz-team"
+LABEL description="Base JRE image for Tiz services"
+
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates curl tzdata && \
+    cp /usr/share/zoneinfo/UTC /etc/localtime && \
+    echo "UTC" > /etc/timezone && \
+    # Create non-root user
+    addgroup -S tiz && \
+    adduser -S -G tiz tiz
+
+WORKDIR /app
+
+# Switch to non-root user
+USER tiz

@@ -10,11 +10,8 @@ x-logging: &default-logging
 
 # 网络定义
 networks:
-  tiz-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.28.0.0/16
+  npass:
+    external: true
 
 services:
   # ==================== MySQL ====================
@@ -40,8 +37,7 @@ services:
       - "--default-time-zone=+08:00"
       - --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO
     networks:
-      tiz-network:
-        ipv4_address: 172.28.0.10
+      - npass
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
       interval: 10s
@@ -64,8 +60,7 @@ services:
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     networks:
-      tiz-network:
-        ipv4_address: 172.28.0.11
+      - npass
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "$$REDIS_PASSWORD", "ping"]
       interval: 10s
@@ -103,8 +98,7 @@ services:
     volumes:
       - /opt/dev/dockermnt/elasticsearch:/usr/share/elasticsearch/data
     networks:
-      tiz-network:
-        ipv4_address: 172.28.0.12
+      - npass
     healthcheck:
       test: ["CMD-SHELL", "curl -f -u elastic:$$ELASTIC_PASSWORD http://localhost:9200/_cluster/health || exit 1"]
       interval: 30s
@@ -122,7 +116,7 @@ services:
       - MODE=standalone
       - PREFER_HOST_MODE=ip
       - SPRING_DATASOURCE_PLATFORM=mysql
-      - MYSQL_SERVICE_HOST=172.28.0.10
+      - MYSQL_SERVICE_HOST=mysql
       - MYSQL_SERVICE_PORT=3306
       - MYSQL_SERVICE_DB_NAME=nacos
       - MYSQL_SERVICE_USER=root
@@ -145,8 +139,7 @@ services:
       - /opt/dev/dockermnt/nacos:/home/nacos/data
       - ./config/docker/nacos/logs:/home/nacos/logs
     networks:
-      tiz-network:
-        ipv4_address: 172.28.0.14
+      - npass
     depends_on:
       mysql:
         condition: service_healthy
@@ -190,8 +183,7 @@ services:
     volumes:
       - /opt/dev/dockermnt/kafka:/var/lib/kafka/data
     networks:
-      tiz-network:
-        ipv4_address: 172.28.0.15
+      - npass
     healthcheck:
       test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9094"]
       interval: 15s
@@ -212,8 +204,7 @@ services:
     ports:
       - "30010:8080"
     networks:
-      tiz-network:
-        ipv4_address: 172.28.0.16
+      - npass
     depends_on:
       kafka:
         condition: service_healthy

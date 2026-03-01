@@ -280,6 +280,25 @@ pixi run dev
 
 ### Deployment
 
+**Architecture Overview:**
+
+1. **GitHub Packages**
+   - `common`, `llmsrv-api`, `contentsrv-api` published to GitHub Packages
+   - Services pull dependencies from GitHub Packages during build
+
+2. **CI/CD Pipelines**
+   - `lib-publish.yml` - Library publishing workflow
+   - `srv-*.yml` - Independent service build workflows (one per service)
+   - `deploy.yml` - Deployment only (no build, pulls pre-built images)
+
+3. **Network Architecture**
+   - All services use the `npass` Docker network
+   - Services communicate via DNS names: `mysql`, `redis`, `kafka`, `nacos`
+
+4. **Docker Images**
+   - Base image: `base-jre` (custom JRE base image)
+   - Each service has its own Dockerfile
+
 **GitHub Secrets Configuration:**
 | Secret | Description |
 |--------|-------------|
@@ -296,8 +315,11 @@ git push origin v1.0.0
 
 **Manual Deployment:**
 ```bash
-cd /opt/dev/apps/tiz
-docker-compose -f infra/docker-compose-app.yml up -d
+# 1. Start infrastructure services (MySQL, Redis, Kafka, Nacos)
+docker-compose -f infra/docker-compose.yml up -d
+
+# 2. Start application services
+docker-compose -f deploy/docker-compose.yml up -d
 ```
 
 ### Postman Collection Notes

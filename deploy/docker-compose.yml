@@ -12,7 +12,7 @@ x-java-service: &java-service
   restart: always
   environment:
     - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-    - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-172.28.0.14:8848}
+    - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
     - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
     - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
     - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
@@ -51,16 +51,6 @@ x-python-service: &python-service
 
 networks:
   npass:
-    name: npass
-    external: true
-  tiz-backend:
-    name: tiz-backend
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.29.0.0/16
-  tiz-network:
-    name: tiz-network
     external: true
 
 services:
@@ -98,7 +88,7 @@ services:
       - "${GATEWAY_PORT:-8080}:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-172.28.0.14:8848}
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
@@ -118,10 +108,7 @@ services:
         reservations:
           memory: 256M
     networks:
-      npass:
-        ipv4_address: 172.20.0.10
-      tiz-backend:
-        ipv4_address: 172.29.0.10
+      - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 15s
@@ -151,32 +138,24 @@ services:
     <<: *java-service
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-172.28.0.14:8848}
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - JAVA_OPTS=${AUTHSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://172.28.0.10:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-172.28.0.11}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRATION=${JWT_EXPIRATION:-86400000}
     networks:
-      tiz-backend:
-        ipv4_address: 172.29.0.20
-      tiz-network:
-        ipv4_address: 172.28.0.20
+      - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8101/actuator/health"]
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
 
   # ==================== Chat Service ====================
   chatsrv:
@@ -185,36 +164,24 @@ services:
     <<: *java-service
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-172.28.0.14:8848}
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - JAVA_OPTS=${CHATSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://172.28.0.10:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-172.28.0.11}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
-      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-172.28.0.15:9094}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9094}
       - LLM_SERVICE_URL=http://llmsrv:8106
     networks:
-      tiz-backend:
-        ipv4_address: 172.29.0.21
-      tiz-network:
-        ipv4_address: 172.28.0.21
+      - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8102/actuator/health"]
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      llmsrv:
-        condition: service_healthy
 
   # ==================== Content Service ====================
   contentsrv:
@@ -223,30 +190,22 @@ services:
     <<: *java-service
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-172.28.0.14:8848}
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - JAVA_OPTS=${CONTENTSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://172.28.0.10:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-172.28.0.11}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
     networks:
-      tiz-backend:
-        ipv4_address: 172.29.0.22
-      tiz-network:
-        ipv4_address: 172.28.0.22
+      - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8103/actuator/health"]
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
 
   # ==================== Practice Service ====================
   practicesrv:
@@ -255,33 +214,23 @@ services:
     <<: *java-service
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-172.28.0.14:8848}
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - JAVA_OPTS=${PRACTICESRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://172.28.0.10:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-172.28.0.11}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
-      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-172.28.0.15:9094}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9094}
     networks:
-      tiz-backend:
-        ipv4_address: 172.29.0.23
-      tiz-network:
-        ipv4_address: 172.28.0.23
+      - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8104/actuator/health"]
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
 
   # ==================== Quiz Service ====================
   quizsrv:
@@ -290,30 +239,22 @@ services:
     <<: *java-service
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-172.28.0.14:8848}
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - JAVA_OPTS=${QUIZSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://172.28.0.10:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-172.28.0.11}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
     networks:
-      tiz-backend:
-        ipv4_address: 172.29.0.24
-      tiz-network:
-        ipv4_address: 172.28.0.24
+      - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8105/actuator/health"]
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
 
   # ==================== LLM Service ====================
   llmsrv:
@@ -322,11 +263,11 @@ services:
     <<: *python-service
     environment:
       - PYTHONUNBUFFERED=1
-      - DATABASE_URL=${LLM_DATABASE_URL:-mysql+pymysql://tiz:Tiz@2026@172.28.0.10:3306/tiz}
-      - REDIS_HOST=${SPRING_DATA_REDIS_HOST:-172.28.0.11}
+      - DATABASE_URL=${LLM_DATABASE_URL:-mysql+pymysql://tiz:Tiz@2026@mysql:3306/tiz}
+      - REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
       - REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
       - REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
-      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-172.28.0.15:9094}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9094}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_API_BASE=${OPENAI_API_BASE:-https://api.openai.com/v1}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
@@ -340,21 +281,13 @@ services:
         reservations:
           memory: 512M
     networks:
-      tiz-backend:
-        ipv4_address: 172.29.0.25
-      tiz-network:
-        ipv4_address: 172.28.0.25
+      - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8106/health"]
       interval: 15s
       timeout: 10s
       retries: 5
       start_period: 30s
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
 
   # ==================== User Service ====================
   usersrv:
@@ -363,54 +296,31 @@ services:
     <<: *java-service
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-172.28.0.14:8848}
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - JAVA_OPTS=${USERSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://172.28.0.10:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-172.28.0.11}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
     networks:
-      tiz-backend:
-        ipv4_address: 172.29.0.26
-      tiz-network:
-        ipv4_address: 172.28.0.26
+      - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8107/actuator/health"]
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
 
-  # ==================== Infrastructure Dependencies (Reference) ====================
-  # These services are defined in docker-compose-lite.yml
-  # This section documents the expected healthcheck dependencies
-  mysql:
-    image: docker.m.daocloud.io/library/mysql:9.2
-    container_name: tiz-mysql
-    networks:
-      tiz-network:
-        ipv4_address: 172.28.0.10
-    external: true
-
-  redis:
-    image: docker.m.daocloud.io/library/redis:7.4-alpine
-    container_name: tiz-redis
-    networks:
-      tiz-network:
-        ipv4_address: 172.28.0.11
-    external: true
-
-  kafka:
-    image: docker.m.daocloud.io/confluentinc/cp-kafka:7.8.0
-    container_name: tiz-kafka
-    networks:
-      tiz-network:
-        ipv4_address: 172.28.0.15
-    external: true
+# ==================== Infrastructure Dependencies ====================
+# mysql, redis, kafka are defined in infra/docker-compose.yml
+# Services connect to them via npass network using DNS names:
+#   - mysql:3306
+#   - redis:6379
+#   - kafka:9094
+#   - nacos:8848
+#
+# Note: depends_on cannot check health of external containers.
+# Start infra first: docker-compose -f infra/docker-compose.yml up -d
+# Then start apps: docker-compose -f deploy/docker-compose.yml up -d
