@@ -94,13 +94,6 @@ services:
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - JAVA_OPTS=${GATEWAY_JAVA_OPTS:--Xms256m -Xmx512m}
-      - GATEWAY_ROUTES_AUTHSRV_URL=http://authsrv:8101
-      - GATEWAY_ROUTES_CHATSRV_URL=http://chatsrv:8102
-      - GATEWAY_ROUTES_CONTENTSRV_URL=http://contentsrv:8103
-      - GATEWAY_ROUTES_PRACTICESRV_URL=http://practicesrv:8104
-      - GATEWAY_ROUTES_QUIZSRV_URL=http://quizsrv:8105
-      - GATEWAY_ROUTES_LLSMSRV_URL=http://llmsrv:8106
-      - GATEWAY_ROUTES_USERSRV_URL=http://usersrv:8107
     deploy:
       resources:
         limits:
@@ -177,7 +170,6 @@ services:
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9094}
-      - LLM_SERVICE_URL=http://llmsrv:8106
     networks:
       - npass
     healthcheck:

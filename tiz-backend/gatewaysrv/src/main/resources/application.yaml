@@ -48,13 +48,13 @@ spring:
 
     nacos:
       discovery:
-        enabled: false
-        server-addr: localhost:30006
-        namespace: public
+        enabled: true
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        namespace: ${NACOS_NAMESPACE:}
       config:
         enabled: false
-        server-addr: localhost:30006
-        namespace: public
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        namespace: ${NACOS_NAMESPACE:}
         file-extension: yaml
 
 # JWT Configuration

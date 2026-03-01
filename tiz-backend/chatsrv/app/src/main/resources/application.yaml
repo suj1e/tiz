@@ -33,11 +33,11 @@ spring:
   cloud:
     nacos:
       discovery:
-        enabled: false
-        server-addr: localhost:30006
+        enabled: true
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
       config:
         enabled: false
-        server-addr: localhost:30006
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
 
 # SSE configuration
 sse:

@@ -3,6 +3,7 @@ package io.github.suj1e.chat.config;
 import io.github.suj1e.content.api.client.ContentClient;
 import io.github.suj1e.llm.api.client.LlmClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,14 +16,23 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class HttpClientConfig {
 
-    @Value("${llm.service.url:http://localhost:8106}")
+    @Value("${llm.service.url:http://llmsrv:8106}")
     private String llmServiceUrl;
 
-    @Value("${content.service.url:http://localhost:8103}")
+    @Value("${content.service.url:http://contentsrv:8103}")
     private String contentServiceUrl;
 
     /**
-     * LLM 服务客户端.
+     * LoadBalanced WebClient.Builder for service discovery.
+     */
+    @Bean
+    @LoadBalanced
+    public WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder();
+    }
+
+    /**
+     * LLM 服务客户端 (不使用服务发现，直接 Docker DNS).
      */
     @Bean
     public LlmClient llmClient() {
@@ -38,11 +48,11 @@ public class HttpClientConfig {
     }
 
     /**
-     * Content 服务客户端.
+     * Content 服务客户端 (使用服务发现).
      */
     @Bean
-    public ContentClient contentClient() {
-        WebClient webClient = WebClient.builder()
+    public ContentClient contentClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        WebClient webClient = loadBalancedWebClientBuilder
             .baseUrl(contentServiceUrl)
             .build();
 

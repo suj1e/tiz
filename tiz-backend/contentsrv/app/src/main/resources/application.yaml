@@ -23,11 +23,13 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:30006
-        namespace: tiz
+        enabled: true
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        namespace: ${NACOS_NAMESPACE:}
       config:
-        server-addr: localhost:30006
-        namespace: tiz
+        enabled: false
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        namespace: ${NACOS_NAMESPACE:}
         file-extension: yaml
 
 # HTTP Client for llmsrv
