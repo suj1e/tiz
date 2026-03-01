@@ -9,18 +9,14 @@ spring:
     nacos:
       discovery:
         enabled: true
-        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30848}
         namespace: ${NACOS_NAMESPACE:}
       config:
         enabled: true
-        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30848}
         namespace: ${NACOS_NAMESPACE:}
         file-extension: yaml
         refresh-enabled: true
-        shared-configs:
-          - data-id: common.yaml
-            group: DEFAULT_GROUP
-            refresh: true
 
 # SSE configuration
 sse:

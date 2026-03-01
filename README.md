@@ -131,6 +131,52 @@ cd infra
 ./infra.sh start --env prod
 ```
 
+### Nacos 配置导入
+
+首次启动或配置变更后，需要导入 Nacos 配置（按 namespace 隔离环境）：
+
+```bash
+cd tiz-backend/nacos-config
+
+# 导入 dev 环境配置到 dev namespace
+./import.sh dev
+
+# 导入 staging 环境配置
+./import.sh staging
+
+# 导入 prod 环境配置
+./import.sh prod
+```
+
+配置文件结构：
+```
+nacos-config/
+├── dev/                  # dev 环境配置
+│   ├── authsrv.yaml      # 认证服务配置
+│   ├── chatsrv.yaml      # 对话服务配置
+│   └── ...
+├── staging/              # staging 环境配置
+└── prod/                 # prod 环境配置
+```
+
+### 一键启动后端服务
+
+```bash
+cd tiz-backend
+
+# 启动所有服务
+./start-dev.sh start
+
+# 查看状态
+./start-dev.sh status
+
+# 查看日志
+./start-dev.sh logs authsrv
+
+# 停止所有服务
+./start-dev.sh stop
+```
+
 ## 服务部署
 
 每个服务都是独立的，有独立的 Dockerfile 和 docker-compose.yml：
@@ -143,6 +189,18 @@ docker-compose up -d
 # 或者构建镜像
 docker build -t authsrv:latest .
 ```
+
+### 基础设施端口 (dev 环境)
+
+| 服务 | 端口 | 用途 |
+|------|------|------|
+| MySQL | 30001 | 数据库 |
+| Redis | 30002 | 缓存 |
+| Elasticsearch | 30003 | 搜索引擎 |
+| Nacos Console | 30006 | 配置中心 Web UI |
+| Nacos API | 30848 | SDK 连接地址 |
+| Kafka | 30009 | 消息队列 |
+| Kafka UI | 30010 | Kafka 管理界面 |
 
 ### 服务端口
 

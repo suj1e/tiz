@@ -226,6 +226,28 @@ pixi install
 pixi run dev
 ```
 
+### Start All Backend Services
+
+Use the development startup script:
+
+```bash
+cd tiz-backend
+
+# Start all services in dependency order
+./start-dev.sh start
+
+# Check service status
+./start-dev.sh status
+
+# View logs for a service
+./start-dev.sh logs authsrv
+
+# Stop all services
+./start-dev.sh stop
+```
+
+Logs are written to `tiz-backend/logs/` directory.
+
 ### API Gateway Routes
 
 ```
@@ -256,6 +278,57 @@ cd infra
 # View status
 ./infra.sh status
 ```
+
+### Infrastructure Ports (dev)
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| MySQL | 30001 | Database |
+| Redis | 30002 | Cache |
+| Elasticsearch | 30003 | Search engine |
+| Nacos Console | 30006 | Config center Web UI |
+| Nacos API | 30848 | SDK connection address |
+| Kafka | 30009 | Message queue |
+| Kafka UI | 30010 | Kafka management UI |
+
+### Nacos 3.x Notes
+
+Nacos 3.x has separate ports for Console and API:
+- **Console (8080 → 30006)**: Web UI at `http://localhost:30006/`
+- **HTTP API (8848 → 30848)**: SDK connects here, API path is `/nacos/v1/...`
+- **gRPC (9848 → 31848)**: Auto-calculated as API port + 1000
+
+Services should configure `NACOS_SERVER_ADDR=localhost:30848`.
+
+### Nacos Config Import
+
+After starting infra or when configs change, import configs to Nacos (isolated by namespace):
+
+```bash
+cd tiz-backend/nacos-config
+
+# Import dev environment configs to 'dev' namespace
+./import.sh dev
+
+# Import staging configs
+./import.sh staging
+
+# Import prod configs
+./import.sh prod
+```
+
+Config structure:
+```
+nacos-config/
+├── dev/                  # dev environment
+│   ├── authsrv.yaml      # auth service config
+│   ├── chatsrv.yaml      # chat service config
+│   └── ...
+├── staging/              # staging environment
+└── prod/                 # prod environment
+```
+
+Each service has its own config file (no shared configs). Services connect to the appropriate namespace via `NACOS_NAMESPACE` environment variable.
 
 ### Environment Differences
 
@@ -288,10 +361,39 @@ All services connect to the `npass` Docker network and communicate via DNS names
 
 ## Development Workflow
 
-1. Frontend development typically uses mock mode (`VITE_MOCK=true`)
-2. For full-stack development, start infra: `./infra/infra.sh start`
-3. API specs and contracts are in `standards/api.md`
-4. Postman collection available at `standards/postman.json`
+### Full-Stack Development
+
+1. **Start infrastructure**
+   ```bash
+   cd infra && ./infra.sh start
+   ```
+
+2. **Import Nacos configs** (first time or after config changes)
+   ```bash
+   cd tiz-backend/nacos-config && ./import.sh import
+   ```
+
+3. **Start backend services**
+   ```bash
+   cd tiz-backend && ./start-dev.sh start
+   ```
+
+4. **Start frontend**
+   ```bash
+   cd tiz-web && pnpm dev
+   ```
+
+### Frontend-Only Development
+
+```bash
+cd tiz-web
+VITE_MOCK=true pnpm dev  # Mock mode, no backend needed
+```
+
+### Notes
+
+- API specs and contracts are in `standards/api.md`
+- Postman collection available at `standards/postman.json`
 
 ### Postman Collection Notes
 

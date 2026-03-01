@@ -1,0 +1,26 @@
+# Gateway Service Configuration - Dev Environment
+# dataId: gatewaysrv.yaml, group: DEFAULT_GROUP, namespace: dev
+
+jwt:
+  secret: ${JWT_SECRET:TizJwtSecretKey2026VeryLongSecretKeyForSecurity}
+
+# CORS Configuration
+cors:
+  allowed-origins: http://localhost:5173,http://localhost:3000
+  allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+  allowed-headers: Authorization,Content-Type,X-*
+  allow-credentials: true
+  max-age: 3600
+
+# Whitelist paths (no authentication required)
+gateway:
+  whitelist:
+    - /api/auth/v1/login
+    - /api/auth/v1/register
+    - /api/auth/v1/refresh
+    - /actuator/**
+
+logging:
+  level:
+    root: INFO
+    io.github.suj1e: DEBUG

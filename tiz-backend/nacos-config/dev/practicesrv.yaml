@@ -1,5 +1,5 @@
-# Nacos 共享配置 - dev 环境
-# dataId: common.yaml, group: DEFAULT_GROUP
+# Practice Service Configuration - Dev Environment
+# dataId: practicesrv.yaml, group: DEFAULT_GROUP, namespace: dev
 
 spring:
   datasource:
@@ -19,8 +19,16 @@ spring:
   kafka:
     bootstrap-servers: localhost:30009
 
+# Service URLs (local development)
+content:
+  service:
+    url: http://localhost:8103
+
+llm:
+  service:
+    url: http://localhost:8106
+
 logging:
   level:
     root: INFO
     io.github.suj1e: DEBUG
-    org.springframework.web: DEBUG

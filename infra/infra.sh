@@ -93,6 +93,7 @@ print_access_info() {
         fi
         if docker ps --format '{{.Names}}' | grep -q "tiz-nacos"; then
             echo -e "${GREEN}✓ Nacos Console: http://localhost:30006${NC}"
+            echo -e "${GREEN}✓ Nacos API: localhost:30848${NC}"
         fi
         if docker ps --format '{{.Names}}' | grep -q "tiz-kafka"; then
             echo -e "${GREEN}✓ Kafka: localhost:30009${NC}"
