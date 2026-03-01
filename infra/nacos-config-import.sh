@@ -33,10 +33,26 @@ if [ ! -d "$CONFIG_DIR" ]; then
     exit 1
 fi
 
+# 获取 access token
+get_token() {
+    local response
+    response=$(curl -s -X POST "http://$NACOS_ADDR/nacos/v1/auth/login" \
+        -d "username=$NACOS_USER" \
+        -d "password=$NACOS_PASS")
+    echo "$response" | grep -o '"accessToken":"[^"]*"' | sed 's/"accessToken":"//;s/"//'
+}
+
+TOKEN=$(get_token)
+if [ -z "$TOKEN" ]; then
+    echo -e "${RED}Error: Failed to get Nacos access token${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ Logged in to Nacos${NC}"
+
 # 创建 namespace
 create_namespace() {
     echo -e "${YELLOW}Creating namespace: $ENV${NC}"
-    curl -s -X POST "http://$NACOS_ADDR/nacos/v1/console/namespaces" \
+    curl -s -X POST "http://$NACOS_ADDR/nacos/v1/console/namespaces?accessToken=$TOKEN" \
         -d "customNamespaceId=$ENV" \
         -d "namespaceName=$ENV" \
         -d "namespaceDesc=$ENV environment" >/dev/null 2>&1 || true
@@ -52,7 +68,7 @@ import_config() {
     echo -e "  ${YELLOW}Importing:${NC} $data_id"
 
     local response
-    response=$(curl -s -w "\n%{http_code}" -X POST "http://$NACOS_ADDR/nacos/v1/cs/configs" \
+    response=$(curl -s -w "\n%{http_code}" -X POST "http://$NACOS_ADDR/nacos/v1/cs/configs?accessToken=$TOKEN" \
         -d "dataId=$data_id" \
         -d "group=DEFAULT_GROUP" \
         -d "tenant=$ENV" \

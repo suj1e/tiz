@@ -1,7 +1,4 @@
-version: '3.9'
-
 # 全局日志配置 - 限制日志大小防止系统盘被占满
-# 单个容器日志最大 10MB，最多保留 3 个文件
 x-logging: &default-logging
   driver: "json-file"
   options:
@@ -12,6 +9,14 @@ x-logging: &default-logging
 networks:
   npass:
     external: true
+
+# 数据卷定义 (OrbStack 管理)
+volumes:
+  mysql-data:
+  redis-data:
+  elasticsearch-data:
+  nacos-data:
+  kafka-data:
 
 services:
   # ==================== MySQL ====================
@@ -28,7 +33,7 @@ services:
     ports:
       - "30001:3306"
     volumes:
-      - /opt/dev/dockermnt/mysql:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
       - ./config/docker/mysql/init:/docker-entrypoint-initdb.d
     command:
       - --max_connections=500
@@ -54,7 +59,7 @@ services:
     ports:
       - "30002:6379"
     volumes:
-      - /opt/dev/dockermnt/redis:/data
+      - redis-data:/data
       - ./config/docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
     command: sh -c "redis-server /usr/local/etc/redis/redis.conf --requirepass $$REDIS_PASSWORD"
     environment:
@@ -96,7 +101,7 @@ services:
       - "30003:9200"
       - "30004:9300"
     volumes:
-      - /opt/dev/dockermnt/elasticsearch:/usr/share/elasticsearch/data
+      - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
       - npass
     healthcheck:
@@ -132,11 +137,11 @@ services:
       - JVM_XMX=256m
       - JVM_XMN=128m
     ports:
-      - "30006:8080"    # HTTP
-      - "31006:9848"    # gRPC
-      - "31007:9849"    # gRPC server
+      - "30006:8080"
+      - "31006:9848"
+      - "31007:9849"
     volumes:
-      - /opt/dev/dockermnt/nacos:/home/nacos/data
+      - nacos-data:/home/nacos/data
       - ./config/docker/nacos/logs:/home/nacos/logs
     networks:
       - npass
@@ -159,13 +164,13 @@ services:
       nacos:
         condition: service_healthy
     environment:
-      - NACOS_ENV=${NACOS_ENV:-prod}
+      - NACOS_ENV=${NACOS_ENV:-dev}
       - NACOS_ADDR=nacos:8080
       - NACOS_USER=${NACOS_USER:-nacos}
       - NACOS_PASS=${NACOS_PASS:-nacos}
     volumes:
       - ../deploy/nacos-config:/configs:ro
-      - ./scripts/nacos-import-configs.sh:/init.sh:ro
+      - ./nacos-config-import.sh:/init.sh:ro
     entrypoint: ["/bin/sh", "/init.sh"]
     networks:
       - npass
@@ -202,7 +207,7 @@ services:
     ports:
       - "30009:9094"
     volumes:
-      - /opt/dev/dockermnt/kafka:/var/lib/kafka/data
+      - kafka-data:/var/lib/kafka/data
     networks:
       - npass
     healthcheck:
