@@ -84,13 +84,23 @@ publish_config() {
 
     local content=$(cat "$file" | python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.stdin.read(), safe=''))")
 
+    # 根据文件扩展名确定类型
+    local type="text"
+    if [[ "$data_id" == *.yaml ]] || [[ "$data_id" == *.yml ]]; then
+        type="yaml"
+    elif [[ "$data_id" == *.properties ]]; then
+        type="properties"
+    elif [[ "$data_id" == *.json ]]; then
+        type="json"
+    fi
+
     local url="http://${NACOS_ADDR}/nacos/v1/cs/configs"
-    local data="dataId=${data_id}&group=${group}&content=${content}&tenant=${namespace}&accessToken=${token}"
+    local data="dataId=${data_id}&group=${group}&content=${content}&tenant=${namespace}&type=${type}&accessToken=${token}"
 
     local response=$(curl -s -X POST "$url" -d "$data")
 
     if [ "$response" = "true" ]; then
-        log_success "Published: $data_id (namespace: $namespace)"
+        log_success "Published: $data_id (namespace: $namespace, type: $type)"
     else
         log_error "Failed to publish $data_id: $response"
         return 1
