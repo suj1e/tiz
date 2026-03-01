@@ -1,0 +1,28 @@
+services:
+  usersrv:
+    build:
+      context: .
+      args:
+        PORT: 8107
+    image: usersrv:latest
+    container_name: tiz-usersrv
+    restart: always
+    ports:
+      - "8107:8107"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-Tiz@2026}
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD:-Tiz@2026}
+      - JWT_SECRET=${JWT_SECRET:-tiz-jwt-secret-2026}
+    networks:
+      - npass
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  npass:
+    external: true

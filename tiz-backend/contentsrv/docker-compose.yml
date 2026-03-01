@@ -1,0 +1,27 @@
+services:
+  contentsrv:
+    build:
+      context: .
+      args:
+        PORT: 8103
+    image: contentsrv:latest
+    container_name: tiz-contentsrv
+    restart: always
+    ports:
+      - "8103:8103"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-Tiz@2026}
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD:-Tiz@2026}
+    networks:
+      - npass
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  npass:
+    external: true

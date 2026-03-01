@@ -1,0 +1,27 @@
+services:
+  chatsrv:
+    build:
+      context: .
+      args:
+        PORT: 8102
+    image: chatsrv:latest
+    container_name: tiz-chatsrv
+    restart: always
+    ports:
+      - "8102:8102"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-Tiz@2026}
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD:-Tiz@2026}
+    networks:
+      - npass
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  npass:
+    external: true

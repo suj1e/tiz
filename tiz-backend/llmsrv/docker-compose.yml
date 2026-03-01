@@ -1,0 +1,28 @@
+services:
+  llmsrv:
+    build: .
+    image: llmsrv:latest
+    container_name: tiz-llmsrv
+    restart: always
+    ports:
+      - "8106:8106"
+    environment:
+      - DATABASE_URL=mysql+pymysql://tiz:${MYSQL_PASSWORD:-Tiz@2026}@mysql:3306/tiz
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-Tiz@2026}
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_BASE=${OPENAI_API_BASE:-https://api.openai.com/v1}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
+    networks:
+      - npass
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  npass:
+    external: true

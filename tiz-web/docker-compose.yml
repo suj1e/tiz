@@ -1,0 +1,19 @@
+services:
+  tiz-web:
+    build: .
+    image: tiz-web:latest
+    container_name: tiz-web
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - npass
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  npass:
+    external: true
