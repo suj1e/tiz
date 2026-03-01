@@ -3,9 +3,12 @@ ARG BUILD_IMAGE=gradle:9.3.1-jdk21
 
 FROM ${BUILD_IMAGE} AS builder
 WORKDIR /build
-ARG GITHUB_TOKEN
 
-# Configure GitHub Packages authentication
+# Pass GITHUB_TOKEN for GitHub Packages authentication
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+
+# Configure Gradle
 RUN mkdir -p ~/.gradle && \
     echo "org.gradle.jvmargs=-Xmx2g" >> ~/.gradle/gradle.properties
 
@@ -13,14 +16,11 @@ RUN mkdir -p ~/.gradle && \
 COPY gradle ./gradle
 COPY gradle.properties settings.gradle.kts build.gradle.kts ./
 
-# Configure GitHub Packages in project
-RUN echo 'repositories { mavenLocal(); mavenCentral(); maven { name = "GitHubPackages"; url = uri("https://maven.pkg.github.com/suj1e/tiz"); credentials { username = "token"; password = System.getenv("GITHUB_TOKEN") } } }' >> build.gradle.kts
-
 # Copy source
 COPY api ./api
 COPY app ./app
 
-# Build
+# Build (repositories already configured in settings.gradle.kts)
 RUN ./gradlew :app:bootJar --no-daemon --quiet
 
 # Runtime stage
