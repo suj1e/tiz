@@ -157,27 +157,6 @@ services:
       start_period: 60s
     logging: *default-logging
 
-  # ==================== Nacos Config Init ====================
-  nacos-init:
-    image: docker.m.daocloud.io/curlimages/curl:latest
-    container_name: tiz-nacos-init
-    depends_on:
-      nacos:
-        condition: service_healthy
-    environment:
-      - NACOS_ENV=${NACOS_ENV:-dev}
-      - NACOS_ADDR=nacos:8080
-      - NACOS_USER=${NACOS_USER:-nacos}
-      - NACOS_PASS=${NACOS_PASS:-nacos}
-    volumes:
-      - ../deploy/nacos-config:/configs:ro
-      - ./nacos-config-import.sh:/init.sh:ro
-    entrypoint: ["/bin/sh", "/init.sh"]
-    networks:
-      - npass
-    restart: "no"
-    logging: *default-logging
-
   # ==================== Kafka (KRaft Mode) ====================
   kafka:
     image: docker.m.daocloud.io/confluentinc/cp-kafka:7.8.0
