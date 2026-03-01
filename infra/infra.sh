@@ -40,12 +40,16 @@ case $ENV in
         COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
         NETWORK_NAME="npass"
         ;;
+    staging)
+        COMPOSE_FILE="$SCRIPT_DIR/../deploy/docker-compose.yml"
+        NETWORK_NAME="npass"
+        ;;
     prod)
         COMPOSE_FILE="$SCRIPT_DIR/../deploy/docker-compose.yml"
         NETWORK_NAME="npass"
         ;;
     *)
-        echo -e "${RED}Error: Unknown environment '$ENV'. Use 'dev' or 'prod'.${NC}"
+        echo -e "${RED}Error: Unknown environment '$ENV'. Use 'dev', 'staging' or 'prod'.${NC}"
         exit 1
         ;;
 esac
@@ -221,7 +225,7 @@ logs() {
 
 # 显示帮助
 show_help() {
-    echo "Usage: $0 {start|stop|restart|status|logs} [--env dev|prod]"
+    echo "Usage: $0 {start|stop|restart|status|logs} [--env dev|staging|prod]"
     echo ""
     echo "Commands:"
     echo "  start     Start all services"
@@ -231,7 +235,7 @@ show_help() {
     echo "  logs      View logs (optional: specify service name)"
     echo ""
     echo "Options:"
-    echo "  --env, -e   Environment: dev (default) or prod"
+    echo "  --env, -e   Environment: dev (default), staging or prod"
     echo ""
     echo "Examples:"
     echo "  $0 start                    # Start dev environment"
