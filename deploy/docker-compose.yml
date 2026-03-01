@@ -8,15 +8,17 @@ x-logging: &default-logging
     max-file: "3"
 
 # Java 服务通用配置
+# DB/Redis/Kafka 地址从 Nacos common.yaml 加载
+# 敏感信息通过环境变量传递
 x-java-service: &java-service
   restart: always
   environment:
-    - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-    - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
-    - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-    - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
+    - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+    - NACOS_NAMESPACE=${NACOS_NAMESPACE:-prod}
     - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
     - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+    - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+    - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
     - JAVA_OPTS=${JAVA_OPTS:--Xms256m -Xmx512m}
   deploy:
     resources:
@@ -87,27 +89,12 @@ services:
     ports:
       - "${GATEWAY_PORT:-8080}:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
-      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - JAVA_OPTS=${GATEWAY_JAVA_OPTS:--Xms256m -Xmx512m}
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 256M
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
     networks:
       - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
     depends_on:
       authsrv:
         condition: service_healthy
@@ -130,21 +117,7 @@ services:
     container_name: tiz-authsrv
     <<: *java-service
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
-      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - JAVA_OPTS=${AUTHSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
-      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
-      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
       - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION:-86400000}
     networks:
       - npass
     healthcheck:
@@ -155,21 +128,6 @@ services:
     image: ${CHATSRV_IMAGE:-ghcr.io/suj1e/tiz/chatsrv}:${IMAGE_TAG:-latest}
     container_name: tiz-chatsrv
     <<: *java-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
-      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - JAVA_OPTS=${CHATSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
-      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
-      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
-      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9094}
     networks:
       - npass
     healthcheck:
@@ -180,20 +138,6 @@ services:
     image: ${CONTENTSRV_IMAGE:-ghcr.io/suj1e/tiz/contentsrv}:${IMAGE_TAG:-latest}
     container_name: tiz-contentsrv
     <<: *java-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
-      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - JAVA_OPTS=${CONTENTSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
-      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
-      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
     networks:
       - npass
     healthcheck:
@@ -204,21 +148,6 @@ services:
     image: ${PRACTICESRV_IMAGE:-ghcr.io/suj1e/tiz/practicesrv}:${IMAGE_TAG:-latest}
     container_name: tiz-practicesrv
     <<: *java-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
-      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - JAVA_OPTS=${PRACTICESRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
-      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
-      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
-      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9094}
     networks:
       - npass
     healthcheck:
@@ -229,20 +158,6 @@ services:
     image: ${QUIZSRV_IMAGE:-ghcr.io/suj1e/tiz/quizsrv}:${IMAGE_TAG:-latest}
     container_name: tiz-quizsrv
     <<: *java-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
-      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - JAVA_OPTS=${QUIZSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
-      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
-      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
     networks:
       - npass
     healthcheck:
@@ -255,17 +170,14 @@ services:
     <<: *python-service
     environment:
       - PYTHONUNBUFFERED=1
-      - DATABASE_URL=${LLM_DATABASE_URL:-mysql+pymysql://tiz:Tiz@2026@mysql:3306/tiz}
-      - REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
-      - REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
-      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9094}
+      - DATABASE_URL=mysql+pymysql://tiz:${MYSQL_PASSWORD}@mysql:3306/tiz
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9094
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_API_BASE=${OPENAI_API_BASE:-https://api.openai.com/v1}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
-      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY:-}
-      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-false}
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     deploy:
       resources:
         limits:
@@ -276,10 +188,6 @@ services:
       - npass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8106/health"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
 
   # ==================== User Service ====================
   usersrv:
@@ -287,19 +195,7 @@ services:
     container_name: tiz-usersrv
     <<: *java-service
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8848}
-      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - NACOS_GROUP=${NACOS_GROUP:-DEFAULT_GROUP}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - JAVA_OPTS=${USERSRV_JAVA_OPTS:--Xms256m -Xmx512m}
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-tiz}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
-      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
-      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
+      - JWT_SECRET=${JWT_SECRET}
     networks:
       - npass
     healthcheck:

@@ -52,18 +52,23 @@ spring:
         server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
         namespace: ${NACOS_NAMESPACE:}
       config:
-        enabled: false
+        enabled: true
         server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
         namespace: ${NACOS_NAMESPACE:}
         file-extension: yaml
+        refresh-enabled: true
+        shared-configs:
+          - data-id: common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
 
 # JWT Configuration
 jwt:
-  secret: TizJwtSecretKey2026VeryLongSecretKeyForSecurity
+  secret: ${JWT_SECRET:TizJwtSecretKey2026VeryLongSecretKeyForSecurity}
 
 # CORS Configuration
 cors:
-  allowed-origins: http://localhost:5173,http://localhost:3000
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
   allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
   allowed-headers: Authorization,Content-Type,X-*
   allow-credentials: true
@@ -76,18 +81,3 @@ gateway:
     - /api/auth/v1/register
     - /api/auth/v1/refresh
     - /actuator/**
-
-# Actuator endpoints
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: always
-
-logging:
-  level:
-    io.github.suj1e: DEBUG
-    org.springframework.cloud.gateway: DEBUG

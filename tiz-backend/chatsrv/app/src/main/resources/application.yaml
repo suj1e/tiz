@@ -5,60 +5,38 @@ spring:
   application:
     name: chatsrv
 
-  datasource:
-    url: jdbc:mysql://localhost:30001/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: Tiz@2026
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-
-  data:
-    redis:
-      host: localhost
-      port: 30002
-      password: Tiz@2026
-      timeout: 3000ms
-
   cloud:
     nacos:
       discovery:
         enabled: true
         server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        namespace: ${NACOS_NAMESPACE:}
       config:
-        enabled: false
+        enabled: true
         server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        namespace: ${NACOS_NAMESPACE:}
+        file-extension: yaml
+        refresh-enabled: true
+        shared-configs:
+          - data-id: common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
 
 # SSE configuration
 sse:
-  timeout: 300000  # 5 minutes in milliseconds
+  timeout: 300000
 
-# LLM service configuration
+# LLM service (Docker DNS, not in Nacos)
 llm:
   service:
-    url: http://localhost:8106
+    url: ${LLM_SERVICE_URL:http://llmsrv:8106}
 
-# Content service configuration
+# Content service (Nacos service discovery)
 content:
   service:
-    url: http://localhost:8103
+    url: http://contentsrv:8103
 
 jwt:
-  secret: TizJwtSecretKey2026VeryLongSecretKeyForSecurity
-  access-token-expiration: 1800    # 30 minutes in seconds
-  refresh-token-expiration: 604800 # 7 days in seconds
-
-logging:
-  level:
-    io.github.suj1e: DEBUG
-    org.springframework.security: DEBUG
+  secret: ${JWT_SECRET:TizJwtSecretKey2026VeryLongSecretKeyForSecurity}
+  access-token-expiration: 1800
+  refresh-token-expiration: 604800
