@@ -1,4 +1,4 @@
-# Build stage for practicesrv (with api/app subproject structure)
+# Build stage
 ARG BUILD_IMAGE=gradle:9.3.1-jdk21
 
 FROM ${BUILD_IMAGE} AS builder
@@ -24,9 +24,24 @@ COPY app ./app
 RUN ./gradlew :app:bootJar --no-daemon --quiet
 
 # Runtime stage
-ARG BASE_IMAGE=ghcr.io/suj1e/tiz/base-jre:21
-FROM ${BASE_IMAGE} AS runtime
+FROM eclipse-temurin:21-jre-alpine AS runtime
 
-COPY --from=builder /build/app/build/libs/*.jar app.jar
-EXPOSE 8104
+LABEL maintainer="tiz-team"
+
+# Install runtime dependencies and create non-root user
+RUN apk add --no-cache ca-certificates curl tzdata && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    addgroup -S tiz && \
+    adduser -S -G tiz tiz
+
+WORKDIR /app
+
+ARG PORT
+COPY --from=builder --chown=tiz:tiz /build/app/build/libs/*.jar app.jar
+
+# Switch to non-root user
+USER tiz
+
+EXPOSE ${PORT}
 ENTRYPOINT ["java", "-jar", "app.jar"]

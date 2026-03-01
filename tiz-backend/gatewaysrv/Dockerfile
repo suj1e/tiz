@@ -23,9 +23,23 @@ COPY src ./src
 RUN ./gradlew bootJar --no-daemon --quiet
 
 # Runtime stage
-ARG BASE_IMAGE=ghcr.io/suj1e/tiz/base-jre:21
-FROM ${BASE_IMAGE} AS runtime
+FROM eclipse-temurin:21-jre-alpine AS runtime
 
-COPY --from=builder /build/build/libs/*.jar app.jar
+LABEL maintainer="tiz-team"
+
+# Install runtime dependencies and create non-root user
+RUN apk add --no-cache ca-certificates curl tzdata && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    addgroup -S tiz && \
+    adduser -S -G tiz tiz
+
+WORKDIR /app
+
+COPY --from=builder --chown=tiz:tiz /build/build/libs/*.jar app.jar
+
+# Switch to non-root user
+USER tiz
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

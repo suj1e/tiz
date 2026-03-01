@@ -6,35 +6,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Tiz is an AI-driven knowledge practice platform. Users interact with AI through conversational chat to generate personalized practice questions and quizzes.
 
-## Monorepo Structure
+## Project Structure
 
 ```
 tiz/
 ├── tiz-web/           # Frontend (React + TypeScript + Vite)
-├── tiz-backend/       # Backend microservices (independent Gradle projects)
+├── tiz-backend/       # Backend services (independent services in shared directory)
 │   ├── common/        # Shared utilities (published to Maven Local)
+│   ├── nacos-config/  # Nacos configuration files
+│   │   ├── dev/
+│   │   ├── staging/
+│   │   └── prod/
 │   ├── llmsrv/        # AI service (Python/FastAPI) (:8106)
 │   ├── authsrv/       # Authentication service (:8101)
-│   │   ├── api/       # DTOs & client interfaces (published to Maven Local)
-│   │   └── app/       # Service implementation
 │   ├── chatsrv/       # Chat service (:8102)
-│   │   ├── api/       # DTOs & client interfaces
-│   │   └── app/       # Service implementation
 │   ├── contentsrv/    # Content service (:8103)
-│   │   ├── api/       # DTOs & client interfaces
-│   │   └── app/       # Service implementation
 │   ├── practicesrv/   # Practice service (:8104)
-│   │   ├── api/       # DTOs & client interfaces
-│   │   └── app/       # Service implementation
 │   ├── quizsrv/       # Quiz service (:8105)
-│   │   ├── api/       # DTOs & client interfaces
-│   │   └── app/       # Service implementation
 │   ├── usersrv/       # User service (:8107)
-│   │   ├── api/       # DTOs & client interfaces
-│   │   └── app/       # Service implementation
 │   └── gatewaysrv/    # API Gateway (:8080)
-├── infra/             # Docker Compose infrastructure
-├── standards/         # Development standards (api.md, frontend.md, backend.md)
+├── infra/             # Infrastructure
+│   ├── envs/          # Multi-environment configs
+│   │   ├── dev/       # Development
+│   │   ├── staging/   # Staging
+│   │   └── prod/      # Production
+│   └── infra.sh       # Management script
+├── standards/         # Development standards
 └── openspec/          # OpenSpec change management
 ```
 
@@ -136,58 +133,16 @@ interface AuthState {
   logout: () => void
 }
 export const useAuthStore = create<AuthState>((set) => ({ ... }))
-
-// Library store with filter actions
-interface LibraryState {
-  libraries: KnowledgeSetSummary[]
-  selectedCategory: string | null
-  selectedTags: string[]
-  setSelectedCategory: (category: string | null) => void
-  toggleTag: (tag: string) => void
-  addLibrary: (library: KnowledgeSetSummary) => void
-}
 ```
-
-**User Service:**
-```typescript
-// src/services/user.ts
-export const userService = {
-  getSettings: () => api.get('/user/v1/settings'),
-  updateSettings: (settings) => api.patch('/user/v1/settings', settings),
-  getWebhook: () => api.get('/user/v1/webhook'),
-  saveWebhook: (config) => api.post('/user/v1/webhook', config),
-  deleteWebhook: () => api.delete('/user/v1/webhook'),
-}
-```
-
-**Theme System:**
-- `ThemeToggle` component available in all pages
-- Theme stored in `uiStore` and persisted to localStorage
-- Add to new pages: `<ThemeToggle theme={theme} onThemeChange={setTheme} />`
 
 **Responsive Design:**
 - Mobile-first approach with Tailwind breakpoints (sm:, md:, lg:, xl:)
 - Avoid hardcoded pixel values; use Tailwind spacing utilities
-- Use dynamic heights like `min-h-[50vh]` instead of `min-h-[400px]`
-
-```tsx
-// ❌ Avoid hardcoded sizes
-<div className="h-[50px] w-[50px] min-h-[400px]">
-
-// ✅ Use responsive utilities
-<div className="h-12 w-12 sm:h-auto sm:w-auto min-h-[50vh]">
-```
 
 **Mock Service (MSW):**
 - Enabled via `VITE_MOCK=true` environment variable
 - Handlers in `src/mocks/handlers/`
 - Mock data in `src/mocks/data/`
-- Browser setup in `src/mocks/browser.ts`
-
-**Styling:**
-- Use `cn()` utility from `@/lib/utils` for conditional class merging
-- Tailwind classes with mobile-first responsive design
-- shadcn/ui components in `src/components/ui/`
 
 ### Naming Conventions
 
@@ -212,9 +167,20 @@ export const userService = {
 
 ## Backend (tiz-backend)
 
-Each Java service is an independent Gradle project with api + app subproject structure:
-- **api/**: DTOs and client interfaces (published to Maven Local for inter-service communication)
-- **app/**: Service implementation with Spring Boot
+Each service is an **independent project** with its own Dockerfile and docker-compose.yml. Services are placed in a shared directory for convenience, but can be extracted and deployed separately.
+
+### Service Types
+
+**Java Services** (api + app subproject structure):
+- `authsrv`, `chatsrv`, `contentsrv`, `practicesrv`, `quizsrv`, `usersrv`
+- `api/`: DTOs and client interfaces (published to Maven Local)
+- `app/`: Service implementation with Spring Boot
+
+**Gateway Service**:
+- `gatewaysrv` - Single module structure (no api/app split)
+
+**Python Service**:
+- `llmsrv` - FastAPI + LangGraph
 
 ### Tech Stack
 
@@ -271,67 +237,66 @@ pixi run dev
 /api/user/v1/**     → usersrv:8107
 ```
 
+## Infrastructure
+
+### Multi-Environment Support
+
+```bash
+cd infra
+
+# Start dev environment (default)
+./infra.sh start
+
+# Start staging environment
+./infra.sh start --env staging
+
+# Start prod environment
+./infra.sh start --env prod
+
+# View status
+./infra.sh status
+```
+
+### Environment Differences
+
+| Environment | Data Storage | Resources | Ports | Kafka UI |
+|-------------|--------------|-----------|-------|----------|
+| dev | Docker volumes | Low | All exposed | Yes |
+| staging | Host directory | Medium | All exposed | Yes |
+| prod | Host directory | High | Internal only | No |
+
+## Service Deployment
+
+Each service is independent with its own Dockerfile and docker-compose.yml:
+
+```bash
+# Start any service independently
+cd tiz-backend/authsrv
+docker-compose up -d
+
+# Build Docker image
+docker build -t authsrv:latest .
+```
+
+### Docker Images
+
+- **Java services**: Use `eclipse-temurin:21-jre-alpine` (official image)
+- **Python service**: Uses `python:3.11-slim`
+- **Frontend**: Uses `node:20-alpine` + `nginx:alpine`
+
+All services connect to the `npass` Docker network and communicate via DNS names: `mysql`, `redis`, `kafka`, `nacos`.
+
 ## Development Workflow
 
 1. Frontend development typically uses mock mode (`VITE_MOCK=true`)
-2. For full-stack development, start infra via `docker-compose -f infra/docker-compose-lite.yml up -d`
+2. For full-stack development, start infra: `./infra/infra.sh start`
 3. API specs and contracts are in `standards/api.md`
 4. Postman collection available at `standards/postman.json`
-
-### Deployment
-
-**Architecture Overview:**
-
-1. **GitHub Packages**
-   - `common`, `llmsrv-api`, `contentsrv-api` published to GitHub Packages
-   - Services pull dependencies from GitHub Packages during build
-
-2. **CI/CD Pipelines**
-   - `lib-publish.yml` - Library publishing workflow
-   - `srv-*.yml` - Independent service build workflows (one per service)
-   - `deploy.yml` - Deployment only (no build, pulls pre-built images)
-
-3. **Network Architecture**
-   - All services use the `npass` Docker network
-   - Services communicate via DNS names: `mysql`, `redis`, `kafka`, `nacos`
-
-4. **Docker Images**
-   - Base image: `base-jre` (custom JRE base image)
-   - Each service has its own Dockerfile
-
-**GitHub Secrets Configuration:**
-| Secret | Description |
-|--------|-------------|
-| SERVER_HOST | Server IP or domain |
-| SERVER_USER | SSH username |
-| SSH_PRIVATE_KEY | SSH private key |
-| DEPLOY_PATH | Deployment directory (/opt/dev/apps/tiz) |
-
-**Deploy via Git Tag:**
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-**Manual Deployment:**
-```bash
-# 1. Start infrastructure services (MySQL, Redis, Kafka, Nacos)
-docker-compose -f infra/docker-compose.yml up -d
-
-# 2. Start application services
-docker-compose -f deploy/docker-compose.yml up -d
-```
 
 ### Postman Collection Notes
 
 When editing `standards/postman.json`, the `url.path` array must include `v1`:
 ```json
-// ❌ Wrong - v1 missing in path array
-"url": {
-  "raw": "{{base_url}}/auth/v1/login",
-  "path": ["auth", "login"]
-}
-
 // ✅ Correct - v1 included in path array
 "url": {
   "raw": "{{base_url}}/auth/v1/login",

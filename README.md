@@ -7,34 +7,27 @@ Tiz 是一个基于 AI 的知识练习平台，用户通过对话式交互与 AI
 ```
 tiz/
 ├── tiz-web/           # 前端项目 (React + TypeScript + Vite)
-├── tiz-backend/       # 后端微服务 (独立 Gradle 项目)
+├── tiz-backend/       # 后端微服务 (独立服务，放在同一目录下)
 │   ├── common/        # 公共模块 (发布到 Maven Local)
+│   ├── nacos-config/  # Nacos 配置文件
+│   │   ├── dev/
+│   │   ├── staging/
+│   │   └── prod/
 │   ├── llmsrv/        # AI 服务 (Python/FastAPI) (:8106)
 │   ├── authsrv/       # 认证服务 (:8101)
-│   │   ├── api/       # DTO 和客户端接口 (发布到 Maven Local)
-│   │   └── app/       # 服务实现
 │   ├── chatsrv/       # 对话服务 (:8102)
-│   │   ├── api/       # DTO 和客户端接口
-│   │   └── app/       # 服务实现
 │   ├── contentsrv/    # 内容服务 (:8103)
-│   │   ├── api/       # DTO 和客户端接口
-│   │   └── app/       # 服务实现
 │   ├── practicesrv/   # 练习服务 (:8104)
-│   │   ├── api/       # DTO 和客户端接口
-│   │   └── app/       # 服务实现
 │   ├── quizsrv/       # 测验服务 (:8105)
-│   │   ├── api/       # DTO 和客户端接口
-│   │   └── app/       # 服务实现
 │   ├── usersrv/       # 用户服务 (:8107)
-│   │   ├── api/       # DTO 和客户端接口
-│   │   └── app/       # 服务实现
 │   └── gatewaysrv/    # API 网关 (:8080)
-├── infra/             # 基础设施配置 (Docker Compose)
+├── infra/             # 基础设施
+│   ├── envs/          # 多环境配置
+│   │   ├── dev/       # 开发环境
+│   │   ├── staging/   # 预发环境
+│   │   └── prod/      # 生产环境
+│   └── infra.sh       # 管理脚本
 ├── standards/         # 开发规范文档
-│   ├── api.md         # API 接口文档
-│   ├── backend.md     # 后端开发规范
-│   ├── frontend.md    # 前端开发规范
-│   └── postman.json   # Postman Collection
 └── openspec/          # OpenSpec 变更管理
 ```
 
@@ -94,9 +87,7 @@ pnpm build
 
 ### 后端开发
 
-每个 Java 服务都是独立的 Gradle 项目，采用 api + app 子模块结构：
-- **api/**: DTO 和客户端接口（发布到 Maven Local 供其他服务依赖）
-- **app/**: 服务实现
+每个服务都是独立的项目，可以单独开发和部署：
 
 ```bash
 # 首先发布 common 模块
@@ -111,14 +102,6 @@ gradle :api:publishToMavenLocal
 cd tiz-backend/contentsrv
 gradle :app:bootRun
 ```
-
-### 服务间依赖
-
-服务通过 Maven Local 相互依赖：
-- `io.github.suj1e:common:1.0.0-SNAPSHOT` - 公共工具类
-- `io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT` - 内容服务 DTO
-- `io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT` - AI 服务 DTO
-- 等等...
 
 ### AI 服务 (llmsrv)
 
@@ -137,24 +120,43 @@ pixi run dev
 ```bash
 cd infra
 
-# 启动所有服务
-docker-compose -f docker-compose-lite.yml up -d
+# 启动开发环境
+./infra.sh start
+
+# 查看状态
+./infra.sh status
+
+# 启动其他环境
+./infra.sh start --env staging
+./infra.sh start --env prod
 ```
 
-## 页面路由
+## 服务部署
 
-| 路径 | 页面 | 认证 | 说明 |
-|------|------|------|------|
-| `/` | 落地页 | 否 | 产品介绍，支持主题切换 |
-| `/login` | 登录 | 否 | 用户登录 |
-| `/register` | 注册 | 否 | 用户注册 |
-| `/chat` | 试用对话 | 否 | 无需登录的试用对话 |
-| `/home` | 首页 | 是 | 对话式学习 |
-| `/library` | 题库 | 是 | 管理保存的练习题 |
-| `/practice/:id` | 练习 | 是 | 练习模式 |
-| `/quiz/:id` | 测验 | 是 | 测验模式 |
-| `/result/:id` | 结果 | 是 | 测验结果 |
-| `/settings` | 设置 | 是 | 主题、通知、Webhook、账户设置 |
+每个服务都是独立的，有独立的 Dockerfile 和 docker-compose.yml：
+
+```bash
+# 在任意服务目录下
+cd tiz-backend/authsrv
+docker-compose up -d
+
+# 或者构建镜像
+docker build -t authsrv:latest .
+```
+
+### 服务端口
+
+| 服务 | 端口 |
+|------|------|
+| tiz-web | 80 |
+| gatewaysrv | 8080 |
+| authsrv | 8101 |
+| chatsrv | 8102 |
+| contentsrv | 8103 |
+| practicesrv | 8104 |
+| quizsrv | 8105 |
+| llmsrv | 8106 |
+| usersrv | 8107 |
 
 ## API 网关路由
 
@@ -174,66 +176,6 @@ docker-compose -f docker-compose-lite.yml up -d
 - [API 文档](standards/api.md)
 - [后端规范](standards/backend.md)
 - [前端规范](standards/frontend.md)
-
-## API 变更记录
-
-### 2026-02 游标分页迁移
-
-题库列表接口 (`GET /api/content/v1/library`) 已从传统的页码分页迁移到游标分页：
-
-**旧版 (已废弃)**:
-```
-GET /api/content/v1/library?page=1&limit=10
-响应: { "data": [...], "pagination": { "page": 1, "total_pages": 5, "total_count": 50 } }
-```
-
-**新版 (当前)**:
-```
-GET /api/content/v1/library?page_size=10&page_token=
-响应: { "data": [...], "has_more": true, "next_token": "eyJ..." }
-```
-
-**变更说明**:
-- `page` 参数改为 `page_token`（游标字符串，首次请求为空）
-- `limit` 参数改为 `page_size`
-- 响应移除 `pagination` 对象，改为 `has_more` 和 `next_token` 字段
-- 当 `has_more` 为 `false` 时，`next_token` 不存在
-
-**分类/标签响应格式更新**:
-```json
-// 旧版
-{ "data": { "categories": ["前端开发", "后端开发"] } }
-
-// 新版（包含 count 字段）
-{ "data": { "categories": [{ "name": "前端开发", "count": 15 }] } }
-```
-
-## 部署
-
-### 前置要求
-- Docker & Docker Compose
-- GitHub CLI
-
-### GitHub Secrets 配置
-| Secret | 说明 |
-|--------|------|
-| SERVER_HOST | 服务器 IP 或域名 |
-| SERVER_USER | SSH 用户名 |
-| SSH_PRIVATE_KEY | SSH 私钥 |
-| DEPLOY_PATH | 部署目录 (/opt/dev/apps/tiz) |
-
-### 部署命令
-```bash
-# 打 tag 触发部署
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-### 手动部署
-```bash
-cd /opt/dev/apps/tiz
-docker-compose -f infra/docker-compose-app.yml up -d
-```
 
 ## 许可证
 

@@ -10,6 +10,11 @@ tiz-backend/
 │   ├── build.gradle.kts
 │   └── src/main/java/
 │
+├── nacos-config/              # Nacos 配置文件
+│   ├── dev/
+│   ├── staging/
+│   └── prod/
+│
 ├── llmsrv/                    # AI 服务 (Python/FastAPI)
 │
 ├── authsrv/                   # 认证服务
@@ -128,7 +133,7 @@ gradle :app:bootRun
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                              gatewaysrv (网关)                              │
 │                      Java / Spring Boot / Spring Cloud Gateway              │
-│                                   :40004                                    │
+│                                   :8080                                     │
 └──────────────────────────────┬──────────────────────────────────────────────┘
                                │
     ┌──────────────────────────┼──────────────────────────┐
@@ -136,15 +141,15 @@ gradle :app:bootRun
     ▼                          ▼                          ▼
 ┌───────────────┐      ┌───────────────┐      ┌───────────────┐
 │   authsrv     │      │   chatsrv     │      │  contentsrv   │
-│   :40006      │      │   :40008      │      │   :40010      │
+│   :8101       │      │   :8102       │      │   :8103       │
 │    (Java)     │      │    (Java)     │      │    (Java)     │
 └───────────────┘      └───────┬───────┘      └───────────────┘
                                │
                                │ HTTP
                                ▼
                        ┌───────────────┐
-                       │   llmsrv   │
-                       │   :40020      │
+                       │   llmsrv      │
+                       │   :8106       │
                        │  (Python)     │
                        │  LangGraph    │
                        └───────────────┘
@@ -160,7 +165,7 @@ gradle :app:bootRun
     ▼                          ▼                          ▼
 ┌───────────────┐      ┌───────────────┐      ┌───────────────┐
 │ practicesrv   │      │   quizsrv     │      │   usersrv     │
-│   :40012      │      │   :40014      │      │   :40016      │
+│   :8104       │      │   :8105       │      │   :8107       │
 │    (Java)     │      │    (Java)     │      │    (Java)     │
 └───────────────┘      └───────────────┘      └───────────────┘
 ```
@@ -169,14 +174,14 @@ gradle :app:bootRun
 
 | 服务 | 端口 | 语言 | 职责 | 数据库 |
 |------|------|------|------|--------|
-| gatewaysrv | 40004 | Java | API 网关、路由、鉴权、限流 | - |
-| authsrv | 40006 | Java | 用户注册、登录、Token 管理 | users |
-| chatsrv | 40008 | Java | 对话入口、会话管理 | sessions |
-| contentsrv | 40010 | Java | 题库、题目、分类、标签 | content |
-| practicesrv | 40012 | Java | 练习记录、答案 | practice |
-| quizsrv | 40014 | Java | 测验、结果 | quiz |
-| usersrv | 40016 | Java | 用户设置、偏好 | users |
-| llmsrv | 40020 | Python | AI 对话、题目生成、评分 | - |
+| gatewaysrv | 8080 | Java | API 网关、路由、鉴权、限流 | - |
+| authsrv | 8101 | Java | 用户注册、登录、Token 管理 | users |
+| chatsrv | 8102 | Java | 对话入口、会话管理 | sessions |
+| contentsrv | 8103 | Java | 题库、题目、分类、标签 | content |
+| practicesrv | 8104 | Java | 练习记录、答案 | practice |
+| quizsrv | 8105 | Java | 测验、结果 | quiz |
+| llmsrv | 8106 | Python | AI 对话、题目生成、评分 | - |
+| usersrv | 8107 | Java | 用户设置、偏好 | users |
 
 ## AI 服务架构 (llmsrv)
 
@@ -229,7 +234,7 @@ class LlmServiceClient(
 ) {
     suspend fun chat(sessionId: String?, message: String): Flow<ChatEvent> {
         return webClient.post()
-            .uri("http://llmsrv:40020/internal/ai/chat")
+            .uri("http://llmsrv:8106/internal/ai/chat")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(mapOf(
                 "session_id" to sessionId,
@@ -698,48 +703,61 @@ refactor(content): 重构题库查询逻辑
 
 ## 配置管理
 
+### Nacos 配置中心
+
+配置文件位于 `tiz-backend/nacos-config/`，按环境区分：
+
+```
+nacos-config/
+├── dev/common.yaml      # 开发环境
+├── staging/common.yaml  # 预发环境
+└── prod/common.yaml     # 生产环境
+```
+
 ### 环境变量
 
-```bash
-# 数据库
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=tiz
-DB_USER=tiz
-DB_PASSWORD=xxx
+服务通过环境变量覆盖敏感配置：
 
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
+```bash
+# Nacos
+NACOS_SERVER_ADDR=nacos:8080
+NACOS_NAMESPACE=                    # 命名空间（留空为 public）
+
+# 数据库密码（覆盖 Nacos 配置）
+SPRING_DATASOURCE_PASSWORD=xxx
+
+# Redis 密码（覆盖 Nacos 配置）
+SPRING_DATA_REDIS_PASSWORD=xxx
 
 # JWT
 JWT_SECRET=xxx
-JWT_EXPIRATION=86400
 
-# AI 服务
-AI_API_KEY=xxx
-AI_API_URL=xxx
+# AI 服务 (llmsrv)
+OPENAI_API_KEY=xxx
+OPENAI_API_BASE=https://api.openai.com/v1
 ```
 
-### Nacos 配置
+### 服务配置示例
 
 ```yaml
-# 应用配置
-spring:
-  datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-
-# 服务发现
+# application.yaml
 spring:
   cloud:
     nacos:
       discovery:
-        server-addr: nacos:8848
+        enabled: true
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        namespace: ${NACOS_NAMESPACE:}
       config:
-        server-addr: nacos:8848
+        enabled: true
+        server-addr: ${NACOS_SERVER_ADDR:localhost:30006}
+        namespace: ${NACOS_NAMESPACE:}
         file-extension: yaml
+        refresh-enabled: true
+        shared-configs:
+          - data-id: common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
 ```
 
 ## 健康检查
