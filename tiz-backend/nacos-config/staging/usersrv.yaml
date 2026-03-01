@@ -1,0 +1,25 @@
+# User Service Configuration - Staging Environment
+# dataId: usersrv.yaml, group: DEFAULT_GROUP, namespace: staging
+
+spring:
+  datasource:
+    url: jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+      timeout: 10s
+
+  kafka:
+    bootstrap-servers: kafka:9092
+
+logging:
+  level:
+    root: INFO
+    io.github.suj1e: DEBUG
