@@ -15,16 +15,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
 NETWORK_NAME="npass"
 
-# 服务访问信息
-declare -A SERVICE_INFO=(
-    ["mysql"]="MySQL: localhost:30001 (root/Tiz@2026)"
-    ["redis"]="Redis: localhost:30002 (password: Tiz@2026)"
-    ["elasticsearch"]="Elasticsearch: localhost:30003 (elastic/Tiz@2026)"
-    ["nacos"]="Nacos Console: http://localhost:30006 (nacos/nacos)"
-    ["kafka"]="Kafka: localhost:30009"
-    ["kafka-ui"]="Kafka UI: http://localhost:30010"
-)
-
 # 检查 Docker
 check_docker() {
     if ! command -v docker &> /dev/null; then
@@ -87,6 +77,33 @@ wait_for_service() {
     return 1
 }
 
+# 打印访问信息
+print_access_info() {
+    echo ""
+    echo -e "${BLUE}=========================================${NC}"
+    echo -e "${BLUE}   Access URLs${NC}"
+    echo -e "${BLUE}=========================================${NC}"
+
+    if docker ps --format '{{.Names}}' | grep -q "tiz-mysql"; then
+        echo -e "${GREEN}✓ MySQL: localhost:30001 (root/Tiz@2026)${NC}"
+    fi
+    if docker ps --format '{{.Names}}' | grep -q "tiz-redis"; then
+        echo -e "${GREEN}✓ Redis: localhost:30002 (password: Tiz@2026)${NC}"
+    fi
+    if docker ps --format '{{.Names}}' | grep -q "tiz-elasticsearch"; then
+        echo -e "${GREEN}✓ Elasticsearch: localhost:30003 (elastic/Tiz@2026)${NC}"
+    fi
+    if docker ps --format '{{.Names}}' | grep -q "tiz-nacos"; then
+        echo -e "${GREEN}✓ Nacos Console: http://localhost:30006 (nacos/nacos)${NC}"
+    fi
+    if docker ps --format '{{.Names}}' | grep -q "tiz-kafka"; then
+        echo -e "${GREEN}✓ Kafka: localhost:30009${NC}"
+    fi
+    if docker ps --format '{{.Names}}' | grep -q "tiz-kafka-ui"; then
+        echo -e "${GREEN}✓ Kafka UI: http://localhost:30010${NC}"
+    fi
+}
+
 # 启动服务
 start() {
     echo -e "${BLUE}=========================================${NC}"
@@ -123,8 +140,7 @@ start() {
         fi
     done
 
-    echo ""
-    print_status
+    print_access_info
 }
 
 # 停止服务
@@ -136,24 +152,11 @@ stop() {
 
 # 查看状态
 status() {
-    print_status
-}
-
-print_status() {
     echo -e "${BLUE}=========================================${NC}"
     echo -e "${BLUE}   Service Status${NC}"
     echo -e "${BLUE}=========================================${NC}"
     docker-compose -f "$COMPOSE_FILE" ps 2>/dev/null || echo "No services running"
-
-    echo ""
-    echo -e "${BLUE}=========================================${NC}"
-    echo -e "${BLUE}   Access URLs${NC}"
-    echo -e "${BLUE}=========================================${NC}"
-    for svc in "${!SERVICE_INFO[@]}"; do
-        if docker ps --format '{{.Names}}' | grep -q "tiz-$svc"; then
-            echo -e "${GREEN}✓ ${SERVICE_INFO[$svc]}${NC}"
-        fi
-    done
+    print_access_info
 }
 
 # 查看日志
