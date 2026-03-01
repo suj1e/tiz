@@ -17,6 +17,7 @@ volumes:
   elasticsearch-data:
   nacos-data:
   kafka-data:
+  kafka-secrets:
 
 services:
   # ==================== MySQL ====================
@@ -208,6 +209,7 @@ services:
       - "30009:9094"
     volumes:
       - kafka-data:/var/lib/kafka/data
+      - kafka-secrets:/etc/kafka/secrets
     networks:
       - npass
     healthcheck:
