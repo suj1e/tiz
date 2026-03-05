@@ -20,31 +20,31 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${DATA_PATH:-/opt/tiz/data}/mysql
+      device: ${DATA_PATH:-/opt/dev/dockermnt/tiz}/mysql
   redis-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DATA_PATH:-/opt/tiz/data}/redis
+      device: ${DATA_PATH:-/opt/dev/dockermnt/tiz}/redis
   elasticsearch-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DATA_PATH:-/opt/tiz/data}/elasticsearch
+      device: ${DATA_PATH:-/opt/dev/dockermnt/tiz}/elasticsearch
   nacos-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DATA_PATH:-/opt/tiz/data}/nacos
+      device: ${DATA_PATH:-/opt/dev/dockermnt/tiz}/nacos
   kafka-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DATA_PATH:-/opt/tiz/data}/kafka
+      device: ${DATA_PATH:-/opt/dev/dockermnt/tiz}/kafka
 
 services:
   # ==================== MySQL ====================
