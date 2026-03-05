@@ -57,8 +57,8 @@ jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 
 # Jackson
-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version = "2.18.2" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.18.2" }
 
 # Lombok
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
@@ -67,7 +67,7 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash-logback" }
 
 # Database
-mysql-connector-j = { module = "com.mysql:mysql-connector-j" }
+mysql-connector-j = { module = "com.mysql:mysql-connector-j", version = "9.1.0" }
 
 # Testing
 testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
