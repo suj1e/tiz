@@ -19,14 +19,13 @@ jobs:
           distribution: 'temurin'
       
       - name: Setup Gradle
-        run: |
-          wget -q https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -O /tmp/gradle.zip
-          sudo unzip -q /tmp/gradle.zip -d /opt
-          sudo ln -sf /opt/gradle-9.3.1/bin/gradle /usr/local/bin/gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.3.1"
       
       - name: Publish to Aliyun Maven
         working-directory: tiz-backend/contentsrv
         env:
           ALIYUN_MAVEN_USERNAME: ${{ secrets.ALIYUN_MAVEN_USERNAME }}
           ALIYUN_MAVEN_PASSWORD: ${{ secrets.ALIYUN_MAVEN_PASSWORD }}
-        run: gradle :api:publish --no-daemon
+        run: gradle :api:publish
