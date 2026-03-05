@@ -12,7 +12,8 @@ Tiz is an AI-driven knowledge practice platform. Users interact with AI through 
 tiz/
 ├── tiz-web/           # Frontend (React + TypeScript + Vite)
 ├── tiz-backend/       # Backend services (independent services in shared directory)
-│   ├── common/        # Shared utilities (published to Maven Local)
+│   ├── common/        # Shared utilities (published to Aliyun Maven)
+│   ├── llmsrv-api/    # LLM service API (Java DTOs for Python service)
 │   ├── nacos-config/  # Nacos configuration files
 │   │   ├── dev/
 │   │   ├── staging/
@@ -193,13 +194,13 @@ Each service is an **independent project** with its own Dockerfile and docker-co
 ### Quick Start
 
 ```bash
-# Build and publish common module first
+# Build and publish common module (to Aliyun Maven)
 cd tiz-backend/common
-gradle publishToMavenLocal
+gradle publish
 
 # Build and publish a service's API
 cd tiz-backend/contentsrv
-gradle :api:publishToMavenLocal
+gradle :api:publish
 
 # Build and run a service
 cd tiz-backend/contentsrv
@@ -208,11 +209,55 @@ gradle :app:bootRun
 
 ### Service Dependencies
 
-Services depend on each other via Maven Local:
+Services depend on each other via Aliyun Maven Repository:
 - `io.github.suj1e:common:1.0.0-SNAPSHOT` - Shared utilities
 - `io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT` - Content service DTOs
 - `io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT` - LLM service DTOs
 - etc.
+
+### Maven Publishing
+
+Common module and service API modules are published to Aliyun Maven Repository.
+
+**Repository URLs:**
+- Snapshot: `https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-snapshot-qazpfx`
+- Release: `https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-release-epshtr`
+
+**Local Authentication:**
+
+Add to `~/.gradle/gradle.properties`:
+```properties
+aliyunMavenUsername=<your-username>
+aliyunMavenPassword=<your-password>
+```
+
+**CI/CD Authentication:**
+
+GitHub Actions uses `ALIYUN_MAVEN_USERNAME` and `ALIYUN_MAVEN_PASSWORD` secrets.
+
+**Publishable Modules:**
+
+| Module | Path | Artifact ID |
+|--------|------|-------------|
+| common | `tiz-backend/common` | `common` |
+| llmsrv-api | `tiz-backend/llmsrv-api` | `llmsrv-api` |
+| authsrv-api | `tiz-backend/authsrv/api` | `authsrv-api` |
+| chatsrv-api | `tiz-backend/chatsrv/api` | `chatsrv-api` |
+| contentsrv-api | `tiz-backend/contentsrv/api` | `contentsrv-api` |
+| practicesrv-api | `tiz-backend/practicesrv/api` | `practicesrv-api` |
+| quizsrv-api | `tiz-backend/quizsrv/api` | `quizsrv-api` |
+| usersrv-api | `tiz-backend/usersrv/api` | `usersrv-api` |
+
+**Publish Command:**
+```bash
+# For standalone projects (common, llmsrv-api)
+cd tiz-backend/common
+gradle publish
+
+# For service api modules
+cd tiz-backend/contentsrv
+gradle :api:publish
+```
 
 ### AI Service (llmsrv)
 
