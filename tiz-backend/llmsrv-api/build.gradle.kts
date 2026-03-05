@@ -11,6 +11,12 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.2")
+    }
+}
+
 repositories {
     mavenCentral()
     mavenLocal()
