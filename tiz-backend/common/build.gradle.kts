@@ -75,11 +75,22 @@ publishing {
     }
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/suj1e/tiz")
+            name = "AliyunPackages"
+            val isSnapshot = version.toString().contains("SNAPSHOT", ignoreCase = true)
+            url = uri(
+                if (isSnapshot) {
+                    "https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-snapshot-qazpfx"
+                } else {
+                    "https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-release-epshtr"
+                }
+            )
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: "token"
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("ALIYUN_MAVEN_USERNAME")
+                    ?: project.findProperty("aliyunMavenUsername") as String?
+                    ?: ""
+                password = System.getenv("ALIYUN_MAVEN_PASSWORD")
+                    ?: project.findProperty("aliyunMavenPassword") as String?
+                    ?: ""
             }
         }
     }
