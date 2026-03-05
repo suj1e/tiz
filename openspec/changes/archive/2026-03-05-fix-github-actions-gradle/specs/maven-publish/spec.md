@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: GitHub Actions 使用 gradle-version 参数配置 Gradle
 
