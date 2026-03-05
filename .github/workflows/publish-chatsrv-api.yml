@@ -10,6 +10,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      ALIYUN_MAVEN_USERNAME: ${{ secrets.ALIYUN_MAVEN_USERNAME }}
+      ALIYUN_MAVEN_PASSWORD: ${{ secrets.ALIYUN_MAVEN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       
@@ -25,7 +28,4 @@ jobs:
       
       - name: Publish to Aliyun Maven
         working-directory: tiz-backend/chatsrv
-        env:
-          ALIYUN_MAVEN_USERNAME: ${{ secrets.ALIYUN_MAVEN_USERNAME }}
-          ALIYUN_MAVEN_PASSWORD: ${{ secrets.ALIYUN_MAVEN_PASSWORD }}
         run: gradle :api:publish
