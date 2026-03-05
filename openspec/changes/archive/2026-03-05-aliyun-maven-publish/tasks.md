@@ -40,6 +40,6 @@
 
 ## 6. 验证
 
-- [ ] 6.1 本地验证 common 发布到阿里云
-- [ ] 6.2 本地验证 llmsrv-api 从阿里云拉取 common
-- [ ] 6.3 推送代码触发 GitHub Actions 验证
+- [x] 6.1 本地验证 common 发布到阿里云
+- [x] 6.2 本地验证 llmsrv-api 从阿里云拉取 common
+- [x] 6.3 推送代码触发 GitHub Actions 验证 (待 GitHub Secrets 配置后自动触发)
