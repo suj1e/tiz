@@ -20,10 +20,12 @@ jobs:
       
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
       
       - name: Publish to Aliyun Maven
         working-directory: tiz-backend/quizsrv
         env:
           ALIYUN_MAVEN_USERNAME: ${{ secrets.ALIYUN_MAVEN_USERNAME }}
           ALIYUN_MAVEN_PASSWORD: ${{ secrets.ALIYUN_MAVEN_PASSWORD }}
-        run: ./gradlew :api:publish
+        run: gradle :api:publish
