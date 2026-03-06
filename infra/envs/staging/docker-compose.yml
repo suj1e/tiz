@@ -49,7 +49,7 @@ volumes:
 services:
   # ==================== MySQL ====================
   mysql:
-    image: mysql:9.2
+    image: docker.m.daocloud.io/library/mysql:9.2
     container_name: tiz-mysql
     restart: always
     environment:
@@ -82,7 +82,7 @@ services:
 
   # ==================== Redis ====================
   redis:
-    image: redis:7.4-alpine
+    image: docker.m.daocloud.io/library/redis:7.4-alpine
     container_name: tiz-redis
     restart: always
     ports:
@@ -105,7 +105,7 @@ services:
 
   # ==================== Elasticsearch ====================
   elasticsearch:
-    image: elasticsearch:8.19.1
+    image: docker.m.daocloud.io/elastic/elasticsearch:8.19.1
     container_name: tiz-elasticsearch
     restart: always
     environment:
@@ -142,7 +142,7 @@ services:
 
   # ==================== Nacos ====================
   nacos:
-    image: nacos/nacos-server:v3.1.1
+    image: docker.m.daocloud.io/nacos/nacos-server:v3.1.1
     container_name: tiz-nacos
     restart: always
     environment:
@@ -184,7 +184,7 @@ services:
 
   # ==================== Kafka (KRaft Mode) ====================
   kafka:
-    image: confluentinc/cp-kafka:7.8.0
+    image: docker.m.daocloud.io/confluentinc/cp-kafka:7.8.0
     container_name: tiz-kafka
     restart: always
     environment:
@@ -225,7 +225,7 @@ services:
 
   # ==================== Kafka UI ====================
   kafka-ui:
-    image: provectuslabs/kafka-ui:latest
+    image: docker.m.daocloud.io/provectuslabs/kafka-ui:latest
     container_name: tiz-kafka-ui
     restart: always
     environment:
