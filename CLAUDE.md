@@ -453,3 +453,43 @@ When editing `standards/postman.json`, the `url.path` array must include `v1`:
 }
 ```
 Postman imports URL from `path` array, not `raw` field. Missing `v1` in `path` causes version to be lost on import.
+
+## CI/CD Workflows
+
+### Maven Publish Workflows
+
+Automated publishing to Aliyun Maven Repository when paths change on main branch:
+
+| Workflow | Trigger Path | Artifact |
+|----------|--------------|----------|
+| publish-common.yml | `tiz-backend/common/**` | common |
+| publish-authsrv-api.yml | `tiz-backend/authsrv/api/**` | authsrv-api |
+| publish-chatsrv-api.yml | `tiz-backend/chatsrv/api/**` | chatsrv-api |
+| publish-contentsrv-api.yml | `tiz-backend/contentsrv/api/**` | contentsrv-api |
+| publish-practicesrv-api.yml | `tiz-backend/practicesrv/api/**` | practicesrv-api |
+| publish-quizsrv-api.yml | `tiz-backend/quizsrv/api/**` | quizsrv-api |
+| publish-usersrv-api.yml | `tiz-backend/usersrv/api/**` | usersrv-api |
+
+### Docker Build Workflows
+
+Manual trigger to build and push Docker images to Aliyun Container Registry:
+
+**Registry:** `registry.cn-hangzhou.aliyuncs.com/nxo/<service>`
+
+| Workflow | Service | Image |
+|----------|---------|-------|
+| docker-authsrv.yml | authsrv | `nxo/authsrv` |
+| docker-chatsrv.yml | chatsrv | `nxo/chatsrv` |
+| docker-contentsrv.yml | contentsrv | `nxo/contentsrv` |
+| docker-practicesrv.yml | practicesrv | `nxo/practicesrv` |
+| docker-quizsrv.yml | quizsrv | `nxo/quizsrv` |
+| docker-usersrv.yml | usersrv | `nxo/usersrv` |
+| docker-gatewaysrv.yml | gatewaysrv | `nxo/gatewaysrv` |
+| docker-llmsrv.yml | llmsrv | `nxo/llmsrv` |
+| docker-tiz-web.yml | tiz-web | `nxo/tiz-web` |
+
+**Image Tags:** `latest` + `sha-<commit>`
+
+**Required Secrets:**
+- `ALIYUN_REGISTRY_USERNAME`
+- `ALIYUN_REGISTRY_PASSWORD`
