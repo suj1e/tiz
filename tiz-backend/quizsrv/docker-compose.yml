@@ -1,10 +1,7 @@
 services:
   quizsrv:
-    build:
-      context: .
-      args:
-        PORT: 8105
-    image: quizsrv:latest
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/quizsrv:latest
+    pull_policy: always
     container_name: tiz-quizsrv
     restart: always
     ports:

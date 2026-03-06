@@ -1,10 +1,7 @@
 services:
   usersrv:
-    build:
-      context: .
-      args:
-        PORT: 8107
-    image: usersrv:latest
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/usersrv:latest
+    pull_policy: always
     container_name: tiz-usersrv
     restart: always
     ports:
@@ -14,7 +11,6 @@ services:
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-Tiz@2026}
       - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD:-Tiz@2026}
-      - JWT_SECRET=${JWT_SECRET:-tiz-jwt-secret-2026}
     networks:
       - npass
     logging:

@@ -1,10 +1,7 @@
 services:
   chatsrv:
-    build:
-      context: .
-      args:
-        PORT: 8102
-    image: chatsrv:latest
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/chatsrv:latest
+    pull_policy: always
     container_name: tiz-chatsrv
     restart: always
     ports:

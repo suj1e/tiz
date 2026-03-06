@@ -1,10 +1,7 @@
 services:
   gatewaysrv:
-    build:
-      context: .
-      args:
-        PORT: 8080
-    image: gatewaysrv:latest
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/gatewaysrv:latest
+    pull_policy: always
     container_name: tiz-gatewaysrv
     restart: always
     ports:
@@ -12,7 +9,6 @@ services:
     environment:
       - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - JWT_SECRET=${JWT_SECRET:-tiz-jwt-secret-2026}
     networks:
       - npass
     logging:

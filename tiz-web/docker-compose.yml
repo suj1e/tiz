@@ -1,7 +1,7 @@
 services:
   tiz-web:
-    build: .
-    image: tiz-web:latest
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/tiz-web:latest
+    pull_policy: always
     container_name: tiz-web
     restart: always
     ports:
