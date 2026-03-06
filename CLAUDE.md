@@ -380,7 +380,7 @@ Each service has its own config file (no shared configs). Services connect to th
 | Environment | Data Storage | Resources | Ports | Kafka UI |
 |-------------|--------------|-----------|-------|----------|
 | dev | Docker volumes (managed) | Low | All exposed | Yes |
-| staging | `/opt/dev/dockermnt/tiz` | Medium | All exposed | Yes |
+| staging | `/opt/dev/dockermnt/tiz-staging` | Medium | All exposed | Yes |
 | prod | `/opt/dev/dockermnt/tiz` | High | Internal only | No |
 
 Data path can be overridden via `DATA_PATH` environment variable in `.env` file.
