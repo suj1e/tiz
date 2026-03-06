@@ -26,4 +26,6 @@ jobs:
             registry.cn-hangzhou.aliyuncs.com/nxo/chatsrv:sha-${{ github.sha }}
           build-args: |
             GITHUB_TOKEN=${{ github.token }}
+            ALIYUN_MAVEN_USERNAME=${{ secrets.ALIYUN_MAVEN_USERNAME }}
+            ALIYUN_MAVEN_PASSWORD=${{ secrets.ALIYUN_MAVEN_PASSWORD }}
             PORT=8102
