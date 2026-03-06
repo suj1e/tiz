@@ -1,3 +1,38 @@
+# 修复 Java 微服务 Dockerfile
+
+## 概述
+
+修复 Java 微服务 Dockerfile 中的 Gradle 构建问题，并优化 JVM 参数。
+
+## 问题分析
+
+### 当前问题
+
+1. **Gradle 构建失败**
+   - Dockerfile 使用 `./gradlew` 但没有复制 `gradlew` 脚本
+   - 导致构建失败
+
+2. **JVM 参数不够优化**
+   - 没有容器感知参数
+   - 内存设置硬编码
+
+### 解决方案
+
+1. **使用 `gradle` 命令替代 `gradlew`**
+   - `gradle:9.3.1-jdk21` 镜像已包含正确版本的 Gradle
+   - 直接使用 `gradle` 命令更简洁
+
+2. **优化 JVM 参数**
+   - 添加 `-XX:+UseContainerSupport` 容器感知
+   - 使用环境变量配置内存，支持运行时覆盖
+
+## 变更范围
+
+修改 7 个 Java 服务的 Dockerfile
+
+## 新 Dockerfile 模板
+
+```dockerfile
 # Build stage
 FROM gradle:9.3.1-jdk21 AS builder
 WORKDIR /build
@@ -37,7 +72,7 @@ RUN apk add --no-cache ca-certificates curl tzdata && \
 
 WORKDIR /app
 
-ARG PORT=8101
+ARG PORT
 ENV PORT=${PORT}
 ENV JAVA_OPTS="-XX:+UseContainerSupport -Xms256m -Xmx512m"
 
@@ -52,3 +87,14 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:${PORT}/actuator/health || exit 1
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+```
+
+## 改进点
+
+| 改进 | 说明 |
+|------|------|
+| `gradle` 替代 `./gradlew` | 使用镜像自带的 gradle |
+| `UseContainerSupport` | JVM 容器感知 |
+| `JAVA_OPTS` 环境变量 | 支持运行时覆盖 |
+| `HEALTHCHECK` | 容器健康检查 |
+| 移除 `GITHUB_TOKEN` | 不再需要 |

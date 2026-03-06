@@ -1,34 +1,26 @@
 # Build stage
-ARG BUILD_IMAGE=gradle:9.3.1-jdk21
-
-FROM ${BUILD_IMAGE} AS builder
+FROM gradle:9.3.1-jdk21 AS builder
 WORKDIR /build
 
-# Pass GITHUB_TOKEN for GitHub Packages authentication
-ARG GITHUB_TOKEN
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+ARG ALIYUN_MAVEN_USERNAME
+ARG ALIYUN_MAVEN_PASSWORD
+ENV ALIYUN_MAVEN_USERNAME=${ALIYUN_MAVEN_USERNAME}
+ENV ALIYUN_MAVEN_PASSWORD=${ALIYUN_MAVEN_PASSWORD}
 
-# Configure Gradle
 RUN mkdir -p ~/.gradle && \
     echo "org.gradle.jvmargs=-Xmx2g" >> ~/.gradle/gradle.properties
 
-# Copy gradle wrapper and config first (for caching)
 COPY gradle ./gradle
 COPY gradle.properties settings.gradle.kts build.gradle.kts ./
-
-# Copy source
 COPY api ./api
 COPY app ./app
 
-# Build (repositories already configured in settings.gradle.kts)
-RUN ./gradlew :app:bootJar --no-daemon --quiet
+RUN gradle :app:bootJar --no-daemon --quiet
 
-# Runtime stage
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
 LABEL maintainer="tiz-team"
 
-# Install runtime dependencies and create non-root user
 RUN apk add --no-cache ca-certificates curl tzdata && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
@@ -37,11 +29,17 @@ RUN apk add --no-cache ca-certificates curl tzdata && \
 
 WORKDIR /app
 
-ARG PORT
+ARG PORT=8103
+ENV PORT=${PORT}
+ENV JAVA_OPTS="-XX:+UseContainerSupport -Xms256m -Xmx512m"
+
 COPY --from=builder --chown=tiz:tiz /build/app/build/libs/*.jar app.jar
 
-# Switch to non-root user
 USER tiz
 
 EXPOSE ${PORT}
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/actuator/health || exit 1
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
