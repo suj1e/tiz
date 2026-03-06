@@ -1,0 +1,43 @@
+name: Deploy contentsrv
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to staging
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            mkdir -p /opt/dev/deploy/staging/contentsrv
+            
+            cat > /opt/dev/deploy/staging/contentsrv/docker-compose.yml << 'EOFCOMPOSE'
+            services:
+              contentsrv:
+                image: registry.cn-hangzhou.aliyuncs.com/nxo/contentsrv:sha-${{ github.sha }}
+                pull_policy: always
+                container_name: tiz-contentsrv
+                restart: always
+                env_file:
+                  - ../.env
+                networks:
+                  - npass
+                logging:
+                  driver: "json-file"
+                  options:
+                    max-size: "10m"
+                    max-file: "3"
+            
+            networks:
+              npass:
+                external: true
+            EOFCOMPOSE
+            
+            cd /opt/dev/deploy/staging/contentsrv
+            docker-compose pull
+            docker-compose up -d
