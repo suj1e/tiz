@@ -7,8 +7,25 @@ services:
     ports:
       - "8106:8106"
     environment:
+      # Nacos Discovery (optional, for service discovery)
       - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+
+      # Database
+      - DATABASE_URL=${DATABASE_URL:-mysql://root@mysql:3306/tiz}
+      - DATABASE_PASSWORD=${MYSQL_PASSWORD}
+
+      # Redis
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+      # LLM Provider
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4}
+
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     networks:
       - npass
     logging:

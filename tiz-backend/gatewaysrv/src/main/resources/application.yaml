@@ -51,16 +51,10 @@ spring:
         enabled: true
         server-addr: ${NACOS_SERVER_ADDR:localhost:30848}
         namespace: ${NACOS_NAMESPACE:}
-      config:
-        enabled: true
-        server-addr: ${NACOS_SERVER_ADDR:localhost:30848}
-        namespace: ${NACOS_NAMESPACE:}
-        file-extension: yaml
-        refresh-enabled: true
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:TizJwtSecretKey2026VeryLongSecretKeyForSecurity}
+  secret: ${JWT_SECRET}
 
 # CORS Configuration
 cors:

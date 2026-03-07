@@ -7,10 +7,32 @@ services:
     ports:
       - "8102:8102"
     environment:
+      # Nacos Discovery
       - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
-      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-Tiz@2026}
-      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD:-Tiz@2026}
+
+      # Database
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+
+      # Redis
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
+
+      # Kafka
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+
+      # LLM Service
+      - LLM_SERVICE_URL=${LLM_SERVICE_URL:-http://llmsrv:8106}
+
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+
+      # Logging
+      - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT:-INFO}
+      - LOGGING_LEVEL_IO_GITHUB_SUJ1E=${LOGGING_LEVEL_IO_GITHUB_SUJ1E:-DEBUG}
     networks:
       - npass
     logging:

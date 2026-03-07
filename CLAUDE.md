@@ -14,10 +14,7 @@ tiz/
 ├── tiz-backend/       # Backend services (independent services in shared directory)
 │   ├── common/        # Shared utilities (published to Aliyun Maven)
 │   ├── llmsrv-api/    # LLM service API (Java DTOs for Python service)
-│   ├── nacos-config/  # Nacos configuration files
-│   │   ├── dev/
-│   │   ├── staging/
-│   │   └── prod/
+│   ├── .env.*            # Environment-specific configuration files
 │   ├── llmsrv/        # AI service (Python/FastAPI) (:8106)
 │   ├── authsrv/       # Authentication service (:8101)
 │   ├── chatsrv/       # Chat service (:8102)
@@ -345,35 +342,31 @@ Nacos 3.x has separate ports for Console and API:
 
 Services should configure `NACOS_SERVER_ADDR=localhost:30848`.
 
-### Nacos Config Import
+### Service Configuration
 
-After starting infra or when configs change, import configs to Nacos (isolated by namespace):
+Services use environment variables for configuration (see docker-compose.yml in each service directory).
 
+Each service has `.env.dev`, `.env.staging`, `.env.prod` files for environment-specific values.
+
+### Service Configuration
+
+Each service manages its own configuration through environment variables. Configuration files are placed in each service directory:
+
+```
+authsrv/
+├── docker-compose.yml
+├── .env.dev            # dev environment variables
+├── .env.staging        # staging environment variables
+└── .env.prod            # production environment variables
+```
+
+Deploy with environment file:
 ```bash
-cd tiz-backend/nacos-config
-
-# Import dev environment configs to 'dev' namespace
-./import.sh dev
-
-# Import staging configs
-./import.sh staging
-
-# Import prod configs
-./import.sh prod
+cd tiz-backend/authsrv
+docker-compose --env-file .env.prod up -d
 ```
 
-Config structure:
-```
-nacos-config/
-├── dev/                  # dev environment
-│   ├── authsrv.yaml      # auth service config
-│   ├── chatsrv.yaml      # chat service config
-│   └── ...
-├── staging/              # staging environment
-└── prod/                 # prod environment
-```
-
-Each service has its own config file (no shared configs). Services connect to the appropriate namespace via `NACOS_NAMESPACE` environment variable.
+See docker-compose.yml for environment variable declarations with defaults.
 
 ### Environment Differences
 
@@ -415,17 +408,12 @@ All services connect to the `npass` Docker network and communicate via DNS names
    cd infra && ./infra.sh start
    ```
 
-2. **Import Nacos configs** (first time or after config changes)
-   ```bash
-   cd tiz-backend/nacos-config && ./import.sh import
-   ```
-
-3. **Start backend services**
+2. **Start backend services**
    ```bash
    cd tiz-backend && ./start-dev.sh start
    ```
 
-4. **Start frontend**
+3. **Start frontend**
    ```bash
    cd tiz-web && pnpm dev
    ```

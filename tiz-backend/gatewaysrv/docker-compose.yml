@@ -7,8 +7,19 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # Nacos Discovery
       - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+
+      # CORS
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000}
+
+      # Logging
+      - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT:-INFO}
+      - LOGGING_LEVEL_IO_GITHUB_SUJ1E=${LOGGING_LEVEL_IO_GITHUB_SUJ1E:-DEBUG}
     networks:
       - npass
     logging:
