@@ -10,10 +10,6 @@ tiz/
 ├── tiz-backend/       # 后端微服务 (独立服务，放在同一目录下)
 │   ├── common/        # 公共模块 (发布到 Aliyun Maven)
 │   ├── llmsrv-api/    # AI 服务 API (Java DTOs for Python service)
-│   ├── nacos-config/  # Nacos 配置文件
-│   │   ├── dev/
-│   │   ├── staging/
-│   │   └── prod/
 │   ├── llmsrv/        # AI 服务 (Python/FastAPI) (:8106)
 │   ├── authsrv/       # 认证服务 (:8101)
 │   ├── chatsrv/       # 对话服务 (:8102)
@@ -132,32 +128,24 @@ cd infra
 ./infra.sh start --env prod
 ```
 
-### Nacos 配置导入
+### 服务配置
 
-首次启动或配置变更后，需要导入 Nacos 配置（按 namespace 隔离环境）：
+每个服务通过环境变量进行配置。各服务目录下有 `.env.dev`、`.env.staging`、`.env.prod` 文件用于不同环境：
 
+```
+authsrv/
+├── docker-compose.yml
+├── .env.dev            # dev 环境变量
+├── .env.staging        # staging 环境变量
+└── .env.prod           # production 环境变量
+```
+
+参考项目根目录的 `.env.example` 了解主要环境变量。
+
+部署时指定环境文件：
 ```bash
-cd tiz-backend/nacos-config
-
-# 导入 dev 环境配置到 dev namespace
-./import.sh dev
-
-# 导入 staging 环境配置
-./import.sh staging
-
-# 导入 prod 环境配置
-./import.sh prod
-```
-
-配置文件结构：
-```
-nacos-config/
-├── dev/                  # dev 环境配置
-│   ├── authsrv.yaml      # 认证服务配置
-│   ├── chatsrv.yaml      # 对话服务配置
-│   └── ...
-├── staging/              # staging 环境配置
-└── prod/                 # prod 环境配置
+cd tiz-backend/authsrv
+docker-compose --env-file .env.prod up -d
 ```
 
 ### 一键启动后端服务
