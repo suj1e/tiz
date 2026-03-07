@@ -253,22 +253,6 @@ docker build -t authsrv:latest .
 
 **镜像标签:** `latest` + `sha-<commit>`
 
-### Staging 部署
-
-手动触发通过 SSH 部署到 staging 环境：
-
-| 工作流 | 部署服务 |
-|--------|----------|
-| deploy-authsrv.yml | authsrv |
-| deploy-chatsrv.yml | chatsrv |
-| deploy-contentsrv.yml | contentsrv |
-| deploy-practicesrv.yml | practicesrv |
-| deploy-quizsrv.yml | quizsrv |
-| deploy-usersrv.yml | usersrv |
-| deploy-gatewaysrv.yml | gatewaysrv |
-| deploy-llmsrv.yml | llmsrv |
-| deploy-tiz-web.yml | tiz-web |
-
 ## 开发规范
 
 详细规范请参阅 `standards/` 目录：
