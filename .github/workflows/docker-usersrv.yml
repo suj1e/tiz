@@ -24,8 +24,3 @@ jobs:
           tags: |
             registry.cn-hangzhou.aliyuncs.com/nxo/usersrv:latest
             registry.cn-hangzhou.aliyuncs.com/nxo/usersrv:sha-${{ github.sha }}
-          build-args: |
-            GITHUB_TOKEN=${{ github.token }}
-            ALIYUN_MAVEN_USERNAME=${{ secrets.ALIYUN_MAVEN_USERNAME }}
-            ALIYUN_MAVEN_PASSWORD=${{ secrets.ALIYUN_MAVEN_PASSWORD }}
-            PORT=8107
