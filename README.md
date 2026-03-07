@@ -8,7 +8,8 @@ Tiz 是一个基于 AI 的知识练习平台，用户通过对话式交互与 AI
 tiz/
 ├── tiz-web/           # 前端项目 (React + TypeScript + Vite)
 ├── tiz-backend/       # 后端微服务 (独立服务，放在同一目录下)
-│   ├── common/        # 公共模块 (发布到 Maven Local)
+│   ├── common/        # 公共模块 (发布到 Aliyun Maven)
+│   ├── llmsrv-api/    # AI 服务 API (Java DTOs for Python service)
 │   ├── nacos-config/  # Nacos 配置文件
 │   │   ├── dev/
 │   │   ├── staging/
@@ -90,13 +91,13 @@ pnpm build
 每个服务都是独立的项目，可以单独开发和部署：
 
 ```bash
-# 首先发布 common 模块
+# 首先发布 common 模块到 Aliyun Maven
 cd tiz-backend/common
-gradle publishToMavenLocal
+gradle publish
 
 # 发布服务 API（如果其他服务依赖它）
 cd tiz-backend/contentsrv
-gradle :api:publishToMavenLocal
+gradle :api:publish
 
 # 构建并运行服务
 cd tiz-backend/contentsrv
@@ -226,6 +227,59 @@ docker build -t authsrv:latest .
 /api/quiz/v1/**     → quizsrv:8105
 /api/user/v1/**     → usersrv:8107
 ```
+
+## CI/CD
+
+### Maven 发布
+
+当 `main` 分支上的模块路径发生变化时，自动发布到 Aliyun Maven Repository：
+
+| 工作流 | 触发路径 | 构件 |
+|--------|----------|------|
+| publish-common.yml | `tiz-backend/common/**` | common |
+| publish-authsrv-api.yml | `tiz-backend/authsrv/api/**` | authsrv-api |
+| publish-chatsrv-api.yml | `tiz-backend/chatsrv/api/**` | chatsrv-api |
+| publish-contentsrv-api.yml | `tiz-backend/contentsrv/api/**` | contentsrv-api |
+| publish-practicesrv-api.yml | `tiz-backend/practicesrv/api/**` | practicesrv-api |
+| publish-quizsrv-api.yml | `tiz-backend/quizsrv/api/**` | quizsrv-api |
+| publish-usersrv-api.yml | `tiz-backend/usersrv/api/**` | usersrv-api |
+| publish-llmsrv-api.yml | `tiz-backend/llmsrv-api/**` | llmsrv-api |
+
+### Docker 构建
+
+手动触发构建并推送到 Aliyun Container Registry：
+
+**镜像仓库:** `registry.cn-hangzhou.aliyuncs.com/nxo/<service>`
+
+| 服务 | 镜像 |
+|------|------|
+| authsrv | `nxo/authsrv` |
+| chatsrv | `nxo/chatsrv` |
+| contentsrv | `nxo/contentsrv` |
+| practicesrv | `nxo/practicesrv` |
+| quizsrv | `nxo/quizsrv` |
+| usersrv | `nxo/usersrv` |
+| gatewaysrv | `nxo/gatewaysrv` |
+| llmsrv | `nxo/llmsrv` |
+| tiz-web | `nxo/tiz-web` |
+
+**镜像标签:** `latest` + `sha-<commit>`
+
+### Staging 部署
+
+手动触发通过 SSH 部署到 staging 环境：
+
+| 工作流 | 部署服务 |
+|--------|----------|
+| deploy-authsrv.yml | authsrv |
+| deploy-chatsrv.yml | chatsrv |
+| deploy-contentsrv.yml | contentsrv |
+| deploy-practicesrv.yml | practicesrv |
+| deploy-quizsrv.yml | quizsrv |
+| deploy-usersrv.yml | usersrv |
+| deploy-gatewaysrv.yml | gatewaysrv |
+| deploy-llmsrv.yml | llmsrv |
+| deploy-tiz-web.yml | tiz-web |
 
 ## 开发规范
 

@@ -463,6 +463,7 @@ Automated publishing to Aliyun Maven Repository when paths change on main branch
 | Workflow | Trigger Path | Artifact |
 |----------|--------------|----------|
 | publish-common.yml | `tiz-backend/common/**` | common |
+| publish-llmsrv-api.yml | `tiz-backend/llmsrv-api/**` | llmsrv-api |
 | publish-authsrv-api.yml | `tiz-backend/authsrv/api/**` | authsrv-api |
 | publish-chatsrv-api.yml | `tiz-backend/chatsrv/api/**` | chatsrv-api |
 | publish-contentsrv-api.yml | `tiz-backend/contentsrv/api/**` | contentsrv-api |
@@ -493,3 +494,24 @@ Manual trigger to build and push Docker images to Aliyun Container Registry:
 **Required Secrets:**
 - `ALIYUN_REGISTRY_USERNAME`
 - `ALIYUN_REGISTRY_PASSWORD`
+
+### Staging Deploy Workflows
+
+Manual trigger to deploy services to staging environment via SSH:
+
+| Workflow | Service |
+|----------|---------|
+| deploy-authsrv.yml | authsrv |
+| deploy-chatsrv.yml | chatsrv |
+| deploy-contentsrv.yml | contentsrv |
+| deploy-practicesrv.yml | practicesrv |
+| deploy-quizsrv.yml | quizsrv |
+| deploy-usersrv.yml | usersrv |
+| deploy-gatewaysrv.yml | gatewaysrv |
+| deploy-llmsrv.yml | llmsrv |
+| deploy-tiz-web.yml | tiz-web |
+
+**Required Secrets:**
+- `DEPLOY_HOST` - Staging server hostname
+- `DEPLOY_USER` - SSH username
+- `DEPLOY_KEY` - SSH private key
