@@ -44,7 +44,13 @@ repositories {
 }
 
 dependencies {
-    api(libs.common)
+    // Common module (exclude servlet-based and JPA dependencies for reactive client library)
+    api(libs.common) {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-data-jpa")
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-security")
+        exclude(group = "com.querydsl", module = "querydsl-jpa")
+    }
 
     // WebFlux for reactive client
     api(libs.spring.boot.starter.webflux)
