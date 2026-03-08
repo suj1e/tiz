@@ -4,9 +4,6 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
 }
 
-group = "io.github.suj1e"
-version = "1.0.0-SNAPSHOT"
-
 java {
     sourceCompatibility = JavaVersion.VERSION_21
 }

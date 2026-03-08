@@ -3,9 +3,6 @@ plugins {
     alias(libs.plugins.spring.dependency.management) apply false
 }
 
-group = "io.github.suj1e"
-version = "1.0.0-SNAPSHOT"
-
 subprojects {
     group = rootProject.group
     version = rootProject.version
