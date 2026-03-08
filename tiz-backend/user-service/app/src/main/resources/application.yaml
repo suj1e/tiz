@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: usersrv
+    name: user-service
 
   cloud:
     nacos:

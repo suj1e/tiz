@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: authsrv
+    name: auth-service
 
   cloud:
     nacos:

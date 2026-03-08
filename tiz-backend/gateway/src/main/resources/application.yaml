@@ -3,14 +3,14 @@ server:
 
 spring:
   application:
-    name: gatewaysrv
+    name: gateway-service
 
   cloud:
     gateway:
       routes:
         # Auth Service
         - id: auth-service
-          uri: lb://authsrv
+          uri: lb://auth-service
           predicates:
             - Path=/api/auth/v1/**
           filters:
@@ -18,31 +18,31 @@ spring:
 
         # User Service
         - id: user-service
-          uri: lb://usersrv
+          uri: lb://user-service
           predicates:
             - Path=/api/user/v1/**
 
         # Chat Service
         - id: chat-service
-          uri: lb://chatsrv
+          uri: lb://chat-service
           predicates:
             - Path=/api/chat/v1/**
 
         # Content Service
         - id: content-service
-          uri: lb://contentsrv
+          uri: lb://content-service
           predicates:
             - Path=/api/content/v1/**
 
         # Practice Service
         - id: practice-service
-          uri: lb://practicesrv
+          uri: lb://practice-service
           predicates:
             - Path=/api/practice/v1/**
 
         # Quiz Service
         - id: quiz-service
-          uri: lb://quizsrv
+          uri: lb://quiz-service
           predicates:
             - Path=/api/quiz/v1/**
 

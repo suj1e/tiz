@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: practicesrv
+    name: practice-service
 
   cloud:
     nacos:
