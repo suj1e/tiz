@@ -9,15 +9,15 @@ tiz/
 ├── tiz-web/           # 前端项目 (React + TypeScript + Vite)
 ├── tiz-backend/       # 后端微服务 (独立服务，放在同一目录下)
 │   ├── common/        # 公共模块 (发布到 Aliyun Maven)
-│   ├── llmsrv-api/    # AI 服务 API (Java DTOs for Python service)
-│   ├── llmsrv/        # AI 服务 (Python/FastAPI) (:8106)
-│   ├── authsrv/       # 认证服务 (:8101)
-│   ├── chatsrv/       # 对话服务 (:8102)
-│   ├── contentsrv/    # 内容服务 (:8103)
-│   ├── practicesrv/   # 练习服务 (:8104)
-│   ├── quizsrv/       # 测验服务 (:8105)
-│   ├── usersrv/       # 用户服务 (:8107)
-│   └── gatewaysrv/    # API 网关 (:8080)
+│   ├── llm-api/       # AI 服务 API (Java DTOs for Python service)
+│   ├── llm-service/   # AI 服务 (Python/FastAPI) (:8106)
+│   ├── auth-service/  # 认证服务 (:8101)
+│   ├── chat-service/  # 对话服务 (:8102)
+│   ├── content-service/  # 内容服务 (:8103)
+│   ├── practice-service/ # 练习服务 (:8104)
+│   ├── quiz-service/  # 测验服务 (:8105)
+│   ├── user-service/  # 用户服务 (:8107)
+│   └── gateway/       # API 网关 (:8080)
 ├── infra/             # 基础设施
 │   ├── envs/          # 多环境配置
 │   │   ├── dev/       # 开发环境
@@ -92,18 +92,18 @@ cd tiz-backend/common
 gradle publish
 
 # 发布服务 API（如果其他服务依赖它）
-cd tiz-backend/contentsrv
+cd tiz-backend/content-service
 gradle :api:publish
 
 # 构建并运行服务
-cd tiz-backend/contentsrv
+cd tiz-backend/content-service
 gradle :app:bootRun
 ```
 
-### AI 服务 (llmsrv)
+### AI 服务 (llm-service)
 
 ```bash
-cd tiz-backend/llmsrv
+cd tiz-backend/llm-service
 
 # 安装依赖
 pixi install
@@ -130,21 +130,20 @@ cd infra
 
 ### 服务配置
 
-每个服务通过环境变量进行配置。各服务目录下有 `.env.dev`、`.env.staging`、`.env.prod` 文件用于不同环境：
+每个服务通过环境变量进行配置。各服务目录下有 `.env.example` 模板文件和 README.md 说明文档：
 
 ```
-authsrv/
+auth-service/
+├── README.md           # 服务说明文档
 ├── docker-compose.yml
-├── .env.dev            # dev 环境变量
-├── .env.staging        # staging 环境变量
-└── .env.prod           # production 环境变量
+└── .env.example        # 环境变量模板
 ```
 
-参考项目根目录的 `.env.example` 了解主要环境变量。
+复制 `.env.example` 为 `.env.dev`、`.env.staging` 或 `.env.prod` 并配置相应值。
 
 部署时指定环境文件：
 ```bash
-cd tiz-backend/authsrv
+cd tiz-backend/auth-service
 docker-compose --env-file .env.prod up -d
 ```
 
@@ -160,7 +159,7 @@ cd tiz-backend
 ./start-dev.sh status
 
 # 查看日志
-./start-dev.sh logs authsrv
+./start-dev.sh logs auth-service
 
 # 停止所有服务
 ./start-dev.sh stop
@@ -172,11 +171,11 @@ cd tiz-backend
 
 ```bash
 # 在任意服务目录下
-cd tiz-backend/authsrv
+cd tiz-backend/auth-service
 docker-compose up -d
 
 # 或者构建镜像
-docker build -t authsrv:latest .
+docker build -t auth-service:latest .
 ```
 
 ### 基础设施端口 (dev 环境)
@@ -196,24 +195,24 @@ docker build -t authsrv:latest .
 | 服务 | 端口 |
 |------|------|
 | tiz-web | 80 |
-| gatewaysrv | 8080 |
-| authsrv | 8101 |
-| chatsrv | 8102 |
-| contentsrv | 8103 |
-| practicesrv | 8104 |
-| quizsrv | 8105 |
-| llmsrv | 8106 |
-| usersrv | 8107 |
+| gateway | 8080 |
+| auth-service | 8101 |
+| chat-service | 8102 |
+| content-service | 8103 |
+| practice-service | 8104 |
+| quiz-service | 8105 |
+| llm-service | 8106 |
+| user-service | 8107 |
 
 ## API 网关路由
 
 ```
-/api/auth/v1/**     → authsrv:8101
-/api/chat/v1/**     → chatsrv:8102
-/api/content/v1/**  → contentsrv:8103
-/api/practice/v1/** → practicesrv:8104
-/api/quiz/v1/**     → quizsrv:8105
-/api/user/v1/**     → usersrv:8107
+/api/auth/v1/**     → auth-service:8101
+/api/chat/v1/**     → chat-service:8102
+/api/content/v1/**  → content-service:8103
+/api/practice/v1/** → practice-service:8104
+/api/quiz/v1/**     → quiz-service:8105
+/api/user/v1/**     → user-service:8107
 ```
 
 ## CI/CD
@@ -225,13 +224,13 @@ docker build -t authsrv:latest .
 | 工作流 | 触发路径 | 构件 |
 |--------|----------|------|
 | publish-common.yml | `tiz-backend/common/**` | common |
-| publish-authsrv-api.yml | `tiz-backend/authsrv/api/**` | authsrv-api |
-| publish-chatsrv-api.yml | `tiz-backend/chatsrv/api/**` | chatsrv-api |
-| publish-contentsrv-api.yml | `tiz-backend/contentsrv/api/**` | contentsrv-api |
-| publish-practicesrv-api.yml | `tiz-backend/practicesrv/api/**` | practicesrv-api |
-| publish-quizsrv-api.yml | `tiz-backend/quizsrv/api/**` | quizsrv-api |
-| publish-usersrv-api.yml | `tiz-backend/usersrv/api/**` | usersrv-api |
-| publish-llmsrv-api.yml | `tiz-backend/llmsrv-api/**` | llmsrv-api |
+| publish-auth-api.yml | `tiz-backend/auth-service/api/**` | auth-api |
+| publish-chat-api.yml | `tiz-backend/chat-service/api/**` | chat-api |
+| publish-content-api.yml | `tiz-backend/content-service/api/**` | content-api |
+| publish-practice-api.yml | `tiz-backend/practice-service/api/**` | practice-api |
+| publish-quiz-api.yml | `tiz-backend/quiz-service/api/**` | quiz-api |
+| publish-user-api.yml | `tiz-backend/user-service/api/**` | user-api |
+| publish-llm-api.yml | `tiz-backend/llm-api/**` | llm-api |
 
 ### Docker 构建
 
@@ -241,14 +240,14 @@ docker build -t authsrv:latest .
 
 | 服务 | 镜像 |
 |------|------|
-| authsrv | `nxo/authsrv` |
-| chatsrv | `nxo/chatsrv` |
-| contentsrv | `nxo/contentsrv` |
-| practicesrv | `nxo/practicesrv` |
-| quizsrv | `nxo/quizsrv` |
-| usersrv | `nxo/usersrv` |
-| gatewaysrv | `nxo/gatewaysrv` |
-| llmsrv | `nxo/llmsrv` |
+| auth-service | `nxo/auth-service` |
+| chat-service | `nxo/chat-service` |
+| content-service | `nxo/content-service` |
+| practice-service | `nxo/practice-service` |
+| quiz-service | `nxo/quiz-service` |
+| user-service | `nxo/user-service` |
+| gateway | `nxo/gateway` |
+| llm-service | `nxo/llm-service` |
 | tiz-web | `nxo/tiz-web` |
 
 **镜像标签:** `latest` + `sha-<commit>`

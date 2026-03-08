@@ -195,11 +195,11 @@ cd tiz-backend/common
 gradle publish
 
 # Build and publish a service's API
-cd tiz-backend/contentsrv
+cd tiz-backend/content-service
 gradle :api:publish
 
 # Build and run a service
-cd tiz-backend/contentsrv
+cd tiz-backend/content-service
 gradle :app:bootRun
 ```
 
@@ -207,9 +207,27 @@ gradle :app:bootRun
 
 Services depend on each other via Aliyun Maven Repository:
 - `io.github.suj1e:common:1.0.0-SNAPSHOT` - Shared utilities
+- `io.github.suj1e:auth-api:1.0.0-SNAPSHOT` - Auth service DTOs
+- `io.github.suj1e:chat-api:1.0.0-SNAPSHOT` - Chat service DTOs
 - `io.github.suj1e:content-api:1.0.0-SNAPSHOT` - Content service DTOs
+- `io.github.suj1e:practice-api:1.0.0-SNAPSHOT` - Practice service DTOs
+- `io.github.suj1e:quiz-api:1.0.0-SNAPSHOT` - Quiz service DTOs
+- `io.github.suj1e:user-api:1.0.0-SNAPSHOT` - User service DTOs
 - `io.github.suj1e:llm-api:1.0.0-SNAPSHOT` - LLM service DTOs
-- etc.
+
+### Version Catalog
+
+Each service uses `libs.versions.toml` for dependency management. Internal APIs are defined as:
+- `libs.common` - Common utilities
+- `libs.auth.api`, `libs.chat.api`, `libs.content.api`, `libs.practice.api`, `libs.quiz.api`, `libs.user.api` - Service APIs
+- `libs.llm.api` - LLM service API
+
+Example usage in build.gradle.kts:
+```kotlin
+implementation(libs.common)
+implementation(libs.content.api)
+implementation(libs.llm.api)
+```
 
 ### Maven Publishing
 
@@ -254,6 +272,18 @@ gradle publish
 cd tiz-backend/content-service
 gradle :api:publish
 ```
+
+### Environment Variables
+
+Each service has a `.env.example` template file that documents all required environment variables. To configure a service:
+
+```bash
+cd tiz-backend/auth-service
+cp .env.example .env.dev
+# Edit .env.dev with your values
+```
+
+The `.env.example` file serves as documentation and should be kept up to date with all available configuration options.
 
 ### AI Service (llm-service)
 
@@ -436,11 +466,11 @@ Each service is independent with its own Dockerfile and docker-compose.yml:
 
 ```bash
 # Start any service independently
-cd tiz-backend/authsrv
+cd tiz-backend/auth-service
 docker-compose up -d
 
 # Build Docker image
-docker build -t authsrv:latest .
+docker build -t auth-service:latest .
 ```
 
 ### Docker Images

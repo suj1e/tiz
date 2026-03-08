@@ -76,7 +76,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "content-service-api"
+            artifactId = "content-api"
         }
     }
 }
@@ -86,6 +86,32 @@ publishing {
 
 - 包含服务实现、控制器、业务逻辑
 - 依赖本地 api 模块和其他服务的 api
+
+### Version Catalog 依赖管理
+
+项目使用 Gradle Version Catalog 统一管理依赖版本，在 `gradle/libs.versions.toml` 中定义：
+
+```toml
+[libraries]
+common = { module = "io.github.suj1e:common", version = "1.0.0-SNAPSHOT" }
+content-api = { module = "io.github.suj1e:content-api", version = "1.0.0-SNAPSHOT" }
+llm-api = { module = "io.github.suj1e:llm-api", version = "1.0.0-SNAPSHOT" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version = "3.2.0" }
+```
+
+在 `build.gradle.kts` 中使用：
+
+```kotlin
+// 使用 version catalog
+implementation(libs.common)
+implementation(libs.content.api)
+
+// 等同于（不推荐）
+implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+implementation("io.github.suj1e:content-api:1.0.0-SNAPSHOT")
+```
 
 ```kotlin
 // app/build.gradle.kts
@@ -98,12 +124,10 @@ dependencies {
     // 本地 api 模块
     implementation(project(":api"))
 
-    // Common module (from Maven)
-    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
-
-    // Service APIs (from Maven)
-    implementation("io.github.suj1e:content-service-api:1.0.0-SNAPSHOT")
-    implementation("io.github.suj1e:llm-api:1.0.0-SNAPSHOT")
+    // 使用 version catalog 依赖管理
+    implementation(libs.common)
+    implementation(libs.content.api)
+    implementation(libs.llm.api)
 
     // Spring Boot Starters
     implementation(libs.spring.boot.starter.web)
@@ -234,9 +258,9 @@ cd tiz
 
 | 服务 | 依赖 |
 |------|------|
-| chat-service | content-service-api, llm-api |
-| practice-service | content-service-api, llm-api |
-| quiz-service | content-service-api, llm-api |
+| chat-service | content-api, llm-api |
+| practice-service | content-api, llm-api |
+| quiz-service | content-api, llm-api |
 | gateway | common |
 
 ## 微服务架构
@@ -818,7 +842,17 @@ refactor(content): 重构题库查询逻辑
 
 ## 配置管理
 
-### 环境变量
+### 环境变量模板
+
+每个服务都有 `.env.example` 模板文件，列出所有需要的环境变量：
+
+```bash
+cd tiz-backend/auth-service
+cp .env.example .env
+# 编辑 .env 填入实际值
+```
+
+### 环境变量配置
 
 服务通过环境变量配置，每个服务目录下有 `.env.dev`、`.env.staging`、`.env.prod` 文件：
 
