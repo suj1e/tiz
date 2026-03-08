@@ -2,6 +2,7 @@ package io.github.suj1e.auth.controller;
 
 import io.github.suj1e.auth.dto.*;
 import io.github.suj1e.auth.service.AuthService;
+import io.github.suj1e.auth.service.LarkAuthService;
 import io.github.suj1e.common.annotation.NoAuth;
 import io.github.suj1e.common.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class AuthController {
 
     private final AuthService authService;
+    private final LarkAuthService larkAuthService;
 
     /**
      * 用户注册.
@@ -40,6 +42,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.of(response));
+    }
+
+    /**
+     * 飞书免登.
+     */
+    @NoAuth
+    @PostMapping("/lark/login")
+    public ResponseEntity<ApiResponse<LoginResponse>> larkLogin(@Valid @RequestBody LarkLoginRequest request) {
+        LoginResponse response = larkAuthService.login(request);
         return ResponseEntity.ok(ApiResponse.of(response));
     }
 

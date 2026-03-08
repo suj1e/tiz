@@ -1,11 +1,30 @@
 services:
-  tiz-web:
-    image: registry.cn-hangzhou.aliyuncs.com/nxo/tiz-web:latest
-    pull_policy: always
-    container_name: tiz-web
+  tiz-web-desktop:
+    build:
+      context: .
+      dockerfile: Dockerfile.desktop
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/tiz-web-desktop:latest
+    container_name: tiz-web-desktop
     restart: always
-    ports:
-      - "80:80"
+    expose:
+      - "80"
+    networks:
+      - npass
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  tiz-web-mobile:
+    build:
+      context: .
+      dockerfile: Dockerfile.mobile
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/tiz-web-mobile:latest
+    container_name: tiz-web-mobile
+    restart: always
+    expose:
+      - "80"
     networks:
       - npass
     logging:

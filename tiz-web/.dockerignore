@@ -3,7 +3,7 @@ node_modules
 .pnpm-store
 
 # Build outputs
-dist
+# Note: dist is NOT excluded - Dockerfile copies pre-built artifacts
 build
 
 # Development files

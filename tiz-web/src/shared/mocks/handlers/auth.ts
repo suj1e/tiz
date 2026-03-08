@@ -66,6 +66,26 @@ export const authHandlers = [
     return HttpResponse.json({ data: {} })
   }),
 
+  http.post('/api/auth/v1/lark/login', async () => {
+    await delay(500)
+
+    // Mock Lark login - creates a new user based on Lark info
+    const larkUser = {
+      id: `lark-user-${Date.now()}`,
+      email: 'lark@example.com',
+      name: '飞书用户',
+      created_at: new Date().toISOString(),
+      settings: { theme: 'system' as const },
+    }
+
+    return HttpResponse.json({
+      data: {
+        user: larkUser,
+        token: `mock-lark-token-${Date.now()}`,
+      },
+    })
+  }),
+
   http.get('/api/auth/v1/me', async ({ request }) => {
     await delay(200)
     const authHeader = request.headers.get('Authorization')

@@ -4,10 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "pnpm dev:desktop",
+    "dev:desktop": "vite --config vite.config.desktop.ts",
+    "dev:mobile": "vite --config vite.config.mobile.ts",
+    "build": "pnpm build:all",
+    "build:desktop": "tsc -b && vite build --config vite.config.desktop.ts",
+    "build:mobile": "tsc -b && vite build --config vite.config.mobile.ts",
+    "build:all": "run-p build:desktop build:mobile",
+    "preview": "pnpm preview:desktop",
+    "preview:desktop": "vite preview --config vite.config.desktop.ts",
+    "preview:mobile": "vite preview --config vite.config.mobile.ts",
     "lint": "eslint . --fix",
-    "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage"
@@ -30,6 +37,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.6.1",
+    "npm-run-all": "^4.1.5",
     "@eslint/js": "^9.39.1",
     "@tailwindcss/vite": "^4.2.1",
     "@testing-library/jest-dom": "^6.9.1",

@@ -1,6 +1,6 @@
 import React from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { AppLayout } from '@/components/layout/AppLayout'
+import { AppLayout } from './layouts/AppLayout'
 import { AuthLayout } from '@/components/layout/AuthLayout'
 import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 import { RootErrorBoundary } from '@/components/common/RootErrorBoundary'

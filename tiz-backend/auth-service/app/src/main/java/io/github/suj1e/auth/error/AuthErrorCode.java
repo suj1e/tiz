@@ -22,7 +22,12 @@ public enum AuthErrorCode implements ErrorCode {
     AUTH_1007("authentication_error", "AUTH_1007", "访问令牌已过期", HttpStatus.UNAUTHORIZED),
     AUTH_1008("authentication_error", "AUTH_1008", "用户已被禁用", HttpStatus.FORBIDDEN),
     AUTH_1009("validation_error", "AUTH_1009", "用户不存在", HttpStatus.NOT_FOUND),
-    AUTH_1010("authentication_error", "AUTH_1010", "未授权访问", HttpStatus.UNAUTHORIZED);
+    AUTH_1010("authentication_error", "AUTH_1010", "未授权访问", HttpStatus.UNAUTHORIZED),
+
+    // 2xxx - 飞书登录相关
+    AUTH_2001("authentication_error", "AUTH_2001", "飞书登录失败", HttpStatus.UNAUTHORIZED),
+    AUTH_2002("authentication_error", "AUTH_2002", "飞书授权码无效", HttpStatus.UNAUTHORIZED),
+    AUTH_2003("authentication_error", "AUTH_2003", "飞书 API 调用失败", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String type;
     private final String code;

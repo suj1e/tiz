@@ -22,4 +22,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      * 检查邮箱是否存在.
      */
     boolean existsByEmail(String email);
+
+    /**
+     * 根据飞书 open_id 查找用户.
+     */
+    Optional<User> findByLarkOpenId(String larkOpenId);
 }

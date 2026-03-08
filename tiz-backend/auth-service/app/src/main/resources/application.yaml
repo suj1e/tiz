@@ -20,3 +20,7 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: 1800
   refresh-token-expiration: 604800
+
+lark:
+  app-id: ${LARK_APP_ID:}
+  app-secret: ${LARK_APP_SECRET:}

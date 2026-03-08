@@ -17,4 +17,8 @@ export const authService = {
   getCurrentUser: (): Promise<User> => {
     return api.get<User>('/auth/v1/me')
   },
+
+  larkLogin: (code: string): Promise<LoginResponse> => {
+    return api.post<LoginResponse>('/auth/v1/lark/login', { code })
+  },
 }
