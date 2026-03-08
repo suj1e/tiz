@@ -28,6 +28,10 @@ tiz/
 │   ├── staging/       # Staging
 │   ├── prod/          # Production
 │   └── infra.sh       # Management script
+├── deploy/            # Application Deployment
+│   ├── staging/       # Staging environment
+│   ├── prod/          # Production environment
+│   └── deploy.sh      # Deployment script
 ├── standards/         # Development standards
 └── openspec/          # OpenSpec change management
 ```
@@ -606,4 +610,89 @@ cd tiz-backend/auth-service && ./svc.sh image --local  # 只构建不推送
 ```
 
 **镜像仓库:** `registry.cn-hangzhou.aliyuncs.com/nxo/<service>`
+
+## Deployment
+
+`deploy/` 目录统一管理 staging 和 prod 环境的应用部署。
+
+### 部署架构
+
+```
+deploy/
+├── staging/
+│   ├── docker-compose.yml   # 所有应用服务
+│   └── .env                 # 环境变量
+├── prod/
+│   ├── docker-compose.yml
+│   └── .env
+└── deploy.sh                # 部署脚本
+```
+
+**注意**: 基础设施 (MySQL, Redis, Kafka, Nacos, ES) 由 `infra/` 目录管理，`deploy/` 只管理应用服务。
+
+### 部署服务列表
+
+| 服务 | 端口 | 说明 |
+|------|------|------|
+| tiz-web | 30000 | 前端 (desktop + mobile UA分流) |
+| gateway | 8080 | API 网关 |
+| auth-service | 8101 | 认证服务 |
+| chat-service | 8102 | 聊天服务 |
+| content-service | 8103 | 内容服务 |
+| practice-service | 8104 | 练习服务 |
+| quiz-service | 8105 | 测验服务 |
+| llm-service | 8106 | LLM 服务 |
+| user-service | 8107 | 用户服务 |
+
+### 部署命令
+
+```bash
+cd deploy
+
+# 部署 staging 环境
+./deploy.sh staging deploy           # 部署所有服务
+./deploy.sh staging deploy gateway   # 部署单个服务
+
+# 管理命令
+./deploy.sh staging stop             # 停止服务
+./deploy.sh staging restart          # 重启服务
+./deploy.sh staging logs             # 查看日志
+./deploy.sh staging logs auth-service  # 查看单个服务日志
+./deploy.sh staging status           # 健康检查
+./deploy.sh staging ps               # 列出容器
+
+# 回滚 (需要指定版本)
+./deploy.sh staging rollback auth-service
+```
+
+### 部署流程
+
+1. **启动基础设施**
+   ```bash
+   cd infra && ./infra.sh start --env staging
+   ```
+
+2. **配置环境变量**
+   ```bash
+   cd deploy/staging
+   cp .env.example .env
+   # 编辑 .env 填入实际密码
+   ```
+
+3. **部署应用**
+   ```bash
+   cd deploy
+   ./deploy.sh staging deploy
+   ```
+
+4. **验证状态**
+   ```bash
+   ./deploy.sh staging status
+   ```
+
+### 前端部署说明
+
+前端使用单一容器，通过 nginx 根据 User-Agent 分流：
+- Desktop UA → `/usr/share/nginx/html/desktop`
+- Mobile UA → `/usr/share/nginx/html/mobile`
 

@@ -1,0 +1,274 @@
+# Tiz Staging Environment Deployment
+# All application services (frontend + backend)
+# Infrastructure (mysql, redis. kafka. nacos. es) is managed by infra/
+
+services:
+  # ==================== Frontend ====================
+  tiz-web:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/tiz-web:latest
+    pull_policy: always
+    container_name: tiz-web
+    restart: always
+    ports:
+      - "30000:80"
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==================== Gateway ====================
+  gateway:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/gateway:latest
+    pull_policy: always
+    container_name: tiz-gateway
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==================== Auth Service ====================
+  auth-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/auth-service:latest
+    pull_policy: always
+    container_name: tiz-auth-service
+    restart: always
+    ports:
+      - "8101:8101"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8101/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==================== Chat Service ====================
+  chat-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/chat-service:latest
+    pull_policy: always
+    container_name: tiz-chat-service
+    restart: always
+    ports:
+      - "8102:8102"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8102/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==================== Content Service ====================
+  content-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/content-service:latest
+    pull_policy: always
+    container_name: tiz-content-service
+    restart: always
+    ports:
+      - "8103:8103"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8103/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==================== Practice Service ====================
+  practice-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/practice-service:latest
+    pull_policy: always
+    container_name: tiz-practice-service
+    restart: always
+    ports:
+      - "8104:8104"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8104/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==================== Quiz Service ====================
+  quiz-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/quiz-service:latest
+    pull_policy: always
+    container_name: tiz-quiz-service
+    restart: always
+    ports:
+      - "8105:8105"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8105/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==================== LLM Service ====================
+  llm-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/llm-service:latest
+    pull_policy: always
+    container_name: tiz-llm-service
+    restart: always
+    ports:
+      - "8106:8106"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8106/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==================== User Service ====================
+  user-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/user-service:latest
+    pull_policy: always
+    container_name: tiz-user-service
+    restart: always
+    ports:
+      - "8107:8107"
+    environment:
+      - NACOS_SERVER_ADDR=${NACOS_SERVER_ADDR:-nacos:8080}
+      - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/tiz?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST:-redis}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+    networks:
+      - npass
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8107/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  npass:
+    external: true

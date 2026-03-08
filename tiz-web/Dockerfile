@@ -24,18 +24,23 @@ COPY vite.config.desktop.ts vite.config.mobile.ts ./
 RUN pnpm build:all && \
     ls -la dist/desktop/ dist/mobile/
 
-# Production stage - Desktop
-FROM nginx:alpine AS desktop
+# Production stage - Unified desktop + mobile
+FROM nginx:alpine
 
 LABEL maintainer="tiz-team"
-LABEL version="2.0.0"
-LABEL description="Tiz frontend - Desktop version"
+LABEL version="3.0.0"
+LABEL description="Tiz frontend - Unified desktop/mobile with UA routing"
 
 RUN rm -rf /usr/share/nginx/html/* /var/log/nginx/*
 
+# Copy nginx config with UA routing
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/dist/desktop /usr/share/nginx/html
 
+# Copy both builds
+COPY --from=builder /app/dist/desktop /usr/share/nginx/html/desktop
+COPY --from=builder /app/dist/mobile /usr/share/nginx/html/mobile
+
+# Create non-root user
 RUN addgroup -g 1001 -S nginx-app && \
     adduser -S -D -H -u 1001 -h /usr/share/nginx/html -s /sbin/nologin -G nginx-app -g nginx-app nginx-app && \
     chown -R nginx-app:nginx-app /usr/share/nginx/html /var/cache/nginx /var/log/nginx /etc/nginx/conf.d && \
@@ -46,32 +51,6 @@ USER nginx-app
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
-
-CMD ["nginx", "-g", "daemon off;"]
-
-# Production stage - Mobile
-FROM nginx:alpine AS mobile
-
-LABEL maintainer="tiz-team"
-LABEL version="2.0.0"
-LABEL description="Tiz frontend - Mobile version"
-
-RUN rm -rf /usr/share/nginx/html/* /var/log/nginx/*
-
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/dist/mobile /usr/share/nginx/html
-
-RUN addgroup -g 1001 -S nginx-app && \
-    adduser -S -D -H -u 1001 -h /usr/share/nginx/html -s /sbin/nologin -G nginx-app -g nginx-app nginx-app && \
-    chown -R nginx-app:nginx-app /usr/share/nginx/html /var/cache/nginx /var/log/nginx /etc/nginx/conf.d && \
-    touch /var/run/nginx.pid && \
-    chown -R nginx-app:nginx-app /var/run/nginx.pid
-
-USER nginx-app
-EXPOSE 80
-
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+    CMD curl -f http://localhost/health || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
