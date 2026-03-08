@@ -13,33 +13,32 @@ tiz-backend/
 │
 ├── llm-api/                   # LLM API DTOs (发布到 Maven)
 │   ├── svc.sh
-│   └── ...
-│
-├── nacos-config/              # Nacos 配置文件
-│   ├── dev/
-│   ├── staging/
-│   └── prod/
+│   └── src/main/java/
 │
 ├── llm-service/               # AI 服务 (Python/FastAPI)
 │   ├── svc.sh
-│   └── ...
+│   ├── pixi.toml              # Pixi 包管理
+│   ├── pyproject.toml
+│   ├── app/
+│   │   ├── main.py            # FastAPI 入口
+│   │   ├── config.py
+│   │   ├── graphs/            # LangGraph 工作流
+│   │   ├── nodes/             # 工作流节点
+│   │   ├── llm/               # LLM 客户端
+│   │   └── utils/
+│   └── tests/
 │
 ├── auth-service/              # 认证服务
 │   ├── svc.sh                 # 服务管理脚本
+│   ├── Dockerfile
+│   ├── docker-compose.yml
 │   ├── settings.gradle.kts    # include("api", "app")
-│   ├── build.gradle.kts       # 父配置
 │   ├── api/                   # DTO 和客户端接口
 │   │   ├── build.gradle.kts   # maven-publish
 │   │   └── src/main/java/
-│   │       └── io/github/suj1e/auth/dto/
 │   └── app/                   # 服务实现
 │       ├── build.gradle.kts   # spring-boot
 │       └── src/main/java/
-│           └── io/github/suj1e/auth/
-│               ├── controller/
-│               ├── service/
-│               ├── repository/
-│               └── entity/
 │
 ├── chat-service/              # 对话服务 (api + app)
 ├── content-service/           # 内容服务 (api + app)
@@ -49,6 +48,8 @@ tiz-backend/
 │
 └── gateway/                   # API 网关 (无 api 子模块)
     ├── svc.sh
+    ├── Dockerfile
+    ├── docker-compose.yml
     ├── build.gradle.kts
     └── src/main/java/
 ```
@@ -75,7 +76,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "contentsrv-api"
+            artifactId = "content-service-api"
         }
     }
 }
@@ -97,12 +98,12 @@ dependencies {
     // 本地 api 模块
     implementation(project(":api"))
 
-    // Common module (from Maven Local)
+    // Common module (from Maven)
     implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
 
-    // Service APIs (from Maven Local)
-    implementation("io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT")
-    implementation("io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT")
+    // Service APIs (from Maven)
+    implementation("io.github.suj1e:content-service-api:1.0.0-SNAPSHOT")
+    implementation("io.github.suj1e:llm-api:1.0.0-SNAPSHOT")
 
     // Spring Boot Starters
     implementation(libs.spring.boot.starter.web)
@@ -441,6 +442,7 @@ llm-service/
 ├── pixi.toml                # Pixi 包管理配置
 ├── pyproject.toml           # Python 项目配置
 ├── Dockerfile
+├── docker-compose.yml
 ├── app/
 │   ├── __init__.py
 │   ├── main.py              # FastAPI 入口
@@ -474,11 +476,11 @@ llm-service/
 ### Java ↔ Java
 
 ```
-方式: OpenFeign / gRPC
-服务发现: Nacos
+方式: HTTP (OpenFeign / WebClient)
+服务发现: Docker DNS / Kubernetes Service
 ```
 
-### Java ↔ Python (llmsrv)
+### Java ↔ Python (llm-service)
 
 ```
 方式: HTTP (WebClient)
@@ -814,51 +816,48 @@ refactor(content): 重构题库查询逻辑
 }
 ```
 
-## Nacos 配置中心
-
-配置文件位于 `tiz-backend/nacos-config/`，按环境区分：
-
-```
-nacos-config/
-├── dev/common.yaml      # 开发环境
-├── staging/common.yaml  # 预发环境
-└── prod/common.yaml     # 生产环境
-```
-
 ## 配置管理
-
-### Nacos 配置中心
-
-配置文件位于 `tiz-backend/nacos-config/`，按环境区分：
-
-```
-nacos-config/
-├── dev/common.yaml      # 开发环境
-├── staging/common.yaml  # 预发环境
-└── prod/common.yaml     # 生产环境
-```
 
 ### 环境变量
 
-服务通过环境变量覆盖敏感配置：
+服务通过环境变量配置，每个服务目录下有 `.env.dev`、`.env.staging`、`.env.prod` 文件：
 
 ```bash
-# Nacos
-NACOS_SERVER_ADDR=nacos:8080
-NACOS_NAMESPACE=                    # 命名空间（留空为 public）
-
-# 数据库密码（覆盖 Nacos 配置）
+# 数据库
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:30001/tiz
+SPRING_DATASOURCE_USERNAME=root
 SPRING_DATASOURCE_PASSWORD=xxx
 
-# Redis 密码（覆盖 Nacos 配置）
+# Redis
+SPRING_DATA_REDIS_HOST=localhost
+SPRING_DATA_REDIS_PORT=30002
 SPRING_DATA_REDIS_PASSWORD=xxx
+
+# Kafka
+SPRING_KAFKA_BOOTSTRAP_SERVERS=localhost:30009
 
 # JWT
 JWT_SECRET=xxx
 
-# AI 服务 (llmsrv)
+# AI 服务
 OPENAI_API_KEY=xxx
 OPENAI_API_BASE=https://api.openai.com/v1
+```
+
+### 服务配置示例
+
+```yaml
+# application.yaml
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
+      password: ${SPRING_DATA_REDIS_PASSWORD}
 ```
 
 ### 服务配置示例
