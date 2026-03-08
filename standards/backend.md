@@ -476,7 +476,7 @@ llm-service/
 ### Java ↔ Java
 
 ```
-方式: HTTP (OpenFeign / WebClient)
+方式: HTTP (HttpExchange)
 服务发现: Docker DNS / Kubernetes Service
 ```
 
