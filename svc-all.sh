@@ -46,10 +46,8 @@ PUBLISH_SERVICES=(
     "user-service"
 )
 
-# Services for image command (includes frontend)
+# Services for image command (only services with Dockerfile)
 IMAGE_SERVICES=(
-    "common"
-    "llm-api"
     "auth-service"
     "user-service"
     "content-service"
