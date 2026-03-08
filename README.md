@@ -6,26 +6,26 @@ Tiz 是一个基于 AI 的知识练习平台，用户通过对话式交互与 AI
 
 ```
 tiz/
-├── tiz-web/           # 前端项目 (React + TypeScript + Vite)
-├── tiz-backend/       # 后端微服务 (独立服务，放在同一目录下)
-│   ├── common/        # 公共模块 (发布到 Aliyun Maven)
-│   ├── llm-api/       # AI 服务 API (Java DTOs for Python service)
-│   ├── llm-service/   # AI 服务 (Python/FastAPI) (:8106)
-│   ├── auth-service/  # 认证服务 (:8101)
-│   ├── chat-service/  # 对话服务 (:8102)
+├── tiz-web/              # 前端项目 (React + TypeScript + Vite)
+├── tiz-backend/          # 后端微服务 (独立服务，放在同一目录下)
+│   ├── common/           # 公共模块 (发布到 Aliyun Maven)
+│   ├── llm-api/          # LLM API DTOs (发布到 Aliyun Maven)
+│   ├── llm-service/      # AI 服务 (Python/FastAPI) (:8106)
+│   ├── auth-service/     # 认证服务 (:8101)
+│   ├── chat-service/     # 对话服务 (:8102)
 │   ├── content-service/  # 内容服务 (:8103)
 │   ├── practice-service/ # 练习服务 (:8104)
-│   ├── quiz-service/  # 测验服务 (:8105)
-│   ├── user-service/  # 用户服务 (:8107)
-│   └── gateway/       # API 网关 (:8080)
-├── infra/             # 基础设施
-│   ├── envs/          # 多环境配置
-│   │   ├── dev/       # 开发环境
-│   │   ├── staging/   # 预发环境
-│   │   └── prod/      # 生产环境
-│   └── infra.sh       # 管理脚本
-├── standards/         # 开发规范文档
-└── openspec/          # OpenSpec 变更管理
+│   ├── quiz-service/     # 测验服务 (:8105)
+│   ├── user-service/     # 用户服务 (:8107)
+│   └── gateway/          # API 网关 (:8080)
+├── infra/                # 基础设施
+│   ├── dev/              # 开发环境
+│   ├── staging/          # 预发环境
+│   ├── prod/             # 生产环境
+│   └── infra.sh          # 管理脚本
+├── standards/            # 开发规范文档
+├── openspec/             # OpenSpec 变更管理
+└── svc-all.sh            # 批量服务管理脚本
 ```
 
 ## 核心功能
