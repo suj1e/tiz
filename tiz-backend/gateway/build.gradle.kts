@@ -22,11 +22,12 @@ dependencies {
     implementation(platform(libs.spring.cloud.dependencies))
     implementation(platform(libs.spring.cloud.alibaba.dependencies))
 
-    // Common module (exclude servlet-based dependencies for reactive gateway)
+    // Common module (exclude servlet-based and JPA dependencies for reactive gateway)
     implementation(libs.common) {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-data-jpa")
-        exclude(group = "com.mysql", module = "mysql-connector-j")
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-security")
+        exclude(group = "com.querydsl", module = "querydsl-jpa")
     }
 
     // Spring Cloud Gateway (reactive)
