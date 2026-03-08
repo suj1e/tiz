@@ -20,7 +20,7 @@
 | authsrv           | auth-service      |
 | chatsrv           | chat-service      |
 | contentsrv        | content-service   |
-| gatewaysrv        | gateway-service   |
+| gatewaysrv        | gateway           |
 | llmsrv            | llm-service       |
 | llmsrv-api        | llm-api           |
 | practicesrv       | practice-service  |

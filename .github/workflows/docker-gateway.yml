@@ -1,4 +1,4 @@
-name: Docker gateway-service
+name: Docker gateway
 
 on:
   workflow_dispatch:
@@ -19,10 +19,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: tiz-backend/gateway-service
+          context: tiz-backend/gateway
           push: true
           tags: |
-            registry.cn-hangzhou.aliyuncs.com/nxo/gateway-service:latest
-            registry.cn-hangzhou.aliyuncs.com/nxo/gateway-service:sha-${{ github.sha }}
+            registry.cn-hangzhou.aliyuncs.com/nxo/gateway:latest
+            registry.cn-hangzhou.aliyuncs.com/nxo/gateway:sha-${{ github.sha }}
           build-args: |
             PORT=8080

@@ -22,7 +22,7 @@ tiz/
 │   ├── practice-service/  # Practice service (:8104)
 │   ├── quiz-service/      # Quiz service (:8105)
 │   ├── user-service/      # User service (:8107)
-│   └── gateway-service/   # API Gateway (:8080)
+│   └── gateway/            # API Gateway (:8080)
 ├── infra/             # Infrastructure
 │   ├── dev/           # Development
 │   ├── staging/       # Staging
@@ -174,7 +174,7 @@ Each service is an **independent project** with its own Dockerfile and docker-co
 - `app/`: Service implementation with Spring Boot
 
 **Gateway Service**:
-- `gateway-service` - Single module structure (no api/app split)
+- `gateway` - Single module structure (no api/app split)
 
 **Python Service**:
 - `llm-service` - FastAPI + LangGraph
@@ -475,7 +475,7 @@ Manual trigger to build and push Docker images to Aliyun Container Registry:
 | docker-practice-service.yml | practice-service | `nxo/practice-service` |
 | docker-quiz-service.yml | quiz-service | `nxo/quiz-service` |
 | docker-user-service.yml | user-service | `nxo/user-service` |
-| docker-gateway-service.yml | gateway-service | `nxo/gateway-service` |
+| docker-gateway.yml | gateway | `nxo/gateway` |
 | docker-llm-service.yml | llm-service | `nxo/llm-service` |
 | docker-tiz-web.yml | tiz-web | `nxo/tiz-web` |
 

@@ -38,7 +38,7 @@ tiz-backend 采用微服务架构，每个服务是独立的 Gradle 项目。当
 
 ### 2. 特殊处理
 
-**gateway-service**: Gateway 通常不加 service 后缀，但为保持一致性，保留 `-service`
+**gateway**: Gateway 不加 service 后缀，保持简洁
 
 **llm-api**: 原 `llmsrv-api` 是 API 模块不是服务，改为 `llm-api` 更准确
 

@@ -3,7 +3,7 @@
 - [x] 1.1 重命名 authsrv → auth-service
 - [x] 1.2 重命名 chatsrv → chat-service
 - [x] 1.3 重命名 contentsrv → content-service
-- [x] 1.4 重命名 gatewaysrv → gateway-service
+- [x] 1.4 重命名 gatewaysrv → gateway
 - [x] 1.5 重命名 llmsrv → llm-service
 - [x] 1.6 重命名 llmsrv-api → llm-api
 - [x] 1.7 重命名 practicesrv → practice-service

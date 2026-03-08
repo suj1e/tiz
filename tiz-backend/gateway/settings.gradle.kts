@@ -1,4 +1,4 @@
-rootProject.name = "gateway-service"
+rootProject.name = "gateway"
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)

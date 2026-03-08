@@ -120,7 +120,7 @@ status_all() {
     echo "Service Status:"
     echo "==============="
 
-    services=("auth-service:8101" "chat-service:8102" "content-service:8103" "practice-service:8104" "quiz-service:8105" "llm-service:8106" "user-service:8107" "gateway-service:8080")
+    services=("auth-service:8101" "chat-service:8102" "content-service:8103" "practice-service:8104" "quiz-service:8105" "llm-service:8106" "user-service:8107" "gateway:8080")
 
     for svc in "${services[@]}"; do
         local name="${svc%%:*}"
@@ -205,8 +205,8 @@ start_all() {
     fi
 
     # 最后启动网关
-    start_java_service "gateway-service" 8080 "gateway-service"
-    wait_for_service "gateway-service" 8080 || true
+    start_java_service "gateway" 8080 "gateway"
+    wait_for_service "gateway" 8080 || true
 
     echo ""
     log_success "=== All services started ==="
