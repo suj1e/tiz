@@ -87,18 +87,27 @@ pnpm build
 每个服务都是独立的项目，可以单独开发和部署：
 
 ```bash
-# 首先发布 common 模块到 Aliyun Maven
+# 使用 svc.sh 脚本（推荐）
+cd tiz-backend/auth-service
+./svc.sh help           # 查看所有命令
+./svc.sh build          # 构建
+./svc.sh test           # 运行测试
+./svc.sh run            # 本地运行
+./svc.sh publish        # 发布 API 到 Maven
+
+# 或使用 Gradle 命令
 cd tiz-backend/common
 gradle publish
 
-# 发布服务 API（如果其他服务依赖它）
 cd tiz-backend/content-service
 gradle :api:publish
-
-# 构建并运行服务
-cd tiz-backend/content-service
 gradle :app:bootRun
 ```
+
+**服务配置文件：**
+- `gradle.properties` - 项目 group 和 version（禁止在 build.gradle.kts 硬编码）
+- `libs.versions.toml` - 依赖版本目录（所有依赖必须通过 version catalog 引用）
+- `.env.example` - 环境变量模板
 
 ### AI 服务 (llm-service)
 
@@ -259,6 +268,30 @@ docker build -t auth-service:latest .
 - [API 文档](standards/api.md)
 - [后端规范](standards/backend.md)
 - [前端规范](standards/frontend.md)
+
+### Gradle 构建规范
+
+**禁止在 build.gradle.kts 中硬编码：**
+
+| 禁止项 | 正确做法 |
+|--------|----------|
+| `group = "io.github.suj1e"` | 使用 `gradle.properties` |
+| `version = "1.0.0-SNAPSHOT"` | 使用 `gradle.properties` |
+| `implementation("group:artifact:1.0.0")` | 使用 `libs.xxx` |
+
+**正确示例：**
+```kotlin
+// gradle.properties
+// version=1.0.0-SNAPSHOT
+// group=io.github.suj1e
+
+// build.gradle.kts
+dependencies {
+    implementation(libs.common)
+    implementation(libs.content.api)
+    testRuntimeOnly(libs.h2)
+}
+```
 
 ## 许可证
 

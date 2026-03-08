@@ -68,8 +68,8 @@ plugins {
 }
 
 dependencies {
-    api("io.github.suj1e:common:1.0.0-SNAPSHOT")
-    api("jakarta.validation:jakarta.validation-api:3.0.2")
+    api(libs.common)
+    api(libs.jakarta.validation.api)
 }
 
 publishing {
@@ -89,28 +89,65 @@ publishing {
 
 ### Version Catalog 依赖管理
 
-项目使用 Gradle Version Catalog 统一管理依赖版本，在 `gradle/libs.versions.toml` 中定义：
+每个服务使用独立的 `gradle/libs.versions.toml` 统一管理依赖版本：
 
 ```toml
+# gradle/libs.versions.toml
+[versions]
+spring-boot = "4.0.2"
+common = "1.0.0-SNAPSHOT"
+
 [libraries]
-common = { module = "io.github.suj1e:common", version = "1.0.0-SNAPSHOT" }
-content-api = { module = "io.github.suj1e:content-api", version = "1.0.0-SNAPSHOT" }
-llm-api = { module = "io.github.suj1e:llm-api", version = "1.0.0-SNAPSHOT" }
+common = { module = "io.github.suj1e:common", version.ref = "common" }
+content-api = { module = "io.github.suj1e:content-api", version.ref = "content-api" }
+h2 = { module = "com.h2database:h2" }
 
 [plugins]
-spring-boot = { id = "org.springframework.boot", version = "3.2.0" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 ```
 
-在 `build.gradle.kts` 中使用：
+### gradle.properties 配置
+
+项目 group 和 version 在 `gradle.properties` 中配置，**禁止在 build.gradle.kts 中硬编码**：
+
+```properties
+# gradle.properties
+org.gradle.jvmargs=-Xmx2g
+org.gradle.parallel=true
+org.gradle.caching=true
+version=1.0.0-SNAPSHOT
+group=io.github.suj1e
+```
+
+### Gradle 构建规范（强制）
+
+**禁止在 build.gradle.kts 中硬编码：**
+
+| 禁止项 | 正确做法 |
+|--------|----------|
+| `group = "io.github.suj1e"` | 使用 `gradle.properties` |
+| `version = "1.0.0-SNAPSHOT"` | 使用 `gradle.properties` |
+| `implementation("group:artifact:1.0.0")` | 使用 `libs.xxx` |
+
+**正确示例：**
 
 ```kotlin
-// 使用 version catalog
-implementation(libs.common)
-implementation(libs.content.api)
+// build.gradle.kts - 不要写 group 和 version
+plugins {
+    `java-library`
+    alias(libs.plugins.spring.boot)
+}
 
-// 等同于（不推荐）
-implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
-implementation("io.github.suj1e:content-api:1.0.0-SNAPSHOT")
+dependencies {
+    // ✅ 正确 - 使用 version catalog
+    implementation(libs.common)
+    implementation(libs.content.api)
+    testRuntimeOnly(libs.h2)
+
+    // ❌ 错误 - 硬编码版本
+    // implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    // testRuntimeOnly("com.h2database:h2")
+}
 ```
 
 ```kotlin
