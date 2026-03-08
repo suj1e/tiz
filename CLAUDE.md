@@ -32,6 +32,20 @@ tiz/
 └── openspec/          # OpenSpec change management
 ```
 
+## Independent Team Maintenance
+
+每个微服务由独立团队维护。开发时必须遵循：
+
+1. **自包含原则**: 每个服务可以独立理解、构建、测试、部署
+2. **文档完整**: 每个服务有 README.md 和 .env.example
+3. **依赖明确**: 内部 API 通过 version catalog 引用 (`libs.content.api`)
+4. **配置独立**: 每个服务有自己的 libs.versions.toml
+
+**开发检查**:
+- 新增服务：复制现有服务的 README.md、.env.example、libs.versions.toml 模板
+- 修改服务：确保 README 和 .env.example 同步更新
+- 添加依赖：优先使用 version catalog，避免硬编码版本
+
 ## Frontend (tiz-web)
 
 ### Commands
