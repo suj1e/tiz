@@ -20,6 +20,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="${SCRIPT_DIR}/tiz-backend"
+FRONTEND_DIR="${SCRIPT_DIR}/tiz-web"
 
 # Colors
 RED='\033[0;31m'
@@ -45,7 +46,22 @@ PUBLISH_SERVICES=(
     "user-service"
 )
 
-# All services for other commands
+# Services for image command (includes frontend)
+IMAGE_SERVICES=(
+    "common"
+    "llm-api"
+    "auth-service"
+    "user-service"
+    "content-service"
+    "chat-service"
+    "practice-service"
+    "quiz-service"
+    "gateway"
+    "llm-service"
+    "tiz-web"
+)
+
+# All backend services for other commands
 ALL_SERVICES=(
     "common"
     "llm-api"
@@ -57,6 +73,7 @@ ALL_SERVICES=(
     "quiz-service"
     "gateway"
     "llm-service"
+    "tiz-web"
 )
 
 # Parse command
@@ -115,7 +132,14 @@ run_service_cmd() {
     local service="$1"
     local cmd="$2"
     local extra_args="$3"
-    local svc_dir="${BACKEND_DIR}/${service}"
+
+    # Determine service directory (tiz-web is in frontend dir)
+    local svc_dir
+    if [ "$service" = "tiz-web" ]; then
+        svc_dir="${FRONTEND_DIR}"
+    else
+        svc_dir="${BACKEND_DIR}/${service}"
+    fi
 
     if [ ! -f "${svc_dir}/svc.sh" ]; then
         log_warn "No svc.sh found for ${service}, skipping"
@@ -125,7 +149,7 @@ run_service_cmd() {
     log_info "Running '${cmd}' on ${service}..."
 
     if [ "$DRY_RUN" = true ]; then
-        log_info "[DRY-RUN] Would run: cd ${service} && ./svc.sh ${cmd}${extra_args}"
+        log_info "[DRY-RUN] Would run: cd ${svc_dir} && ./svc.sh ${cmd}${extra_args}"
         return 0
     fi
 
@@ -149,10 +173,23 @@ get_services() {
         publish)
             echo "${PUBLISH_SERVICES[@]}"
             ;;
+        image)
+            echo "${IMAGE_SERVICES[@]}"
+            ;;
         *)
             echo "${ALL_SERVICES[@]}"
             ;;
     esac
+}
+
+# Get directory path for a service
+get_service_dir() {
+    local service="$1"
+    if [ "$service" = "tiz-web" ]; then
+        echo "${FRONTEND_DIR}"
+    else
+        echo "${BACKEND_DIR}/${service}"
+    fi
 }
 
 # Command implementations
@@ -178,7 +215,7 @@ cmd_publish() {
     SKIPPED_COUNT=0
 
     for service in $services; do
-        if has_changes "${BACKEND_DIR}/${service}"; then
+        if has_changes "$(get_service_dir "$service")"; then
             if run_service_cmd "$service" "publish"; then
                 SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
             else
@@ -235,7 +272,7 @@ cmd_image() {
     SKIPPED_COUNT=0
 
     for service in $services; do
-        if has_changes "${BACKEND_DIR}/${service}"; then
+        if has_changes "$(get_service_dir "$service")"; then
             if run_service_cmd "$service" "image" "$extra_args"; then
                 SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
             else
@@ -287,7 +324,7 @@ cmd_batch() {
     SKIPPED_COUNT=0
 
     for service in $services; do
-        if has_changes "${BACKEND_DIR}/${service}"; then
+        if has_changes "$(get_service_dir "$service")"; then
             if run_service_cmd "$service" "$cmd" "$extra_args"; then
                 SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
             else
@@ -345,6 +382,7 @@ cmd_help() {
     echo "  ./svc-all.sh status                     # Check all services health"
     echo ""
     echo "Services (publish): ${PUBLISH_SERVICES[*]}"
+    echo "Services (image):   ${IMAGE_SERVICES[*]}"
     echo "Services (other):   ${ALL_SERVICES[*]}"
 }
 
