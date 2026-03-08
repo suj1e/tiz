@@ -11,7 +11,7 @@ dependencies {
     api(libs.common)
 
     // Reactor for reactive streams
-    api("io.projectreactor:reactor-core")
+    api(libs.reactor.core)
 }
 
 publishing {

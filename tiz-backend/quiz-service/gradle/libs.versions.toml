@@ -82,6 +82,7 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 
 # Database
 mysql-connector-j = { module = "com.mysql:mysql-connector-j" }
+h2 = { module = "com.h2database:h2" }
 
 # Testing
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }

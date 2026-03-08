@@ -47,6 +47,9 @@ spring-cloud-nacos-discovery = { module = "com.alibaba.cloud:spring-cloud-starte
 spring-cloud-nacos-config = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config" }
 spring-cloud-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer" }
 
+# Reactor
+reactor-core = { module = "io.projectreactor:reactor-core" }
+
 # Internal APIs
 common = { module = "io.github.suj1e:common", version.ref = "common" }
 auth-api = { module = "io.github.suj1e:auth-api", version.ref = "auth-api" }

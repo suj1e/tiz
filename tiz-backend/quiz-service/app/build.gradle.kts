@@ -59,7 +59,7 @@ dependencies {
 
     // Testing
     testImplementation(libs.bundles.testing)
-    testRuntimeOnly("com.h2database:h2")
+    testRuntimeOnly(libs.h2)
 }
 
 tasks.withType<Test> {
