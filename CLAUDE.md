@@ -289,6 +289,59 @@ cd tiz-backend
 
 Logs are written to `tiz-backend/logs/` directory.
 
+### Service Management Scripts (svc.sh)
+
+每个服务都有独立的 `svc.sh` 脚本，提供统一的服务管理命令。
+
+**使用方式:**
+```bash
+cd tiz-backend/auth-service
+
+./svc.sh help           # 查看所有命令
+./svc.sh build          # 构建
+./svc.sh test           # 运行测试
+./svc.sh run            # 本地运行
+./svc.sh run --env staging  # 指定环境运行
+./svc.sh publish        # 发布 API 到 Maven
+./svc.sh image          # 构建+推送 Docker 镜像
+./svc.sh image --local  # 只构建镜像，不推送
+./svc.sh version        # 查看版本
+./svc.sh version bump   # 版本号+1
+./svc.sh validate       # 验证配置
+./svc.sh status         # 健康检查
+./svc.sh logs           # 查看日志
+```
+
+**批量发布:**
+```bash
+cd tiz-backend
+
+./publish-all.sh           # 发布所有服务
+./publish-all.sh --changed # 只发布有变更的服务
+./publish-all.sh --dry-run # 预览（不执行）
+```
+
+**命令对照表:**
+
+| 命令 | Java 服务 | Python 服务 | 说明 |
+|------|----------|-------------|------|
+| build | ✓ | ✓ | 构建 |
+| test | ✓ | ✓ | 运行测试 |
+| run | ✓ | ✓ | 本地运行 |
+| publish | ✓ | ✓ | 发布到仓库 |
+| image | ✓ | ✓ | Docker 镜像 |
+| version | ✓ | ✓ | 版本管理 |
+| tag | ✓ | ✓ | Git 标签 |
+| validate | ✓ | ✓ | 配置验证 |
+| status | ✓ | ✓ | 健康检查 |
+| logs | ✓ | ✓ | 日志查看 |
+| rollback | ✓ | ✓ | 版本回滚 |
+| images | ✓ | ✓ | 镜像管理 |
+| deps | ✓ | ✓ | 依赖管理 |
+| install | - | ✓ | 安装依赖 |
+| lint | - | ✓ | 代码检查 |
+| format | - | ✓ | 代码格式化 |
+
 ### API Gateway Routes
 
 ```
