@@ -7,11 +7,11 @@ import lombok.Setter;
 import org.springframework.data.domain.Sort;
 
 /**
- * 分页请求参数.
+ * 分页查询参数.
  */
 @Getter
 @Setter
-public class PageRequest {
+public class PageQuery {
 
     @Min(1)
     private int page = 1;

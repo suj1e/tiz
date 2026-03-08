@@ -2,8 +2,6 @@
 # Java & Spring
 java = "21"
 spring-boot = "4.0.2"
-spring-cloud = "2025.1.1"
-spring-cloud-alibaba = "2025.1.0.0"
 
 # Security
 jjwt = "0.13.0"
@@ -18,32 +16,15 @@ mapstruct-lombok-binding = "0.2.0"
 # Utility
 lombok = "1.18.36"
 
-# Observability
-logstash-logback = "9.0"
-
-# Testing
-testcontainers = "1.20.4"
-
 [libraries]
 # Spring Boot Starters (with explicit versions)
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
 spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "spring-boot" }
-spring-boot-starter-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis", version.ref = "spring-boot" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "spring-boot" }
 spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security", version.ref = "spring-boot" }
-spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-boot" }
-spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux", version.ref = "spring-boot" }
-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
-
-# Spring Cloud
-spring-cloud-nacos-discovery = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery" }
-spring-cloud-nacos-config = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config" }
-spring-cloud-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer" }
 
 # QueryDSL (Jakarta version)
 querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
-querydsl-jpa-jakarta = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
-jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api" }
 
 # MapStruct
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
@@ -62,24 +43,10 @@ jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", ver
 # Lombok
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 
-# Logging
-logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash-logback" }
-
-# Database
-mysql-connector-j = { module = "com.mysql:mysql-connector-j", version = "9.1.0" }
-
-# Testing
-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
-testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
-testcontainers-mysql = { module = "org.testcontainers:mysql", version.ref = "testcontainers" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-
 [bundles]
 jjwt = ["jjwt-api", "jjwt-impl", "jjwt-jackson"]
 jackson = ["jackson-datatype-jsr310", "jackson-databind"]
-testing = ["spring-boot-starter-test", "testcontainers", "testcontainers-junit-jupiter", "testcontainers-mysql", "junit-platform-launcher"]
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version = "1.1.7" }
-

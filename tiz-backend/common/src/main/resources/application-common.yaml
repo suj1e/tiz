@@ -21,26 +21,8 @@ spring:
         order_inserts: true
         order_updates: true
 
-  data:
-    redis:
-      timeout: 10s
-      lettuce:
-        pool:
-          max-active: 16
-          max-idle: 8
-          min-idle: 2
-
 server:
   shutdown: graceful
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: when-authorized
 
 logging:
   pattern:

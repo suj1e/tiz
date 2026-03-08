@@ -1,9 +1,9 @@
 package io.github.suj1e.common.exception;
 
+import io.github.suj1e.common.error.CommonErrorCode;
 import io.github.suj1e.common.error.ErrorCode;
 import io.github.suj1e.common.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -42,14 +42,15 @@ public class GlobalExceptionHandler {
 
         log.warn("Validation exception: {}", message);
 
+        ErrorCode errorCode = CommonErrorCode.INVALID_INPUT;
         ErrorBody errorBody = new ErrorBody(
-            "validation_error",
-            "COMMON_1001",
+            errorCode.getType(),
+            errorCode.getCode(),
             message
         );
 
         return ResponseEntity
-            .badRequest()
+            .status(errorCode.getHttpStatus())
             .body(ApiResponse.of(errorBody));
     }
 
@@ -57,14 +58,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<ErrorBody>> handleException(Exception ex) {
         log.error("Unexpected exception", ex);
 
+        ErrorCode errorCode = CommonErrorCode.INTERNAL_ERROR;
         ErrorBody errorBody = new ErrorBody(
-            "api_error",
-            "COMMON_9001",
-            "Internal server error"
+            errorCode.getType(),
+            errorCode.getCode(),
+            errorCode.getMessage()
         );
 
         return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .status(errorCode.getHttpStatus())
             .body(ApiResponse.of(errorBody));
     }
 

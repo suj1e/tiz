@@ -4,12 +4,13 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
 }
 
-group = "io.github.suj1e"
-version = "1.0.0-SNAPSHOT"
-
 java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
+
+// Maven repository URLs
+val aliyunMavenSnapshotUrl = "https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-snapshot-qazpfx"
+val aliyunMavenReleaseUrl = "https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-release-epshtr"
 
 dependencyManagement {
     imports {
@@ -26,7 +27,7 @@ repositories {
     // 阿里云制品仓库 - Snapshot
     maven {
         name = "AliyunPackagesSnapshot"
-        url = uri("https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-snapshot-qazpfx")
+        url = uri(aliyunMavenSnapshotUrl)
         credentials {
             username = System.getenv("ALIYUN_MAVEN_USERNAME") ?: ""
             password = System.getenv("ALIYUN_MAVEN_PASSWORD") ?: ""
@@ -35,7 +36,7 @@ repositories {
     // 阿里云制品仓库 - Release
     maven {
         name = "AliyunPackagesRelease"
-        url = uri("https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-release-epshtr")
+        url = uri(aliyunMavenReleaseUrl)
         credentials {
             username = System.getenv("ALIYUN_MAVEN_USERNAME") ?: ""
             password = System.getenv("ALIYUN_MAVEN_PASSWORD") ?: ""
@@ -47,25 +48,17 @@ dependencies {
     // Spring Boot Starters (core only)
     api(libs.spring.boot.starter.web)
     api(libs.spring.boot.starter.data.jpa)
-    api(libs.spring.boot.starter.data.redis)
     api(libs.spring.boot.starter.validation)
     api(libs.spring.boot.starter.security)
-    api(libs.spring.boot.starter.actuator)
 
     // QueryDSL (Jakarta)
-    api("com.querydsl:querydsl-jpa:5.1.0:jakarta")
+    api(variantOf(libs.querydsl.jpa) { classifier("jakarta") })
 
     // Security
     api(libs.bundles.jjwt)
 
     // Jackson
     api(libs.bundles.jackson)
-
-    // Logging
-    api(libs.logstash.logback.encoder)
-
-    // Database
-    runtimeOnly(libs.mysql.connector.j)
 
     // Lombok
     compileOnly(libs.lombok)
@@ -75,13 +68,6 @@ dependencies {
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
     annotationProcessor(libs.lombok.mapstruct.binding)
-
-    // Testing
-    testImplementation(libs.bundles.testing)
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
 
 tasks.withType<JavaCompile> {
@@ -104,9 +90,9 @@ publishing {
             val isSnapshot = version.toString().contains("SNAPSHOT", ignoreCase = true)
             url = uri(
                 if (isSnapshot) {
-                    "https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-snapshot-qazpfx"
+                    aliyunMavenSnapshotUrl
                 } else {
-                    "https://packages.aliyun.com/638a07cb09a6ccfdd6a1f934/maven/2309695-release-epshtr"
+                    aliyunMavenReleaseUrl
                 }
             )
             credentials {
