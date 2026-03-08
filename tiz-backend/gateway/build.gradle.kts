@@ -23,7 +23,7 @@ dependencies {
     implementation(platform(libs.spring.cloud.alibaba.dependencies))
 
     // Common module (exclude servlet-based dependencies for reactive gateway)
-    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT") {
+    implementation(libs.common) {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-data-jpa")
         exclude(group = "com.mysql", module = "mysql-connector-j")

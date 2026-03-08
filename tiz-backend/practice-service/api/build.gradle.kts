@@ -8,8 +8,7 @@ java {
 }
 
 dependencies {
-    // Common module (from Maven Local)
-    api("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    api(libs.common)
 
     // Validation API
     api("jakarta.validation:jakarta.validation-api:3.0.2")

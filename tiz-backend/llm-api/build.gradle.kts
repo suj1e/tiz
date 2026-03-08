@@ -44,8 +44,7 @@ repositories {
 }
 
 dependencies {
-    // Common module (from Maven Local)
-    api("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    api(libs.common)
 
     // WebFlux for reactive client
     api(libs.spring.boot.starter.webflux)

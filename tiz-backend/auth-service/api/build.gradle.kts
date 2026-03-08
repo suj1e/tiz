@@ -8,7 +8,7 @@ java {
 }
 
 dependencies {
-    api("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    api(libs.common)
 }
 
 publishing {
