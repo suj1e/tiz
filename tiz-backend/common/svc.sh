@@ -5,6 +5,11 @@
 # Note: This is a library module, not a runnable service.
 #       Commands like run, image, status are not available.
 
+#
+# Credentials can be set via:
+#   1. Environment variables (preferred): ALIYUN_MAVEN_USERNAME, ALIYUN_MAVEN_PASSWORD
+#   2. Global gradle.properties: aliyunMavenUsername, aliyunMavenPassword
+
 set -e
 
 # =============================================================================
@@ -45,6 +50,34 @@ get_version() {
     fi
 }
 
+check_maven_credentials() {
+    # Check if credentials are available (env vars or gradle.properties)
+    local has_creds=false
+
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then
+        has_creds=true
+        log_info "Using credentials from environment variables"
+    elif [ -f ~/.gradle/gradle.properties ]; then
+        if grep -q "aliyunMavenUsername=" ~/.gradle/gradle.properties > /dev/null 2>&1; then
+            has_creds=true
+            log_info "Using credentials from ~/.gradle/gradle.properties"
+        fi
+    fi
+
+    if [ "$has_creds" = false ]; then
+        log_error "Maven credentials not configured"
+        log_info ""
+        log_info "Set credentials via environment variables (preferred):"
+        log_info "  export ALIYUN_MAVEN_USERNAME=<username>"
+        log_info "  export ALIYUN_MAVEN_PASSWORD=<password>"
+        log_info ""
+        log_info "Or add to ~/.gradle/gradle.properties:"
+        log_info "  aliyunMavenUsername=<username>"
+        log_info "  aliyunMavenPassword=<password>"
+        exit 1
+    fi
+}
+
 # =============================================================================
 # Commands
 # =============================================================================
@@ -56,6 +89,7 @@ cmd_build() {
     log_success "Build complete"
 }
 
+
 cmd_test() {
     log_info "Running tests for ${SERVICE_NAME}..."
     check_gradle
@@ -63,21 +97,16 @@ cmd_test() {
     log_success "Tests complete"
 }
 
+
 cmd_publish() {
     log_info "Publishing ${SERVICE_NAME} to Aliyun Maven..."
     check_gradle
-
-    if [ -z "$ALIYUN_MAVEN_USERNAME" ] || [ -z "$ALIYUN_MAVEN_PASSWORD" ]; then
-        log_error "ALIYUN_MAVEN_USERNAME and ALIYUN_MAVEN_PASSWORD must be set"
-        log_info "Add to ~/.gradle/gradle.properties:"
-        log_info "  aliyunMavenUsername=<username>"
-        log_info "  aliyunMavenPassword=<password>"
-        exit 1
-    fi
+    check_maven_credentials
 
     gradle publish --no-daemon
     log_success "Published to Aliyun Maven"
 }
+
 
 cmd_version() {
     local action="$1"
@@ -107,6 +136,7 @@ cmd_version() {
     fi
 }
 
+
 cmd_tag() {
     local version=$(get_version)
     local tag_name="${SERVICE_NAME}/v${version%-SNAPSHOT}"
@@ -116,6 +146,7 @@ cmd_tag() {
     log_success "Tag created: ${tag_name}"
     log_info "Push with: git push origin ${tag_name}"
 }
+
 
 cmd_validate() {
     log_info "Validating ${SERVICE_NAME} configuration..."
@@ -136,16 +167,16 @@ cmd_validate() {
         log_success "Java: $(java -version 2>&1 | head -1)"
     fi
 
-    if [ -z "$ALIYUN_MAVEN_USERNAME" ]; then
-        log_warn "ALIYUN_MAVEN_USERNAME not set (required for publish)"
+    # Check credentials (env vars or gradle.properties)
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then
+        log_success "ALIYUN_MAVEN_USERNAME is set (from env)"
+        log_success "ALIYUN_MAVEN_PASSWORD is set (from env)"
+    elif [ -f ~/.gradle/gradle.properties ] && grep -q "aliyunMavenUsername=" ~/.gradle/gradle.properties > /dev/null 2>&1; then
+        log_success "Maven credentials configured in ~/.gradle/gradle.properties"
     else
-        log_success "ALIYUN_MAVEN_USERNAME is set"
-    fi
-
-    if [ -z "$ALIYUN_MAVEN_PASSWORD" ]; then
-        log_warn "ALIYUN_MAVEN_PASSWORD not set (required for publish)"
-    else
-        log_success "ALIYUN_MAVEN_PASSWORD is set"
+        log_warn "Maven credentials not configured (required for publish)"
+        log_info "  Set via: export ALIYUN_MAVEN_USERNAME=<username>"
+        log_info "  Or add to ~/.gradle/gradle.properties"
     fi
 
     if [ -f "gradle.properties" ]; then
@@ -198,6 +229,12 @@ cmd_help() {
     echo "  deps [list|update] Manage dependencies"
     echo ""
     echo "  help               Show this help"
+    echo ""
+    echo "Credentials for publish:"
+    echo "  Environment variables (preferred):"
+    echo "    ALIYUN_MAVEN_USERNAME, ALIYUN_MAVEN_PASSWORD"
+    echo "  Or ~/.gradle/gradle.properties:"
+    echo "    aliyunMavenUsername, aliyunMavenPassword"
     echo ""
     echo "Note: This is a library module, not a runnable service."
     echo "      Commands run, image, status, logs, rollback, images are not available."
