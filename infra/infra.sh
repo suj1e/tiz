@@ -54,7 +54,7 @@ ensure_network() {
 
 # 检查 .env 文件
 check_env_file() {
-    local env_dir="$SCRIPT_DIR/envs/$ENV"
+    local env_dir="$SCRIPT_DIR/$ENV"
     if [ ! -f "$env_dir/.env" ]; then
         if [ -f "$env_dir/.env.example" ]; then
             echo -e "${RED}Error: .env file not found in $env_dir/${NC}"
@@ -70,7 +70,7 @@ check_env_file() {
 
 # 获取 compose 文件路径
 get_compose_file() {
-    echo "$SCRIPT_DIR/envs/$ENV/docker-compose.yml"
+    echo "$SCRIPT_DIR/$ENV/docker-compose.yml"
 }
 
 # 打印访问信息
@@ -123,12 +123,11 @@ start() {
     check_env_file
     ensure_network
 
-    local COMPOSE_FILE=$(get_compose_file)
-    local ENV_DIR="$SCRIPT_DIR/envs/$ENV"
+    local ENV_DIR="$SCRIPT_DIR/$ENV"
 
     echo ""
     echo -e "${GREEN}Starting services...${NC}"
-    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_DIR/.env" up -d
+    cd "$ENV_DIR" && docker-compose --env-file ".env" up -d
 
     echo ""
     print_access_info
@@ -136,36 +135,43 @@ start() {
 
 # 停止服务
 stop() {
-    local COMPOSE_FILE=$(get_compose_file)
-    local ENV_DIR="$SCRIPT_DIR/envs/$ENV"
+    local ENV_DIR="$SCRIPT_DIR/$ENV"
 
     echo -e "${YELLOW}Stopping services ($ENV)...${NC}"
-    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_DIR/.env" down
+    cd "$ENV_DIR" && docker-compose --env-file ".env" down
     echo -e "${GREEN}✓ Services stopped${NC}"
+}
+
+# 删除服务和数据卷（保留镜像）
+remove() {
+    local ENV_DIR="$SCRIPT_DIR/$ENV"
+
+    echo -e "${RED}Removing services and volumes ($ENV)...${NC}"
+    cd "$ENV_DIR" && docker-compose --env-file ".env" down -v
+    echo -e "${GREEN}✓ Services and volumes removed (images preserved)${NC}"
 }
 
 # 查看状态
 status() {
-    local COMPOSE_FILE=$(get_compose_file)
-    local ENV_DIR="$SCRIPT_DIR/envs/$ENV"
+    local ENV_DIR="$SCRIPT_DIR/$ENV"
 
     echo -e "${BLUE}=========================================${NC}"
     echo -e "${BLUE}   Service Status ($ENV)${NC}"
     echo -e "${BLUE}=========================================${NC}"
-    docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_DIR/.env" ps 2>/dev/null || echo "No services running"
+    cd "$ENV_DIR" && docker-compose --env-file ".env" ps 2>/dev/null || echo "No services running"
     print_access_info
 }
 
 # 查看日志
 logs() {
     local service=$1
-    local COMPOSE_FILE=$(get_compose_file)
-    local ENV_DIR="$SCRIPT_DIR/envs/$ENV"
+    local ENV_DIR="$SCRIPT_DIR/$ENV"
 
+    cd "$ENV_DIR"
     if [ -n "$service" ]; then
-        docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_DIR/.env" logs -f "$service"
+        docker-compose --env-file ".env" logs -f "$service"
     else
-        docker-compose -f "$COMPOSE_FILE" --env-file "$ENV_DIR/.env" logs -f
+        docker-compose --env-file ".env" logs -f
     fi
 }
 
@@ -178,7 +184,7 @@ while [[ $# -gt 0 ]]; do
             validate_env "$ENV"
             shift 2
             ;;
-        start|stop|restart|status|logs)
+        start|stop|restart|remove|status|logs)
             COMMAND="$1"
             shift
             ;;
@@ -196,6 +202,9 @@ case "$COMMAND" in
     stop)
         stop
         ;;
+    remove)
+        remove
+        ;;
     restart)
         stop
         sleep 2
@@ -208,12 +217,13 @@ case "$COMMAND" in
         logs "$1"
         ;;
     "")
-        echo "Usage: $0 {start|stop|restart|status|logs} [--env dev|staging|prod]"
+        echo "Usage: $0 {start|stop|restart|remove|status|logs} [--env dev|staging|prod]"
         echo ""
         echo "Commands:"
         echo "  start     Start all infrastructure services"
         echo "  stop      Stop all services"
         echo "  restart   Restart all services"
+        echo "  remove    Remove all services and volumes (images preserved)"
         echo "  status    Show service status and access URLs"
         echo "  logs      View logs (optional: specify service name)"
         echo ""
@@ -226,6 +236,7 @@ case "$COMMAND" in
         echo "  $0 start                    # Start dev environment"
         echo "  $0 start --env staging      # Start staging environment"
         echo "  $0 logs mysql --env prod    # View MySQL logs in prod"
+        echo "  $0 remove                   # Remove dev services and volumes"
         echo "  $0 status"
         exit 1
         ;;

@@ -63,7 +63,7 @@ services:
       - "3306"
     volumes:
       - mysql-data:/var/lib/mysql
-      - ../../config/docker/mysql/init:/docker-entrypoint-initdb.d:ro
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
     command:
       - --max_connections=2000
       - --character-set-server=utf8mb4
@@ -94,7 +94,7 @@ services:
       - "6379"
     volumes:
       - redis-data:/data
-      - ../../config/docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./redis-config/redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: sh -c "redis-server /usr/local/etc/redis/redis.conf --requirepass $$REDIS_PASSWORD --maxmemory 2gb --maxmemory-policy allkeys-lru --appendonly yes"
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
