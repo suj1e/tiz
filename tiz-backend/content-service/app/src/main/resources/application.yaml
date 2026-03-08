@@ -16,7 +16,7 @@ spring:
         username: ${NACOS_USERNAME:nacos}
         password: ${NACOS_PASSWORD:nacos}
 
-# LLM service (Docker DNS, not in Nacos)
+# LLM service (Nacos service discovery)
 llm:
   service:
-    url: ${LLM_SERVICE_URL:http://llmsrv:8106}
+    url: ${LLM_SERVICE_URL:lb://llm-service}
