@@ -171,7 +171,7 @@ get_services() {
         publish)
             echo "${PUBLISH_SERVICES[@]}"
             ;;
-        image)
+        image|status)
             echo "${IMAGE_SERVICES[@]}"
             ;;
         *)
@@ -357,13 +357,13 @@ cmd_help() {
     echo "Usage: ./svc-all.sh <command> [options]"
     echo ""
     echo "Commands:"
-    echo "  publish    Publish API modules to Maven (only services with API)"
-    echo "  image      Build and push Docker images"
-    echo "  build      Build all services"
-    echo "  test       Run all tests"
-    echo "  validate   Validate all service configurations"
-    echo "  status     Check all service health"
-    echo "  version    Show all service versions"
+    echo "  publish    Publish API modules to Maven (8 services)"
+    echo "  image      Build and push Docker images (9 services)"
+    echo "  build      Build all services (11 services)"
+    echo "  test       Run all tests (11 services)"
+    echo "  validate   Validate all configurations (11 services)"
+    echo "  status     Check service health (9 runnable services)"
+    echo "  version    Show all versions (11 services)"
     echo ""
     echo "Options:"
     echo "  --changed    Only process services with changes (git-based)"
@@ -371,17 +371,24 @@ cmd_help() {
     echo "  --local      For image: build without pushing to registry"
     echo ""
     echo "Examples:"
-    echo "  ./svc-all.sh publish                    # Publish all services"
-    echo "  ./svc-all.sh publish --changed          # Publish only changed services"
+    echo "  ./svc-all.sh publish                    # Publish all API modules"
+    echo "  ./svc-all.sh publish --changed          # Publish only changed"
     echo "  ./svc-all.sh image                      # Build and push all images"
     echo "  ./svc-all.sh image --local              # Build images without pushing"
-    echo "  ./svc-all.sh image --changed            # Build only changed services"
-    echo "  ./svc-all.sh build --dry-run            # Preview build commands"
-    echo "  ./svc-all.sh status                     # Check all services health"
+    echo "  ./svc-all.sh status                     # Check all runnable services"
     echo ""
-    echo "Services (publish): ${PUBLISH_SERVICES[*]}"
-    echo "Services (image):   ${IMAGE_SERVICES[*]}"
-    echo "Services (other):   ${ALL_SERVICES[*]}"
+    echo "Service Lists:"
+    echo ""
+    echo "  publish (8):"
+    echo "    common llm-api auth-service chat-service content-service"
+    echo "    practice-service quiz-service user-service"
+    echo ""
+    echo "  image/status (9):"
+    echo "    auth-service chat-service content-service practice-service"
+    echo "    quiz-service user-service gateway llm-service tiz-web"
+    echo ""
+    echo "  build/test/validate/version (11):"
+    echo "    All of the above"
 }
 
 # Main

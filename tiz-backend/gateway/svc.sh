@@ -95,10 +95,6 @@ cmd_run() {
     gradle bootRun --no-daemon
 }
 
-cmd_publish() {
-    log_warn "Gateway does not have an API module to publish"
-}
-
 cmd_image() {
     local push_image=true
     if [ "$1" = "--local" ]; then
@@ -280,7 +276,7 @@ cmd_deps() {
 }
 
 cmd_help() {
-    echo "Service Management Script for ${SERVICE_NAME}"
+    echo "Service Management Script for ${SERVICE_NAME} (API Gateway)"
     echo ""
     echo "Usage: ./svc.sh <command> [options]"
     echo ""
@@ -319,7 +315,6 @@ case "$COMMAND" in
     build)     cmd_build ;;
     test)      cmd_test ;;
     run)       cmd_run "$@" ;;
-    publish)   cmd_publish ;;
     image)     cmd_image "$@" ;;
     version)   cmd_version "$@" ;;
     tag)       cmd_tag ;;
@@ -331,5 +326,10 @@ case "$COMMAND" in
     deps)      cmd_deps "$@" ;;
     help|--help|-h) cmd_help ;;
     "")        cmd_help ;;
+    publish)
+        log_error "Command 'publish' not available for gateway"
+        log_info "Gateway has no API module to publish"
+        exit 1
+        ;;
     *)         log_error "Unknown command: $COMMAND"; cmd_help; exit 1 ;;
 esac
