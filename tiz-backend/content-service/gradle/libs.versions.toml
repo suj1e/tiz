@@ -34,7 +34,6 @@ spring-boot-starter-aop = { module = "org.springframework.boot:spring-boot-start
 spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux", version.ref = "spring-boot" }
 
 # Spring Cloud
-spring-cloud-starter-openfeign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 spring-cloud-nacos-discovery = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery" }
 spring-cloud-nacos-config = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config" }
 spring-cloud-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer" }

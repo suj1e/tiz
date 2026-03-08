@@ -35,7 +35,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security:4.0.2")
 
     // Spring Cloud
-    implementation(libs.spring.cloud.starter.openfeign)
     implementation(libs.spring.cloud.nacos.discovery)
     implementation(libs.spring.cloud.nacos.config)
     implementation(libs.spring.cloud.loadbalancer)

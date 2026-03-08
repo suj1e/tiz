@@ -34,7 +34,6 @@ dependencies {
     implementation(libs.spring.boot.starter.webflux)
 
     // Spring Cloud
-    implementation(libs.spring.cloud.starter.openfeign)
     implementation(libs.spring.cloud.nacos.discovery)
     implementation(libs.spring.cloud.nacos.config)
     implementation(libs.spring.cloud.loadbalancer)
