@@ -1,6 +1,5 @@
 package io.github.suj1e.content.service;
 
-import io.github.suj1e.common.dto.PageRequest;
 import io.github.suj1e.common.exception.NotFoundException;
 import io.github.suj1e.common.response.CursorResponse;
 import io.github.suj1e.content.dto.*;

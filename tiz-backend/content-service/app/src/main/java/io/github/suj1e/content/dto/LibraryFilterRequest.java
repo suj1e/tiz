@@ -1,6 +1,6 @@
 package io.github.suj1e.content.dto;
 
-import io.github.suj1e.common.dto.PageRequest;
+import io.github.suj1e.common.dto.PageQuery;
 import io.github.suj1e.content.entity.KnowledgeSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-public class LibraryFilterRequest extends PageRequest {
+public class LibraryFilterRequest extends PageQuery {
 
     private UUID categoryId;
 
