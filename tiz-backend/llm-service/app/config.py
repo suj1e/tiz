@@ -16,9 +16,23 @@ class Settings(BaseSettings):
     )
 
     # Service configuration
-    service_name: str = "llmsrv"
+    service_name: str = "llm-service"
     service_port: int = 8106
     debug: bool = False
+
+    # Nacos configuration
+    nacos_enabled: bool = True
+    nacos_server_addr: str = "localhost:30848"
+    nacos_namespace: str = ""
+    nacos_username: str = "nacos"
+    nacos_password: str = "nacos"
+
+    # Legacy env var support (for Docker Compose)
+    @property
+    def nacos_server_addr_resolved(self) -> str:
+        """Resolve Nacos server address."""
+        # Support both NACOS_SERVER_ADDR and nacos_server_addr
+        return self.nacos_server_addr
 
     # LLM configuration
     llm_api_key: str = ""

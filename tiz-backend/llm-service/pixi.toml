@@ -21,6 +21,7 @@ httpx = ">=0.26.0"
 python-dotenv = ">=1.0.0"
 pytest = ">=7.4.0"
 pytest-asyncio = ">=0.23.0"
+nacos-sdk-python = ">=0.1.12"
 
 [tasks]
 dev = "uvicorn app.main:app --reload --host 0.0.0.0 --port 8106"

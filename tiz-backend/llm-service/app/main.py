@@ -24,6 +24,7 @@ from app.models import (
     GradeRequest,
     GradeResponse,
 )
+from app.nacos_client import nacos_client
 from app.nodes.analyze import ChatState
 
 # Configure logging
@@ -38,7 +39,14 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     logger.info("Starting Tiz AI Service...")
+
+    # Register to Nacos
+    nacos_client.register()
+
     yield
+
+    # Deregister from Nacos
+    nacos_client.deregister()
     logger.info("Shutting down Tiz AI Service...")
 
 
