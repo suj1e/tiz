@@ -21,6 +21,7 @@
 
 ```
 tiz-web/
+├── svc.sh                     # 服务管理脚本
 ├── src/
 │   ├── app/                    # 路由和页面
 │   │   ├── (auth)/             # 认证相关页面
@@ -330,6 +331,56 @@ export const useAuthStore = create<AuthState>((set) => ({
 ```
 
 ## 开发命令
+
+### 使用 svc.sh 脚本
+
+```bash
+# 安装依赖
+./svc.sh install
+
+# 开发模式 (连接后端)
+./svc.sh dev
+
+# 开发模式 (Mock，无需后端)
+./svc.sh dev --mock
+./svc.sh dev -m
+
+# 构建
+./svc.sh build
+
+# 预览生产构建
+./svc.sh preview
+
+# 测试
+./svc.sh test
+./svc.sh test --coverage
+
+# 代码检查
+./svc.sh lint
+
+# 格式化代码
+./svc.sh format
+
+# 清理构建产物
+./svc.sh clean
+
+# 构建 Docker 镜像
+./svc.sh image
+./svc.sh image --local    # 本地构建，不推送
+
+# 检查服务状态
+./svc.sh status
+
+# 验证配置
+./svc.sh validate
+
+# 管理依赖
+./svc.sh deps
+./svc.sh deps outdated
+./svc.sh deps update
+```
+
+### 直接使用 pnpm
 
 ```bash
 # 安装依赖

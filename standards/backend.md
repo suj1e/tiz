@@ -6,18 +6,26 @@
 
 ```
 tiz-backend/
-├── common/                    # 公共模块 (发布到 Maven Local)
+├── common/                    # 公共模块 (发布到 Maven)
+│   ├── svc.sh                 # 服务管理脚本
 │   ├── build.gradle.kts
 │   └── src/main/java/
+│
+├── llm-api/                   # LLM API DTOs (发布到 Maven)
+│   ├── svc.sh
+│   └── ...
 │
 ├── nacos-config/              # Nacos 配置文件
 │   ├── dev/
 │   ├── staging/
 │   └── prod/
 │
-├── llmsrv/                    # AI 服务 (Python/FastAPI)
+├── llm-service/               # AI 服务 (Python/FastAPI)
+│   ├── svc.sh
+│   └── ...
 │
-├── authsrv/                   # 认证服务
+├── auth-service/              # 认证服务
+│   ├── svc.sh                 # 服务管理脚本
 │   ├── settings.gradle.kts    # include("api", "app")
 │   ├── build.gradle.kts       # 父配置
 │   ├── api/                   # DTO 和客户端接口
@@ -33,13 +41,14 @@ tiz-backend/
 │               ├── repository/
 │               └── entity/
 │
-├── chatsrv/                   # 对话服务 (api + app)
-├── contentsrv/                # 内容服务 (api + app)
-├── practicesrv/               # 练习服务 (api + app)
-├── quizsrv/                   # 测验服务 (api + app)
-├── usersrv/                   # 用户服务 (api + app)
+├── chat-service/              # 对话服务 (api + app)
+├── content-service/           # 内容服务 (api + app)
+├── practice-service/          # 练习服务 (api + app)
+├── quiz-service/              # 测验服务 (api + app)
+├── user-service/              # 用户服务 (api + app)
 │
-└── gatewaysrv/                # API 网关 (无 api 子模块)
+└── gateway/                   # API 网关 (无 api 子模块)
+    ├── svc.sh
     ├── build.gradle.kts
     └── src/main/java/
 ```
@@ -105,33 +114,135 @@ dependencies {
 ### 构建流程
 
 ```bash
-# 1. 首先发布 common 模块
+# 使用 svc.sh 脚本管理单个服务
 cd tiz-backend/common
-gradle publishToMavenLocal
+./svc.sh build        # 构建
+./svc.sh publish      # 发布到 Maven
 
-# 2. 发布服务 API (如果其他服务依赖它)
-cd tiz-backend/contentsrv
-gradle :api:publishToMavenLocal
+cd tiz-backend/auth-service
+./svc.sh build        # 构建
+./svc.sh :api:publish # 发布 API
+./svc.sh run          # 运行服务
 
-# 3. 构建并运行服务
-cd tiz-backend/contentsrv
-gradle :app:bootRun
+# 使用 svc-all.sh 批量管理所有服务
+cd tiz
+./svc-all.sh publish              # 发布所有 API 模块
+./svc-all.sh publish --changed    # 只发布有变更的服务
+./svc-all.sh image                # 构建并推送所有镜像
+./svc-all.sh image --local        # 本地构建镜像（不推送）
+./svc-all.sh status               # 检查所有服务状态
 ```
+
+## 服务管理脚本
+
+每个服务目录下都有 `svc.sh` 脚本，用于统一管理服务生命周期。
+
+### 单服务管理 (svc.sh)
+
+#### 库模块 (common, llm-api)
+
+```bash
+./svc.sh build      # 构建
+./svc.sh test       # 运行测试
+./svc.sh publish    # 发布到 Maven
+./svc.sh version    # 显示版本
+./svc.sh validate   # 验证配置
+./svc.sh deps       # 查看依赖
+
+# 注意：库模块不支持 run, image, status, logs, rollback, images
+```
+
+#### Java 服务 (api + app 结构)
+
+```bash
+./svc.sh build              # 构建服务
+./svc.sh test               # 运行测试
+./svc.sh run [--env ENV]    # 本地运行 (默认: dev)
+./svc.sh publish            # 发布 API 到 Maven
+./svc.sh image [--local]    # 构建 Docker 镜像
+./svc.sh status             # 检查服务健康
+./svc.sh logs [N]           # 查看日志 (默认: 100 行)
+./svc.sh validate           # 验证配置
+./svc.sh version            # 显示版本
+./svc.sh version bump       # 升级版本号
+./svc.sh tag                # 创建 Git 标签
+./svc.sh rollback <v>       # 回滚到指定版本
+./svc.sh images [list|clean] # 管理本地镜像
+./svc.sh deps [list|update] # 管理依赖
+```
+
+#### Python 服务 (llm-service)
+
+```bash
+./svc.sh install            # 安装依赖 (pixi)
+./svc.sh build              # 构建
+./svc.sh test               # 运行测试
+./svc.sh run [--env ENV]    # 本地运行
+./svc.sh lint               # 代码检查
+./svc.sh format             # 格式化代码
+./svc.sh publish            # 发布到 PyPI
+./svc.sh image [--local]    # 构建 Docker 镜像
+./svc.sh status             # 检查服务健康
+```
+
+#### 网关服务 (gateway)
+
+```bash
+# 与 Java 服务相同，但无 publish 命令（无 API 模块）
+./svc.sh build
+./svc.sh run
+./svc.sh image
+./svc.sh status
+# ...
+```
+
+### 批量管理 (svc-all.sh)
+
+根目录下的 `svc-all.sh` 用于批量操作所有服务：
+
+```bash
+# 发布 API 模块 (8 个服务)
+./svc-all.sh publish              # 发布所有
+./svc-all.sh publish --changed    # 只发布有变更的
+./svc-all.sh publish --dry-run    # 预览
+
+# 构建 Docker 镜像 (9 个服务)
+./svc-all.sh image                # 构建并推送
+./svc-all.sh image --local        # 只构建不推送
+./svc-all.sh image --changed      # 只构建有变更的
+
+# 其他命令 (11 个服务)
+./svc-all.sh build                # 构建所有
+./svc-all.sh test                 # 测试所有
+./svc-all.sh validate             # 验证所有
+./svc-all.sh status               # 检查可运行服务
+./svc-all.sh version              # 显示所有版本
+```
+
+### 服务分类
+
+| 类别 | 服务 | publish | image | status | run |
+|------|------|:-------:|:-----:|:------:|:---:|
+| 库模块 | common, llm-api | ✓ | ✗ | ✗ | ✗ |
+| 业务服务 | auth-service, chat-service, content-service, practice-service, quiz-service, user-service | ✓ (api) | ✓ | ✓ | ✓ |
+| 网关 | gateway | ✗ | ✓ | ✓ | ✓ |
+| Python | llm-service | ✓ (PyPI) | ✓ | ✓ | ✓ |
+| 前端 | tiz-web | ✗ | ✓ | ✓ | dev |
 
 ### 服务间依赖
 
 | 服务 | 依赖 |
 |------|------|
-| chatsrv | contentsrv-api, llmsrv-api |
-| practicesrv | contentsrv-api, llmsrv-api |
-| quizsrv | contentsrv-api, llmsrv-api |
-| gatewaysrv | common |
+| chat-service | content-service-api, llm-api |
+| practice-service | content-service-api, llm-api |
+| quiz-service | content-service-api, llm-api |
+| gateway | common |
 
 ## 微服务架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              gatewaysrv (网关)                              │
+│                              gateway (网关)                                  │
 │                      Java / Spring Boot / Spring Cloud Gateway              │
 │                                   :8080                                     │
 └──────────────────────────────┬──────────────────────────────────────────────┘
@@ -140,7 +251,7 @@ gradle :app:bootRun
     │                          │                          │
     ▼                          ▼                          ▼
 ┌───────────────┐      ┌───────────────┐      ┌───────────────┐
-│   authsrv     │      │   chatsrv     │      │  contentsrv   │
+│ auth-service  │      │ chat-service  │      │content-service│
 │   :8101       │      │   :8102       │      │   :8103       │
 │    (Java)     │      │    (Java)     │      │    (Java)     │
 └───────────────┘      └───────┬───────┘      └───────────────┘
@@ -148,7 +259,7 @@ gradle :app:bootRun
                                │ HTTP
                                ▼
                        ┌───────────────┐
-                       │   llmsrv      │
+                       │  llm-service  │
                        │   :8106       │
                        │  (Python)     │
                        │  LangGraph    │
@@ -164,7 +275,7 @@ gradle :app:bootRun
     │                          │                          │
     ▼                          ▼                          ▼
 ┌───────────────┐      ┌───────────────┐      ┌───────────────┐
-│ practicesrv   │      │   quizsrv     │      │   usersrv     │
+│practice-service│     │ quiz-service  │      │ user-service  │
 │   :8104       │      │   :8105       │      │   :8107       │
 │    (Java)     │      │    (Java)     │      │    (Java)     │
 └───────────────┘      └───────────────┘      └───────────────┘
@@ -174,16 +285,16 @@ gradle :app:bootRun
 
 | 服务 | 端口 | 语言 | 职责 | 数据库 |
 |------|------|------|------|--------|
-| gatewaysrv | 8080 | Java | API 网关、路由、鉴权、限流 | - |
-| authsrv | 8101 | Java | 用户注册、登录、Token 管理 | users |
-| chatsrv | 8102 | Java | 对话入口、会话管理 | sessions |
-| contentsrv | 8103 | Java | 题库、题目、分类、标签 | content |
-| practicesrv | 8104 | Java | 练习记录、答案 | practice |
-| quizsrv | 8105 | Java | 测验、结果 | quiz |
-| llmsrv | 8106 | Python | AI 对话、题目生成、评分 | - |
-| usersrv | 8107 | Java | 用户设置、偏好 | users |
+| gateway | 8080 | Java | API 网关、路由、鉴权、限流 | - |
+| auth-service | 8101 | Java | 用户注册、登录、Token 管理 | users |
+| chat-service | 8102 | Java | 对话入口、会话管理 | sessions |
+| content-service | 8103 | Java | 题库、题目、分类、标签 | content |
+| practice-service | 8104 | Java | 练习记录、答案 | practice |
+| quiz-service | 8105 | Java | 测验、结果 | quiz |
+| llm-service | 8106 | Python | AI 对话、题目生成、评分 | - |
+| user-service | 8107 | Java | 用户设置、偏好 | users |
 
-## AI 服务架构 (llmsrv)
+## AI 服务架构 (llm-service)
 
 ### 技术栈
 
@@ -193,7 +304,8 @@ Python 3.11+
 ├── LangChain      # LLM 工具链
 ├── FastAPI        # HTTP 服务
 ├── Pydantic       # 数据验证
-└── httpx          # HTTP 客户端
+├── httpx          # HTTP 客户端
+└── Pixi           # 包管理
 ```
 
 ### LangGraph 工作流
@@ -216,7 +328,7 @@ Python 3.11+
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### llmsrv 接口
+### llm-service 接口
 
 ```
 POST /internal/ai/chat        # 对话（流式）
@@ -224,17 +336,17 @@ POST /internal/ai/generate    # 生成题目
 POST /internal/ai/grade       # 简答题评分
 ```
 
-### chatsrv → llmsrv 调用
+### chat-service → llm-service 调用
 
 ```java
-// chatsrv 调用 llmsrv
+// chat-service 调用 llm-service
 @Service
 class LlmServiceClient(
     private val webClient: WebClient
 ) {
     suspend fun chat(sessionId: String?, message: String): Flow<ChatEvent> {
         return webClient.post()
-            .uri("http://llmsrv:8106/internal/ai/chat")
+            .uri("http://llm-service:8106/internal/ai/chat")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(mapOf(
                 "session_id" to sessionId,
@@ -246,10 +358,10 @@ class LlmServiceClient(
 }
 ```
 
-### llmsrv 服务实现
+### llm-service 实现
 
 ```python
-# llmsrv/main.py
+# llm-service/app/main.py
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from langgraph.graph import StateGraph, END
@@ -324,7 +436,11 @@ async def grade_answer(request: GradeRequest) -> dict:
 ### 目录结构
 
 ```
-llmsrv/
+llm-service/
+├── svc.sh                   # 服务管理脚本
+├── pixi.toml                # Pixi 包管理配置
+├── pyproject.toml           # Python 项目配置
+├── Dockerfile
 ├── app/
 │   ├── __init__.py
 │   ├── main.py              # FastAPI 入口
@@ -350,10 +466,7 @@ llmsrv/
 │   └── utils/
 │       ├── __init__.py
 │       └── prompt.py        # Prompt 模板
-├── tests/
-├── requirements.txt
-├── pyproject.toml
-└── Dockerfile
+└── tests/
 ```
 
 ## 服务间通信
@@ -390,38 +503,38 @@ POST /api/quiz/v1/start
 ### 网关路由配置
 
 ```yaml
-# gatewaysrv 路由配置
+# gateway 路由配置
 spring:
   cloud:
     gateway:
       routes:
-        - id: authsrv
-          uri: lb://authsrv
+        - id: auth-service
+          uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
 
-        - id: chatsrv
-          uri: lb://chatsrv
+        - id: chat-service
+          uri: lb://chat-service
           predicates:
             - Path=/api/chat/**
 
-        - id: contentsrv
-          uri: lb://contentsrv
+        - id: content-service
+          uri: lb://content-service
           predicates:
             - Path=/api/content/**
 
-        - id: practicesrv
-          uri: lb://practicesrv
+        - id: practice-service
+          uri: lb://practice-service
           predicates:
             - Path=/api/practice/**
 
-        - id: quizsrv
-          uri: lb://quizsrv
+        - id: quiz-service
+          uri: lb://quiz-service
           predicates:
             - Path=/api/quiz/**
 
-        - id: usersrv
-          uri: lb://usersrv
+        - id: user-service
+          uri: lb://user-service
           predicates:
             - Path=/api/user/**
 ```
@@ -699,6 +812,17 @@ refactor(content): 重构题库查询逻辑
     "email": "user@example.com"
   }
 }
+```
+
+## Nacos 配置中心
+
+配置文件位于 `tiz-backend/nacos-config/`，按环境区分：
+
+```
+nacos-config/
+├── dev/common.yaml      # 开发环境
+├── staging/common.yaml  # 预发环境
+└── prod/common.yaml     # 生产环境
 ```
 
 ## 配置管理
