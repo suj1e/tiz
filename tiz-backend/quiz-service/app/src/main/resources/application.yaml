@@ -15,7 +15,7 @@ spring:
 # Content service (Nacos service discovery)
 content:
   service:
-    url: http://contentsrv:8103
+    url: ${CONTENT_SERVICE_URL:-http://contentsrv:8103}
 
 # LLM service (Docker DNS, not in Nacos)
 llm:

@@ -6,6 +6,16 @@ spring-cloud = "2025.1.1"
 spring-cloud-alibaba = "2025.1.0.0"
 spring-dependency-management = "1.1.7"
 
+# Internal APIs
+common = "1.0.0-SNAPSHOT"
+auth-api = "1.0.0-SNAPSHOT"
+chat-api = "1.0.0-SNAPSHOT"
+content-api = "1.0.0-SNAPSHOT"
+llm-api = "1.0.0-SNAPSHOT"
+practice-api = "1.0.0-SNAPSHOT"
+quiz-api = "1.0.0-SNAPSHOT"
+user-api = "1.0.0-SNAPSHOT"
+
 # Security
 jjwt = "0.13.0"
 
@@ -31,6 +41,16 @@ spring-cloud-loadbalancer = { module = "org.springframework.cloud:spring-cloud-s
 # Spring Cloud Nacos
 spring-cloud-nacos-discovery = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery" }
 spring-cloud-nacos-config = { module = "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config" }
+
+# Internal APIs
+common = { module = "io.github.suj1e:common", version.ref = "common" }
+auth-api = { module = "io.github.suj1e:auth-api", version.ref = "auth-api" }
+chat-api = { module = "io.github.suj1e:chat-api", version.ref = "chat-api" }
+content-api = { module = "io.github.suj1e:content-api", version.ref = "content-api" }
+llm-api = { module = "io.github.suj1e:llm-api", version.ref = "llm-api" }
+practice-api = { module = "io.github.suj1e:practice-api", version.ref = "practice-api" }
+quiz-api = { module = "io.github.suj1e:quiz-api", version.ref = "quiz-api" }
+user-api = { module = "io.github.suj1e:user-api", version.ref = "user-api" }
 
 # Security
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }

@@ -1,36 +1,37 @@
-# gatewaysrv - API Gateway
+# gateway
 
-Tiz 平台的 API 网关服务，基于 Spring Cloud Gateway 实现。
+API Gateway for the Tiz platform. Routes requests to backend services and handles JWT authentication.
 
-## 技术栈
+## Tech Stack
 
 - Java 21
 - Spring Boot 4.0.2
-- Spring Cloud Gateway
-- Spring Cloud Alibaba (Nacos)
-- JWT 认证 (jjwt 0.13.0)
+- Spring Cloud Gateway (reactive)
+- Spring Cloud Nacos (service discovery)
+- Spring Cloud LoadBalancer
+- JWT (jjwt 0.13.0)
 
-## 功能特性
+## Features
 
-- **路由转发**: 将请求转发到对应的微服务
-- **JWT 认证**: 验证 JWT Token 并注入用户信息
-- **白名单机制**: 支持配置不需要认证的路径
-- **CORS 配置**: 支持跨域请求
-- **全局异常处理**: 统一的错误响应格式
-- **Nacos 集成**: 支持服务发现和配置中心
+- **Request Routing**: Routes requests to appropriate microservices
+- **JWT Authentication**: Validates JWT tokens and injects user information
+- **Whitelist Mechanism**: Configurable paths that don't require authentication
+- **CORS Configuration**: Cross-origin request support
+- **Global Exception Handling**: Unified error response format
+- **Nacos Integration**: Service discovery and configuration center
 
-## 路由规则
+## Route Rules
 
-| 路径 | 目标服务 | 端口 |
-|------|----------|------|
-| `/api/auth/v1/**` | authsrv | 8101 |
-| `/api/chat/v1/**` | chatsrv | 8102 |
-| `/api/content/v1/**` | contentsrv | 8103 |
-| `/api/practice/v1/**` | practicesrv | 8104 |
-| `/api/quiz/v1/**` | quizsrv | 8105 |
-| `/api/user/v1/**` | usersrv | 8107 |
+| Path | Target Service | Service Name |
+|------|----------------|--------------|
+| `/api/auth/v1/**` | auth-service | `authsrv` |
+| `/api/user/v1/**` | user-service | `usersrv` |
+| `/api/chat/v1/**` | chat-service | `chatsrv` |
+| `/api/content/v1/**` | content-service | `contentsrv` |
+| `/api/practice/v1/**` | practice-service | `practicesrv` |
+| `/api/quiz/v1/**` | quiz-service | `quizsrv` |
 
-## 认证流程
+## Authentication Flow
 
 ```
 ┌──────────┐     ┌──────────┐     ┌──────────┐
@@ -40,30 +41,30 @@ Tiz 平台的 API 网关服务，基于 Spring Cloud Gateway 实现。
                       ▼
                ┌──────────────┐
                │ JWT Filter   │
-               │ 1. 提取 Token │
-               │ 2. 验证签名   │
-               │ 3. 检查过期   │
-               │ 4. 注入用户ID │
+               │ 1. Extract Token │
+               │ 2. Verify Signature │
+               │ 3. Check Expiration │
+               │ 4. Inject User ID │
                └──────────────┘
 ```
 
-### 请求头注入
+### Request Headers
 
-网关验证 JWT 后，会向下游服务注入以下请求头：
+After JWT validation, the gateway injects these headers to downstream services:
 
-- `X-User-Id`: 用户 ID
-- `X-User-Email`: 用户邮箱
+- `X-User-Id`: User ID
+- `X-User-Email`: User email
 
-## 白名单路径
+## Whitelist Paths
 
-以下路径不需要 JWT 认证：
+These paths do not require JWT authentication:
 
-- `/api/auth/v1/login` - 登录
-- `/api/auth/v1/register` - 注册
-- `/api/auth/v1/refresh` - 刷新 Token
-- `/actuator/**` - 健康检查端点
+- `/api/auth/v1/login` - Login
+- `/api/auth/v1/register` - Register
+- `/api/auth/v1/refresh` - Refresh token
+- `/actuator/**` - Health check endpoints
 
-## 配置说明
+## Configuration
 
 ### application.yaml
 
@@ -96,43 +97,64 @@ cors:
   max-age: 3600
 ```
 
-## 运行
+## Environment Variables
 
-### 前置条件
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `JWT_SECRET` | JWT signing secret | - | Yes |
+| `NACOS_SERVER_ADDR` | Nacos server address | `localhost:30848` | No |
+| `NACOS_NAMESPACE` | Nacos namespace | - | No |
+| `CORS_ALLOWED_ORIGINS` | CORS allowed origins | `http://localhost:5173,http://localhost:3000` | No |
 
-1. 启动 Nacos (可选，用于服务发现)
-2. 启动后端微服务
+## Dependencies
 
-### 启动网关
+### Infrastructure
+- Nacos 3.x+ - Service discovery and configuration
+
+### Services
+- **auth-service** - Authentication and authorization
+- **user-service** - User profiles
+- **chat-service** - Chat functionality
+- **content-service** - Content management
+- **practice-service** - Practice sessions
+- **quiz-service** - Quiz management
+
+### Libraries
+- `io.github.suj1e:common:1.0.0-SNAPSHOT` - Common utilities (excludes servlet-based dependencies)
+
+## Development
+
+### Build
 
 ```bash
-# 构建
-./gradlew build
-
-# 运行
-./gradlew bootRun
-
-# 或者
-java -jar build/libs/gatewaysrv-1.0.0-SNAPSHOT.jar
+./svc.sh build
 ```
 
-### 环境变量
+### Test
 
 ```bash
-# JWT 密钥
-JWT_SECRET=your-secret-key
-
-# Nacos 地址
-NACOS_SERVER_ADDR=localhost:30006
+./svc.sh test
 ```
 
-## 健康检查
+### Run
+
+```bash
+./svc.sh run
+```
+
+Or with specific environment:
+
+```bash
+./svc.sh run --env staging
+```
+
+## Health Check
 
 ```bash
 curl http://localhost:8080/actuator/health
 ```
 
-## 错误响应格式
+## Error Response Format
 
 ```json
 {
@@ -144,56 +166,47 @@ curl http://localhost:8080/actuator/health
 }
 ```
 
-### 常见错误码
+### Common Error Codes
 
-| code | message | HTTP |
-|------|---------|------|
-| token_missing | Authorization header is required | 401 |
-| token_invalid | Invalid token signature | 401 |
-| token_expired | Token has expired | 401 |
-| internal_error | Internal server error | 500 |
+| Code | Message | HTTP Status |
+|------|---------|-------------|
+| `token_missing` | Authorization header is required | 401 |
+| `token_invalid` | Invalid token signature | 401 |
+| `token_expired` | Token has expired | 401 |
+| `internal_error` | Internal server error | 500 |
 
-## 项目结构
+## Project Structure
 
 ```
-gatewaysrv/
+gateway/
 ├── build.gradle.kts
 ├── gradle/
 │   └── libs.versions.toml
 ├── settings.gradle.kts
-└── src/
-    ├── main/
-    │   ├── java/io/github/suj1e/gateway/
-    │   │   ├── GatewayApplication.java
-    │   │   ├── config/
-    │   │   │   ├── CorsConfig.java
-    │   │   │   ├── JwtProperties.java
-    │   │   │   └── RouteConfig.java
-    │   │   ├── filter/
-    │   │   │   └── JwtAuthenticationFilter.java
-    │   │   └── handler/
-    │   │       ├── GatewayErrorResponse.java
-    │   │       └── GlobalExceptionHandler.java
-    │   └── resources/
-    │       └── application.yaml
-    └── test/
-        ├── java/io/github/suj1e/gateway/
-        │   └── filter/
-        │       └── JwtAuthenticationFilterTest.java
-        └── resources/
-            └── application.yaml
+├── src/
+│   ├── main/
+│   │   ├── java/io/github/suj1e/gateway/
+│   │   │   ├── GatewayApplication.java
+│   │   │   ├── config/
+│   │   │   │   ├── CorsConfig.java
+│   │   │   │   ├── JwtProperties.java
+│   │   │   │   └── RouteConfig.java
+│   │   │   ├── filter/
+│   │   │   │   └── JwtAuthenticationFilter.java
+│   │   │   └── handler/
+│   │   │       ├── GatewayErrorResponse.java
+│   │   │       └── GlobalExceptionHandler.java
+│   │   └── resources/
+│   │       └── application.yaml
+│   └── test/
+│       ├── java/io/github/suj1e/gateway/
+│       │   └── filter/
+│       │       └── JwtAuthenticationFilterTest.java
+│       └── resources/
+│           └── application.yaml
 ```
 
-## 测试
+## Service Port
 
-```bash
-# 运行所有测试
-./gradlew test
-
-# 运行特定测试
-./gradlew test --tests "JwtAuthenticationFilterTest"
-```
-
-## 依赖
-
-- `io.github.suj1e:common:1.0.0-SNAPSHOT` - 公共模块
+- **Default**: 8080
+- **Health Check**: http://localhost:8080/actuator/health

@@ -20,19 +20,18 @@ dependencies {
     implementation(project(":api"))
 
     // Common module (from Maven Local)
-    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    implementation(libs.common)
 
     // Service APIs (from Maven Local)
-    implementation("io.github.suj1e:content-api:1.0.0-SNAPSHOT")
-    implementation("io.github.suj1e:llm-api:1.0.0-SNAPSHOT")
+    implementation(libs.content.api)
+    implementation(libs.llm.api)
 
     // Spring Boot Starters
     implementation(libs.spring.boot.starter.web)
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.starter.actuator)
-    implementation(libs.spring.boot.starter.webflux)
-    implementation("org.springframework.boot:spring-boot-starter-security:4.0.2")
+    implementation(libs.spring.boot.starter.security)
 
     // Spring Cloud
     implementation(libs.spring.cloud.nacos.discovery)
@@ -40,8 +39,8 @@ dependencies {
     implementation(libs.spring.cloud.loadbalancer)
 
     // QueryDSL
-    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
-    annotationProcessor("com.querydsl:querydsl-jpa:5.1.0:jakarta")
+    implementation(libs.querydsl.jpa)
+    annotationProcessor(libs.querydsl.jpa)
     annotationProcessor(libs.jakarta.persistence.api)
 
     // MapStruct

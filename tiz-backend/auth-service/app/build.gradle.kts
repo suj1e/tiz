@@ -17,7 +17,7 @@ dependencyManagement {
 
 dependencies {
     implementation(project(":api"))
-    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    implementation(libs.common)
 
     implementation(libs.spring.boot.starter.web)
     implementation(libs.spring.boot.starter.data.jpa)
@@ -30,7 +30,7 @@ dependencies {
     implementation(libs.spring.cloud.nacos.config)
 
     // QueryDSL
-    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
+    implementation(libs.querydsl.jpa)
 
     // JWT
     implementation(libs.bundles.jjwt)

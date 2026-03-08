@@ -1,17 +1,47 @@
-# Tiz AI Service (llmsrv)
+# llm-service
 
-LangGraph-based AI backend for question generation and grading.
+AI service for the Tiz platform. Provides question generation, essay grading, and chat capabilities using LangGraph and LLMs.
 
 ## Tech Stack
 
-- **Python 3.11+**
-- **FastAPI** - HTTP service
-- **LangGraph** - AI workflow orchestration
-- **LangChain** - LLM toolchain
-- **Pydantic** - Data validation
-- **pixi** - Dependency management
+- Python 3.11+
+- FastAPI - HTTP service framework
+- LangGraph - AI workflow orchestration
+- LangChain - LLM toolchain
+- Pydantic - Data validation
+- pixi - Dependency management
 
-## Quick Start
+## Dependencies
+
+### Infrastructure
+- LLM API (OpenAI or compatible) - Required for AI operations
+
+### Services
+None (this is a standalone Python service, not dependent on other Tiz services)
+
+### Libraries
+- This service publishes an API module for Java services: `io.github.suj1e:llm-api:1.0.0-SNAPSHOT`
+
+## Environment Variables
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `LLM_API_KEY` | LLM provider API key | - | Yes |
+| `LLM_API_BASE` | LLM API base URL | OpenAI default | No |
+| `LLM_MODEL` | Model name | gpt-4o-mini | No |
+| `LOG_LEVEL` | Logging level | INFO | No |
+
+## API Module
+
+This service publishes a Java API module to Maven for other services to use:
+
+```kotlin
+implementation("io.github.suj1e:llm-api:1.0.0-SNAPSHOT")
+```
+
+The llm-api module is located at `/Users/sujie/workspace/dev/apps/tiz/tiz-backend/llm-api/`
+
+## Development
 
 ### Prerequisites
 
@@ -20,27 +50,41 @@ LangGraph-based AI backend for question generation and grading.
 
 ### Setup
 
-1. Copy environment file:
-```bash
-cp .env.example .env
-```
-
-2. Edit `.env` and add your API key:
-```
-LLM_API_KEY=your-api-key-here
-```
-
-3. Install dependencies:
+1. Install dependencies:
 ```bash
 pixi install
 ```
 
-4. Run development server:
+2. Copy and configure environment file:
 ```bash
-pixi run dev
+cp .env.example .env
+# Edit .env and add your LLM_API_KEY
 ```
 
-The service will be available at http://localhost:8106
+### Build
+
+```bash
+./svc.sh build
+```
+
+### Test
+
+```bash
+./svc.sh test
+```
+
+### Run
+
+```bash
+./svc.sh run
+```
+
+Or with pixi directly:
+
+```bash
+pixi run dev    # Development with hot reload
+pixi run start  # Production mode
+```
 
 ## API Endpoints
 
@@ -94,7 +138,7 @@ curl -X POST http://localhost:8106/internal/ai/grade \
 ## Project Structure
 
 ```
-llmsrv/
+llm-service/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py              # FastAPI entry point
@@ -132,38 +176,6 @@ llmsrv/
 └── README.md
 ```
 
-## Development
-
-### Run Tests
-
-```bash
-pixi run test
-```
-
-### Run with Hot Reload
-
-```bash
-pixi run dev
-```
-
-### Production
-
-```bash
-pixi run start
-```
-
-## Docker
-
-Build and run with Docker:
-
-```bash
-# Build
-docker build -t llmsrv .
-
-# Run
-docker run -p 8106:8106 --env-file .env llmsrv
-```
-
 ## LangGraph Workflow
 
 The chat workflow uses LangGraph for orchestrating AI interactions:
@@ -180,6 +192,19 @@ START -> analyze_intent -> generate_content -> (check intent)
 3. **extract_params** - Normalizes parameters for generation
 4. **generate_questions** - Creates questions based on parameters
 
-## License
+## Docker
 
-MIT
+Build and run with Docker:
+
+```bash
+# Build
+docker build -t llmsrv .
+
+# Run
+docker run -p 8106:8106 --env-file .env llmsrv
+```
+
+## Service Port
+
+- **Default**: 8106
+- **Health Check**: http://localhost:8106/health

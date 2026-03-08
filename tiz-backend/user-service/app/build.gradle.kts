@@ -20,7 +20,7 @@ dependencies {
     implementation(project(":api"))
 
     // Common module (from Maven Local)
-    implementation("io.github.suj1e:common:1.0.0-SNAPSHOT")
+    implementation(libs.common)
 
     // Spring Boot Starters
     implementation(libs.spring.boot.starter.web)
@@ -35,7 +35,7 @@ dependencies {
     implementation(libs.spring.cloud.nacos.config)
 
     // QueryDSL
-    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
+    implementation(libs.querydsl.jpa)
 
     // Security (JWT already in common)
     implementation(libs.bundles.jjwt)
