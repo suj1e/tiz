@@ -37,6 +37,13 @@ check_pixi() {
     fi
 }
 
+ensure_dependencies() {
+    if [ ! -d ".pixi" ]; then
+        log_warn ".pixi not found, installing dependencies..."
+        pixi install
+    fi
+}
+
 check_docker() {
     if ! command -v docker &> /dev/null; then
         log_error "Docker not found. Please install Docker"
@@ -77,6 +84,7 @@ cmd_install() {
 cmd_build() {
     log_info "Building ${SERVICE_NAME}..."
     check_pixi
+    ensure_dependencies
     pixi build
     log_success "Build complete"
 }
@@ -84,6 +92,7 @@ cmd_build() {
 cmd_test() {
     log_info "Running tests for ${SERVICE_NAME}..."
     check_pixi
+    ensure_dependencies
     pixi run test
     log_success "Tests complete"
 }
@@ -94,9 +103,12 @@ cmd_run() {
 
     log_info "Running ${SERVICE_NAME} with environment: ${env}"
     check_pixi
+    ensure_dependencies
 
     if [ -f "$env_file" ]; then
-        export $(grep -v '^#' "$env_file" | xargs)
+        set -a
+        source <(grep -v '^#' "$env_file" | grep -v '^[[:space:]]*$')
+        set +a
     fi
 
     pixi run dev

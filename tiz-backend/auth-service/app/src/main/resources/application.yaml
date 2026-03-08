@@ -7,10 +7,14 @@ spring:
 
   cloud:
     nacos:
+      config:
+        enabled: false
       discovery:
         enabled: true
         server-addr: ${NACOS_SERVER_ADDR:localhost:30848}
         namespace: ${NACOS_NAMESPACE:}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWORD:nacos}
 
 jwt:
   secret: ${JWT_SECRET}

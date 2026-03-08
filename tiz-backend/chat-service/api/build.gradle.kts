@@ -1,10 +1,17 @@
 plugins {
     `java-library`
     `maven-publish`
+    alias(libs.plugins.spring.dependency.management)
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${libs.versions.spring.boot.get()}")
+    }
 }
 
 dependencies {

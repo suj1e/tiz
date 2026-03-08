@@ -99,12 +99,12 @@ cmd_test() {
 
 
 cmd_publish() {
-    log_info "Publishing ${SERVICE_NAME} to Aliyun Maven..."
+    log_info "Publishing ${SERVICE_NAME} to local and Aliyun Maven..."
     check_gradle
     check_maven_credentials
 
-    gradle publish --no-daemon
-    log_success "Published to Aliyun Maven"
+    gradle publish publishToMavenLocal --no-daemon
+    log_success "Published to local (~/.m2) and Aliyun Maven"
 }
 
 

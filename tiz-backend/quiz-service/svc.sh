@@ -44,6 +44,34 @@ check_docker() {
     fi
 }
 
+check_maven_credentials() {
+    # Check if credentials are available (env vars or gradle.properties)
+    local has_creds=false
+
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then
+        has_creds=true
+        log_info "Using credentials from environment variables"
+    elif [ -f ~/.gradle/gradle.properties ]; then
+        if grep -q "aliyunMavenUsername=" ~/.gradle/gradle.properties > /dev/null 2>&1; then
+            has_creds=true
+            log_info "Using credentials from ~/.gradle/gradle.properties"
+        fi
+    fi
+
+    if [ "$has_creds" = false ]; then
+        log_error "Maven credentials not configured"
+        log_info ""
+        log_info "Set credentials via environment variables (preferred):"
+        log_info "  export ALIYUN_MAVEN_USERNAME=<username>"
+        log_info "  export ALIYUN_MAVEN_PASSWORD=<password>"
+        log_info ""
+        log_info "Or add to ~/.gradle/gradle.properties:"
+        log_info "  aliyunMavenUsername=<username>"
+        log_info "  aliyunMavenPassword=<password>"
+        exit 1
+    fi
+}
+
 get_env_file() {
     local env="${1:-dev}"
     local env_file="${SCRIPT_DIR}/.env.${env}"
@@ -89,26 +117,21 @@ cmd_run() {
     check_gradle
 
     if [ -f "$env_file" ]; then
-        export $(grep -v '^#' "$env_file" | xargs)
+        set -a
+        source <(grep -v '^#' "$env_file" | grep -v '^[[:space:]]*$')
+        set +a
     fi
 
     gradle :app:bootRun --no-daemon
 }
 
 cmd_publish() {
-    log_info "Publishing ${SERVICE_NAME} API to Maven..."
+    log_info "Publishing ${SERVICE_NAME} API to local and Aliyun Maven..."
     check_gradle
+    check_maven_credentials
 
-    if [ -z "$ALIYUN_MAVEN_USERNAME" ] || [ -z "$ALIYUN_MAVEN_PASSWORD" ]; then
-        log_error "ALIYUN_MAVEN_USERNAME and ALIYUN_MAVEN_PASSWORD must be set"
-        log_info "Add to ~/.gradle/gradle.properties:"
-        log_info "  aliyunMavenUsername=<username>"
-        log_info "  aliyunMavenPassword=<password>"
-        exit 1
-    fi
-
-    gradle :api:publish --no-daemon
-    log_success "Published to Aliyun Maven"
+    gradle :api:publish :api:publishToMavenLocal --no-daemon
+    log_success "Published to local (~/.m2) and Aliyun Maven"
 }
 
 cmd_image() {

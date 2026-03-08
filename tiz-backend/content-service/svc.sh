@@ -89,7 +89,9 @@ cmd_run() {
     check_gradle
 
     if [ -f "$env_file" ]; then
-        export $(grep -v '^#' "$env_file" | xargs)
+        set -a
+        source <(grep -v '^#' "$env_file" | grep -v '^[[:space:]]*$')
+        set +a
     fi
 
     gradle :app:bootRun --no-daemon
@@ -124,12 +126,12 @@ check_maven_credentials() {
 }
 
 cmd_publish() {
-    log_info "Publishing ${SERVICE_NAME} API to Maven..."
+    log_info "Publishing ${SERVICE_NAME} API to local and Aliyun Maven..."
     check_gradle
     check_maven_credentials
 
-    gradle :api:publish --no-daemon
-    log_success "Published to Aliyun Maven"
+    gradle :api:publish :api:publishToMavenLocal --no-daemon
+    log_success "Published to local (~/.m2) and Aliyun Maven"
 }
 
 cmd_image() {

@@ -89,7 +89,9 @@ cmd_run() {
     check_gradle
 
     if [ -f "$env_file" ]; then
-        export $(grep -v '^#' "$env_file" | xargs)
+        set -a
+        source <(grep -v '^#' "$env_file" | grep -v '^[[:space:]]*$')
+        set +a
     fi
 
     gradle bootRun --no-daemon

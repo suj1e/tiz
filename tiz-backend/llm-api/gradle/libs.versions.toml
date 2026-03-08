@@ -4,6 +4,9 @@ java = "21"
 spring-boot = "4.0.2"
 spring-dependency-management = "1.1.7"
 
+# Internal APIs
+common = "1.0.0-SNAPSHOT"
+
 # Utility
 lombok = "1.18.36"
 
@@ -12,7 +15,7 @@ lombok = "1.18.36"
 spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux", version.ref = "spring-boot" }
 
 # Common (from Maven Local)
-# common is declared as dependency in build.gradle.kts
+common = { module = "io.github.suj1e:common", version.ref = "common" }
 
 # Lombok
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }

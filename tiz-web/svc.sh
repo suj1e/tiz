@@ -38,6 +38,13 @@ check_pnpm() {
     fi
 }
 
+ensure_dependencies() {
+    if [ ! -d "node_modules" ]; then
+        log_warn "node_modules not found, installing dependencies..."
+        pnpm install
+    fi
+}
+
 check_docker() {
     if ! command -v docker &> /dev/null; then
         log_error "Docker not found. Please install Docker"
@@ -67,6 +74,7 @@ cmd_install() {
 cmd_build() {
     log_info "Building ${SERVICE_NAME} for production..."
     check_pnpm
+    ensure_dependencies
     pnpm build
     log_success "Build complete: dist/"
 }
@@ -76,6 +84,7 @@ cmd_dev() {
 
     log_info "Starting ${SERVICE_NAME} development server..."
     check_pnpm
+    ensure_dependencies
 
     if [ "$mock" = "--mock" ] || [ "$mock" = "-m" ]; then
         log_info "Running with mock mode (no backend needed)"
@@ -89,6 +98,7 @@ cmd_dev() {
 cmd_preview() {
     log_info "Previewing production build..."
     check_pnpm
+    ensure_dependencies
 
     if [ ! -d "dist" ]; then
         log_error "No build found. Run './svc.sh build' first"
@@ -103,6 +113,7 @@ cmd_test() {
 
     log_info "Running tests for ${SERVICE_NAME}..."
     check_pnpm
+    ensure_dependencies
 
     if [ "$coverage" = "--coverage" ] || [ "$coverage" = "-c" ]; then
         pnpm test:coverage
@@ -115,6 +126,7 @@ cmd_test() {
 cmd_lint() {
     log_info "Running linters for ${SERVICE_NAME}..."
     check_pnpm
+    ensure_dependencies
     pnpm lint
     log_success "Lint complete"
 }

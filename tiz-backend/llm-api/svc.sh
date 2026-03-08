@@ -37,6 +37,34 @@ check_gradle() {
     fi
 }
 
+check_maven_credentials() {
+    # Check if credentials are available (env vars or gradle.properties)
+    local has_creds=false
+
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then
+        has_creds=true
+        log_info "Using credentials from environment variables"
+    elif [ -f ~/.gradle/gradle.properties ]; then
+        if grep -q "aliyunMavenUsername=" ~/.gradle/gradle.properties > /dev/null 2>&1; then
+            has_creds=true
+            log_info "Using credentials from ~/.gradle/gradle.properties"
+        fi
+    fi
+
+    if [ "$has_creds" = false ]; then
+        log_error "Maven credentials not configured"
+        log_info ""
+        log_info "Set credentials via environment variables (preferred):"
+        log_info "  export ALIYUN_MAVEN_USERNAME=<username>"
+        log_info "  export ALIYUN_MAVEN_PASSWORD=<password>"
+        log_info ""
+        log_info "Or add to ~/.gradle/gradle.properties:"
+        log_info "  aliyunMavenUsername=<username>"
+        log_info "  aliyunMavenPassword=<password>"
+        exit 1
+    fi
+}
+
 get_version() {
     if [ -f "gradle.properties" ]; then
         grep -E "^version=" gradle.properties | cut -d'=' -f2 || echo "1.0.0-SNAPSHOT"
@@ -64,12 +92,12 @@ cmd_test() {
 }
 
 cmd_publish() {
-    log_info "Publishing ${SERVICE_NAME} to Aliyun Maven..."
+    log_info "Publishing ${SERVICE_NAME} to local and Aliyun Maven..."
     check_gradle
     check_maven_credentials
 
-    gradle publish --no-daemon
-    log_success "Published to Aliyun Maven"
+    gradle publish publishToMavenLocal --no-daemon
+    log_success "Published to local (~/.m2) and Aliyun Maven"
 }
 
 cmd_version() {
