@@ -208,7 +208,7 @@ services:
     restart: always
     environment:
       - KAFKA_CLUSTERS_0_NAME=tiz-cluster
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9094
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
       - JAVA_OPTS=-Xms128m -Xmx128m
     ports:
       - "30010:8080"
