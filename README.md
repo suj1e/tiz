@@ -224,42 +224,37 @@ docker build -t auth-service:latest .
 /api/user/v1/**     → user-service:8107
 ```
 
-## CI/CD
+## 依赖管理
 
-### Maven 发布
+项目使用 [Dependabot](https://docs.github.com/en/code-security/dependabot) 自动检查依赖更新，每周一运行。
 
-当 `main` 分支上的模块路径发生变化时，自动发布到 Aliyun Maven Repository：
+**配置文件:** `.github/dependabot.yml`
 
-| 工作流 | 触发路径 | 构件 |
-|--------|----------|------|
-| publish-common.yml | `tiz-backend/common/**` | common |
-| publish-auth-api.yml | `tiz-backend/auth-service/api/**` | auth-api |
-| publish-chat-api.yml | `tiz-backend/chat-service/api/**` | chat-api |
-| publish-content-api.yml | `tiz-backend/content-service/api/**` | content-api |
-| publish-practice-api.yml | `tiz-backend/practice-service/api/**` | practice-api |
-| publish-quiz-api.yml | `tiz-backend/quiz-service/api/**` | quiz-api |
-| publish-user-api.yml | `tiz-backend/user-service/api/**` | user-api |
-| publish-llm-api.yml | `tiz-backend/llm-api/**` | llm-api |
+| 包管理器 | 目录 | 更新频率 |
+|---------|------|----------|
+| Gradle | `tiz-backend/*/` | 每周一 |
+| pnpm | `tiz-web/` | 每周一 |
+| pip | `tiz-backend/llm-service/` | 每周一 |
 
-### Docker 构建
+## 手动发布
 
-手动触发构建并推送到 Aliyun Container Registry：
+所有发布操作通过 `svc.sh` 脚本手动执行：
+
+```bash
+# 发布 Maven 依赖
+cd tiz-backend/common && ./svc.sh publish
+cd tiz-backend/auth-service && ./svc.sh publish
+
+# 构建 Docker 镜像
+cd tiz-backend/auth-service && ./svc.sh image
+cd tiz-backend/auth-service && ./svc.sh image --local  # 只构建不推送
+
+# 批量操作
+./svc-all.sh publish    # 发布所有 API
+./svc-all.sh image      # 构建所有镜像
+```
 
 **镜像仓库:** `registry.cn-hangzhou.aliyuncs.com/nxo/<service>`
-
-| 服务 | 镜像 |
-|------|------|
-| auth-service | `nxo/auth-service` |
-| chat-service | `nxo/chat-service` |
-| content-service | `nxo/content-service` |
-| practice-service | `nxo/practice-service` |
-| quiz-service | `nxo/quiz-service` |
-| user-service | `nxo/user-service` |
-| gateway | `nxo/gateway` |
-| llm-service | `nxo/llm-service` |
-| tiz-web | `nxo/tiz-web` |
-
-**镜像标签:** `latest` + `sha-<commit>`
 
 ## 开发规范
 

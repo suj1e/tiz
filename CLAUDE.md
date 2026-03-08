@@ -577,44 +577,33 @@ When editing `standards/postman.json`, the `url.path` array must include `v1`:
 ```
 Postman imports URL from `path` array, not `raw` field. Missing `v1` in `path` causes version to be lost on import.
 
-## CI/CD Workflows
+## Dependabot
 
-### Maven Publish Workflows
+项目使用 Dependabot 自动检查依赖更新，每周一运行。配置文件：`.github/dependabot.yml`
 
-Automated publishing to Aliyun Maven Repository when paths change on main branch:
+| 包管理器 | 目录 |
+|---------|------|
+| Gradle | `tiz-backend/*/` |
+| pnpm | `tiz-web/` |
+| pip | `tiz-backend/llm-service/` |
 
-| Workflow | Trigger Path | Artifact |
-|----------|--------------|----------|
-| publish-common.yml | `tiz-backend/common/**` | common |
-| publish-llm-api.yml | `tiz-backend/llm-api/**` | llm-api |
-| publish-auth-api.yml | `tiz-backend/auth-service/api/**` | auth-api |
-| publish-chat-api.yml | `tiz-backend/chat-service/api/**` | chat-api |
-| publish-content-api.yml | `tiz-backend/content-service/api/**` | content-api |
-| publish-practice-api.yml | `tiz-backend/practice-service/api/**` | practice-api |
-| publish-quiz-api.yml | `tiz-backend/quiz-service/api/**` | quiz-api |
-| publish-user-api.yml | `tiz-backend/user-service/api/**` | user-api |
+## 手动发布
 
-### Docker Build Workflows
+所有发布操作通过 `svc.sh` 脚本手动执行：
 
-Manual trigger to build and push Docker images to Aliyun Container Registry:
+```bash
+# 发布 Maven 依赖
+cd tiz-backend/common && ./svc.sh publish
+cd tiz-backend/auth-service && ./svc.sh publish
 
-**Registry:** `registry.cn-hangzhou.aliyuncs.com/nxo/<service>`
+# 构建 Docker 镜像
+cd tiz-backend/auth-service && ./svc.sh image
+cd tiz-backend/auth-service && ./svc.sh image --local  # 只构建不推送
 
-| Workflow | Service | Image |
-|----------|---------|-------|
-| docker-auth-service.yml | auth-service | `nxo/auth-service` |
-| docker-chat-service.yml | chat-service | `nxo/chat-service` |
-| docker-content-service.yml | content-service | `nxo/content-service` |
-| docker-practice-service.yml | practice-service | `nxo/practice-service` |
-| docker-quiz-service.yml | quiz-service | `nxo/quiz-service` |
-| docker-user-service.yml | user-service | `nxo/user-service` |
-| docker-gateway.yml | gateway | `nxo/gateway` |
-| docker-llm-service.yml | llm-service | `nxo/llm-service` |
-| docker-tiz-web.yml | tiz-web | `nxo/tiz-web` |
+# 批量操作
+./svc-all.sh publish    # 发布所有 API
+./svc-all.sh image      # 构建所有镜像
+```
 
-**Image Tags:** `latest` + `sha-<commit>`
-
-**Required Secrets:**
-- `ALIYUN_REGISTRY_USERNAME`
-- `ALIYUN_REGISTRY_PASSWORD`
+**镜像仓库:** `registry.cn-hangzhou.aliyuncs.com/nxo/<service>`
 
