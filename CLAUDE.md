@@ -41,10 +41,46 @@ tiz/
 3. **依赖明确**: 内部 API 通过 version catalog 引用 (`libs.content.api`)
 4. **配置独立**: 每个服务有自己的 libs.versions.toml
 
+### Gradle 构建规范（强制）
+
+**禁止在 build.gradle.kts 中硬编码以下内容：**
+
+| 禁止项 | 正确做法 |
+|--------|----------|
+| `group = "io.github.suj1e"` | 使用 `gradle.properties` |
+| `version = "1.0.0-SNAPSHOT"` | 使用 `gradle.properties` |
+| `implementation("group:artifact:1.0.0")` | 使用 `libs.xxx` (version catalog) |
+| `testRuntimeOnly("com.h2database:h2")` | 使用 `libs.h2` |
+
+**正确示例：**
+
+```kotlin
+// ❌ 错误 - 硬编码
+group = "io.github.suj1e"
+version = "1.0.0-SNAPSHOT"
+implementation("com.h2database:h2")
+implementation("io.projectreactor:reactor-core")
+
+// ✅ 正确 - 从配置读取
+// build.gradle.kts 不写 group/version，自动从 gradle.properties 读取
+implementation(libs.h2)
+implementation(libs.reactor.core)
+```
+
+**gradle.properties 示例：**
+```properties
+org.gradle.jvmargs=-Xmx2g
+org.gradle.parallel=true
+org.gradle.caching=true
+version=1.0.0-SNAPSHOT
+group=io.github.suj1e
+```
+
 **开发检查**:
 - 新增服务：复制现有服务的 README.md、.env.example、libs.versions.toml 模板
 - 修改服务：确保 README 和 .env.example 同步更新
-- 添加依赖：优先使用 version catalog，避免硬编码版本
+- 添加依赖：**必须**使用 version catalog，禁止硬编码版本
+- 提交前检查：`grep -r "group\|version" **/*.gradle.kts` 应无结果
 
 ## Frontend (tiz-web)
 
