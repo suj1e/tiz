@@ -95,17 +95,38 @@ cmd_run() {
     gradle :app:bootRun --no-daemon
 }
 
-cmd_publish() {
-    log_info "Publishing ${SERVICE_NAME} API to Maven..."
-    check_gradle
+check_maven_credentials() {
+    # Check if credentials are available (env vars or gradle.properties)
+    local has_creds=false
 
-    if [ -z "$ALIYUN_MAVEN_USERNAME" ] || [ -z "$ALIYUN_MAVEN_PASSWORD" ]; then
-        log_error "ALIYUN_MAVEN_USERNAME and ALIYUN_MAVEN_PASSWORD must be set"
-        log_info "Add to ~/.gradle/gradle.properties:"
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then
+        has_creds=true
+        log_info "Using credentials from environment variables"
+    elif [ -f ~/.gradle/gradle.properties ]; then
+        if grep -q "aliyunMavenUsername=" ~/.gradle/gradle.properties > /dev/null 2>&1; then
+            has_creds=true
+            log_info "Using credentials from ~/.gradle/gradle.properties"
+        fi
+    fi
+
+    if [ "$has_creds" = false ]; then
+        log_error "Maven credentials not configured"
+        log_info ""
+        log_info "Set credentials via environment variables (preferred):"
+        log_info "  export ALIYUN_MAVEN_USERNAME=<username>"
+        log_info "  export ALIYUN_MAVEN_PASSWORD=<password>"
+        log_info ""
+        log_info "Or add to ~/.gradle/gradle.properties:"
         log_info "  aliyunMavenUsername=<username>"
         log_info "  aliyunMavenPassword=<password>"
         exit 1
     fi
+}
+
+cmd_publish() {
+    log_info "Publishing ${SERVICE_NAME} API to Maven..."
+    check_gradle
+    check_maven_credentials
 
     gradle :api:publish --no-daemon
     log_success "Published to Aliyun Maven"
@@ -226,17 +247,13 @@ cmd_validate() {
         log_success "Java: $(java -version 2>&1 | head -1)"
     fi
 
-    # Check Maven credentials
-    if [ -z "$ALIYUN_MAVEN_USERNAME" ]; then
-        log_warn "ALIYUN_MAVEN_USERNAME not set (required for publish)"
+    # Check Maven credentials (env vars or gradle.properties)
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then
+        log_success "Maven credentials set (from env vars)"
+    elif [ -f ~/.gradle/gradle.properties ] && grep -q "aliyunMavenUsername=" ~/.gradle/gradle.properties > /dev/null 2>&1; then
+        log_success "Maven credentials set (from ~/.gradle/gradle.properties)"
     else
-        log_success "ALIYUN_MAVEN_USERNAME is set"
-    fi
-
-    if [ -z "$ALIYUN_MAVEN_PASSWORD" ]; then
-        log_warn "ALIYUN_MAVEN_PASSWORD not set (required for publish)"
-    else
-        log_success "ALIYUN_MAVEN_PASSWORD is set"
+        log_warn "Maven credentials not configured (required for publish)"
     fi
 
     # Check Docker credentials

@@ -226,17 +226,13 @@ cmd_validate() {
         log_success "Java: $(java -version 2>&1 | head -1)"
     fi
 
-    # Check Maven credentials
-    if [ -z "$ALIYUN_MAVEN_USERNAME" ]; then
-        log_warn "ALIYUN_MAVEN_USERNAME not set (required for publish)"
+    # Check Maven credentials (env vars or gradle.properties)
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then
+        log_success "Maven credentials set (from env vars)"
+    elif [ -f ~/.gradle/gradle.properties ] && grep -q "aliyunMavenUsername=" ~/.gradle/gradle.properties > /dev/null 2>&1; then
+        log_success "Maven credentials set (from ~/.gradle/gradle.properties)"
     else
-        log_success "ALIYUN_MAVEN_USERNAME is set"
-    fi
-
-    if [ -z "$ALIYUN_MAVEN_PASSWORD" ]; then
-        log_warn "ALIYUN_MAVEN_PASSWORD not set (required for publish)"
-    else
-        log_success "ALIYUN_MAVEN_PASSWORD is set"
+        log_warn "Maven credentials not configured (required for publish)"
     fi
 
     # Check Docker credentials

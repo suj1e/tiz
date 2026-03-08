@@ -66,14 +66,7 @@ cmd_test() {
 cmd_publish() {
     log_info "Publishing ${SERVICE_NAME} to Aliyun Maven..."
     check_gradle
-
-    if [ -z "$ALIYUN_MAVEN_USERNAME" ] || [ -z "$ALIYUN_MAVEN_PASSWORD" ]; then
-        log_error "ALIYUN_MAVEN_USERNAME and ALIYUN_MAVEN_PASSWORD must be set"
-        log_info "Add to ~/.gradle/gradle.properties:"
-        log_info "  aliyunMavenUsername=<username>"
-        log_info "  aliyunMavenPassword=<password>"
-        exit 1
-    fi
+    check_maven_credentials
 
     gradle publish --no-daemon
     log_success "Published to Aliyun Maven"
@@ -136,16 +129,13 @@ cmd_validate() {
         log_success "Java: $(java -version 2>&1 | head -1)"
     fi
 
-    if [ -z "$ALIYUN_MAVEN_USERNAME" ]; then
-        log_warn "ALIYUN_MAVEN_USERNAME not set (required for publish)"
+    # Check Maven credentials (env vars or gradle.properties)
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then
+        log_success "Maven credentials set (from env vars)"
+    elif [ -f ~/.gradle/gradle.properties ] && grep -q "aliyunMavenUsername=" ~/.gradle/gradle.properties > /dev/null 2>&1; then
+        log_success "Maven credentials set (from ~/.gradle/gradle.properties)"
     else
-        log_success "ALIYUN_MAVEN_USERNAME is set"
-    fi
-
-    if [ -z "$ALIYUN_MAVEN_PASSWORD" ]; then
-        log_warn "ALIYUN_MAVEN_PASSWORD not set (required for publish)"
-    else
-        log_success "ALIYUN_MAVEN_PASSWORD is set"
+        log_warn "Maven credentials not configured (required for publish)"
     fi
 
     if [ -f "gradle.properties" ]; then
