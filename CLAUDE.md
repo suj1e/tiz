@@ -13,21 +13,20 @@ tiz/
 ├── tiz-web/           # Frontend (React + TypeScript + Vite)
 ├── tiz-backend/       # Backend services (independent services in shared directory)
 │   ├── common/        # Shared utilities (published to Aliyun Maven)
-│   ├── llmsrv-api/    # LLM service API (Java DTOs for Python service)
-│   ├── .env.*            # Environment-specific configuration files
-│   ├── llmsrv/        # AI service (Python/FastAPI) (:8106)
-│   ├── authsrv/       # Authentication service (:8101)
-│   ├── chatsrv/       # Chat service (:8102)
-│   ├── contentsrv/    # Content service (:8103)
-│   ├── practicesrv/   # Practice service (:8104)
-│   ├── quizsrv/       # Quiz service (:8105)
-│   ├── usersrv/       # User service (:8107)
-│   └── gatewaysrv/    # API Gateway (:8080)
+│   ├── llm-api/       # LLM service API (Java DTOs for Python service)
+│   ├── .env.*         # Environment-specific configuration files
+│   ├── llm-service/   # AI service (Python/FastAPI) (:8106)
+│   ├── auth-service/  # Authentication service (:8101)
+│   ├── chat-service/  # Chat service (:8102)
+│   ├── content-service/   # Content service (:8103)
+│   ├── practice-service/  # Practice service (:8104)
+│   ├── quiz-service/      # Quiz service (:8105)
+│   ├── user-service/      # User service (:8107)
+│   └── gateway-service/   # API Gateway (:8080)
 ├── infra/             # Infrastructure
-│   ├── envs/          # Multi-environment configs
-│   │   ├── dev/       # Development
-│   │   ├── staging/   # Staging
-│   │   └── prod/      # Production
+│   ├── dev/           # Development
+│   ├── staging/       # Staging
+│   ├── prod/          # Production
 │   └── infra.sh       # Management script
 ├── standards/         # Development standards
 └── openspec/          # OpenSpec change management
@@ -170,15 +169,15 @@ Each service is an **independent project** with its own Dockerfile and docker-co
 ### Service Types
 
 **Java Services** (api + app subproject structure):
-- `authsrv`, `chatsrv`, `contentsrv`, `practicesrv`, `quizsrv`, `usersrv`
+- `auth-service`, `chat-service`, `content-service`, `practice-service`, `quiz-service`, `user-service`
 - `api/`: DTOs and client interfaces (published to Maven Local)
 - `app/`: Service implementation with Spring Boot
 
 **Gateway Service**:
-- `gatewaysrv` - Single module structure (no api/app split)
+- `gateway-service` - Single module structure (no api/app split)
 
 **Python Service**:
-- `llmsrv` - FastAPI + LangGraph
+- `llm-service` - FastAPI + LangGraph
 
 ### Tech Stack
 
@@ -208,8 +207,8 @@ gradle :app:bootRun
 
 Services depend on each other via Aliyun Maven Repository:
 - `io.github.suj1e:common:1.0.0-SNAPSHOT` - Shared utilities
-- `io.github.suj1e:contentsrv-api:1.0.0-SNAPSHOT` - Content service DTOs
-- `io.github.suj1e:llmsrv-api:1.0.0-SNAPSHOT` - LLM service DTOs
+- `io.github.suj1e:content-api:1.0.0-SNAPSHOT` - Content service DTOs
+- `io.github.suj1e:llm-api:1.0.0-SNAPSHOT` - LLM service DTOs
 - etc.
 
 ### Maven Publishing
@@ -237,29 +236,29 @@ GitHub Actions uses `ALIYUN_MAVEN_USERNAME` and `ALIYUN_MAVEN_PASSWORD` secrets.
 | Module | Path | Artifact ID |
 |--------|------|-------------|
 | common | `tiz-backend/common` | `common` |
-| llmsrv-api | `tiz-backend/llmsrv-api` | `llmsrv-api` |
-| authsrv-api | `tiz-backend/authsrv/api` | `authsrv-api` |
-| chatsrv-api | `tiz-backend/chatsrv/api` | `chatsrv-api` |
-| contentsrv-api | `tiz-backend/contentsrv/api` | `contentsrv-api` |
-| practicesrv-api | `tiz-backend/practicesrv/api` | `practicesrv-api` |
-| quizsrv-api | `tiz-backend/quizsrv/api` | `quizsrv-api` |
-| usersrv-api | `tiz-backend/usersrv/api` | `usersrv-api` |
+| llm-api | `tiz-backend/llm-api` | `llm-api` |
+| auth-api | `tiz-backend/auth-service/api` | `auth-api` |
+| chat-api | `tiz-backend/chat-service/api` | `chat-api` |
+| content-api | `tiz-backend/content-service/api` | `content-api` |
+| practice-api | `tiz-backend/practice-service/api` | `practice-api` |
+| quiz-api | `tiz-backend/quiz-service/api` | `quiz-api` |
+| user-api | `tiz-backend/user-service/api` | `user-api` |
 
 **Publish Command:**
 ```bash
-# For standalone projects (common, llmsrv-api)
+# For standalone projects (common, llm-api)
 cd tiz-backend/common
 gradle publish
 
 # For service api modules
-cd tiz-backend/contentsrv
+cd tiz-backend/content-service
 gradle :api:publish
 ```
 
-### AI Service (llmsrv)
+### AI Service (llm-service)
 
 ```bash
-cd tiz-backend/llmsrv
+cd tiz-backend/llm-service
 
 # Install dependencies
 pixi install
@@ -282,7 +281,7 @@ cd tiz-backend
 ./start-dev.sh status
 
 # View logs for a service
-./start-dev.sh logs authsrv
+./start-dev.sh logs auth-service
 
 # Stop all services
 ./start-dev.sh stop
@@ -293,12 +292,12 @@ Logs are written to `tiz-backend/logs/` directory.
 ### API Gateway Routes
 
 ```
-/api/auth/v1/**     → authsrv:8101
-/api/chat/v1/**     → chatsrv:8102
-/api/content/v1/**  → contentsrv:8103
-/api/practice/v1/** → practicesrv:8104
-/api/quiz/v1/**     → quizsrv:8105
-/api/user/v1/**     → usersrv:8107
+/api/auth/v1/**     → auth-service:8101
+/api/chat/v1/**     → chat-service:8102
+/api/content/v1/**  → content-service:8103
+/api/practice/v1/** → practice-service:8104
+/api/quiz/v1/**     → quiz-service:8105
+/api/user/v1/**     → user-service:8107
 ```
 
 ## Infrastructure
@@ -353,16 +352,16 @@ Each service has `.env.dev`, `.env.staging`, `.env.prod` files for environment-s
 Each service manages its own configuration through environment variables. Configuration files are placed in each service directory:
 
 ```
-authsrv/
+auth-service/
 ├── docker-compose.yml
 ├── .env.dev            # dev environment variables
 ├── .env.staging        # staging environment variables
-└── .env.prod            # production environment variables
+└── .env.prod           # production environment variables
 ```
 
 Deploy with environment file:
 ```bash
-cd tiz-backend/authsrv
+cd tiz-backend/auth-service
 docker-compose --env-file .env.prod up -d
 ```
 
@@ -398,6 +397,9 @@ docker build -t authsrv:latest .
 - **Frontend**: Uses `node:20-alpine` + `nginx:alpine`
 
 All services connect to the `npass` Docker network and communicate via DNS names: `mysql`, `redis`, `kafka`, `nacos`.
+
+**Image naming:** `registry.cn-hangzhou.aliyuncs.com/nxo/<service-name>`
+- Example: `nxo/auth-service`, `nxo/chat-service`, `nxo/llm-service`
 
 ## Development Workflow
 
@@ -451,13 +453,13 @@ Automated publishing to Aliyun Maven Repository when paths change on main branch
 | Workflow | Trigger Path | Artifact |
 |----------|--------------|----------|
 | publish-common.yml | `tiz-backend/common/**` | common |
-| publish-llmsrv-api.yml | `tiz-backend/llmsrv-api/**` | llmsrv-api |
-| publish-authsrv-api.yml | `tiz-backend/authsrv/api/**` | authsrv-api |
-| publish-chatsrv-api.yml | `tiz-backend/chatsrv/api/**` | chatsrv-api |
-| publish-contentsrv-api.yml | `tiz-backend/contentsrv/api/**` | contentsrv-api |
-| publish-practicesrv-api.yml | `tiz-backend/practicesrv/api/**` | practicesrv-api |
-| publish-quizsrv-api.yml | `tiz-backend/quizsrv/api/**` | quizsrv-api |
-| publish-usersrv-api.yml | `tiz-backend/usersrv/api/**` | usersrv-api |
+| publish-llm-api.yml | `tiz-backend/llm-api/**` | llm-api |
+| publish-auth-api.yml | `tiz-backend/auth-service/api/**` | auth-api |
+| publish-chat-api.yml | `tiz-backend/chat-service/api/**` | chat-api |
+| publish-content-api.yml | `tiz-backend/content-service/api/**` | content-api |
+| publish-practice-api.yml | `tiz-backend/practice-service/api/**` | practice-api |
+| publish-quiz-api.yml | `tiz-backend/quiz-service/api/**` | quiz-api |
+| publish-user-api.yml | `tiz-backend/user-service/api/**` | user-api |
 
 ### Docker Build Workflows
 
@@ -467,14 +469,14 @@ Manual trigger to build and push Docker images to Aliyun Container Registry:
 
 | Workflow | Service | Image |
 |----------|---------|-------|
-| docker-authsrv.yml | authsrv | `nxo/authsrv` |
-| docker-chatsrv.yml | chatsrv | `nxo/chatsrv` |
-| docker-contentsrv.yml | contentsrv | `nxo/contentsrv` |
-| docker-practicesrv.yml | practicesrv | `nxo/practicesrv` |
-| docker-quizsrv.yml | quizsrv | `nxo/quizsrv` |
-| docker-usersrv.yml | usersrv | `nxo/usersrv` |
-| docker-gatewaysrv.yml | gatewaysrv | `nxo/gatewaysrv` |
-| docker-llmsrv.yml | llmsrv | `nxo/llmsrv` |
+| docker-auth-service.yml | auth-service | `nxo/auth-service` |
+| docker-chat-service.yml | chat-service | `nxo/chat-service` |
+| docker-content-service.yml | content-service | `nxo/content-service` |
+| docker-practice-service.yml | practice-service | `nxo/practice-service` |
+| docker-quiz-service.yml | quiz-service | `nxo/quiz-service` |
+| docker-user-service.yml | user-service | `nxo/user-service` |
+| docker-gateway-service.yml | gateway-service | `nxo/gateway-service` |
+| docker-llm-service.yml | llm-service | `nxo/llm-service` |
 | docker-tiz-web.yml | tiz-web | `nxo/tiz-web` |
 
 **Image Tags:** `latest` + `sha-<commit>`

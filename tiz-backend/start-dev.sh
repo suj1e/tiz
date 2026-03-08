@@ -120,7 +120,7 @@ status_all() {
     echo "Service Status:"
     echo "==============="
 
-    services=("authsrv:8101" "chatsrv:8102" "contentsrv:8103" "practicesrv:8104" "quizsrv:8105" "llmsrv:8106" "usersrv:8107" "gatewaysrv:8080")
+    services=("auth-service:8101" "chat-service:8102" "content-service:8103" "practice-service:8104" "quiz-service:8105" "llm-service:8106" "user-service:8107" "gateway-service:8080")
 
     for svc in "${services[@]}"; do
         local name="${svc%%:*}"
@@ -166,54 +166,54 @@ start_all() {
 
     # 2. 发布服务 API 模块
     log_info "=== Step 2: Publishing service APIs ==="
-    publish_module "contentsrv-api" "contentsrv"
-    publish_module "llmsrv-api" "llmsrv"
+    publish_module "content-api" "content-service"
+    publish_module "llm-api" "llm-service"
 
     # 3. 启动核心服务（无严格依赖顺序）
     log_info "=== Step 3: Starting services ==="
 
-    start_java_service "authsrv" 8101 "authsrv" &
-    start_java_service "usersrv" 8107 "usersrv" &
-    start_java_service "contentsrv" 8103 "contentsrv" &
+    start_java_service "auth-service" 8101 "auth-service" &
+    start_java_service "user-service" 8107 "user-service" &
+    start_java_service "content-service" 8103 "content-service" &
 
     wait
 
     # 等待核心服务启动
     sleep 5
-    wait_for_service "authsrv" 8101 || true
-    wait_for_service "usersrv" 8107 || true
-    wait_for_service "contentsrv" 8103 || true
+    wait_for_service "auth-service" 8101 || true
+    wait_for_service "user-service" 8107 || true
+    wait_for_service "content-service" 8103 || true
 
     # 启动业务服务
-    start_java_service "chatsrv" 8102 "chatsrv" &
-    start_java_service "practicesrv" 8104 "practicesrv" &
-    start_java_service "quizsrv" 8105 "quizsrv" &
+    start_java_service "chat-service" 8102 "chat-service" &
+    start_java_service "practice-service" 8104 "practice-service" &
+    start_java_service "quiz-service" 8105 "quiz-service" &
 
     wait
 
     sleep 5
-    wait_for_service "chatsrv" 8102 || true
-    wait_for_service "practicesrv" 8104 || true
-    wait_for_service "quizsrv" 8105 || true
+    wait_for_service "chat-service" 8102 || true
+    wait_for_service "practice-service" 8104 || true
+    wait_for_service "quiz-service" 8105 || true
 
     # 启动 AI 服务
     if command -v pixi &> /dev/null; then
-        start_python_service "llmsrv" 8106 "llmsrv"
+        start_python_service "llm-service" 8106 "llm-service"
         sleep 3
     else
-        log_warn "pixi not found, skipping llmsrv"
+        log_warn "pixi not found, skipping llm-service"
     fi
 
     # 最后启动网关
-    start_java_service "gatewaysrv" 8080 "gatewaysrv"
-    wait_for_service "gatewaysrv" 8080 || true
+    start_java_service "gateway-service" 8080 "gateway-service"
+    wait_for_service "gateway-service" 8080 || true
 
     echo ""
     log_success "=== All services started ==="
     status_all
 
     echo "Logs: $LOG_DIR/tiz-<service>.log"
-    echo "Example: tail -f $LOG_DIR/tiz-authsrv.log"
+    echo "Example: tail -f $LOG_DIR/tiz-auth-service.log"
     echo ""
     echo "API Gateway: http://localhost:8080"
     echo ""
@@ -227,7 +227,7 @@ show_help() {
     echo "  start     Start all backend services"
     echo "  stop      Stop all backend services"
     echo "  status    Show service status"
-    echo "  logs      Show logs for a service (e.g., $0 logs authsrv)"
+    echo "  logs      Show logs for a service (e.g., $0 logs auth-service)"
     echo "  help      Show this help message"
     echo ""
 }
@@ -245,7 +245,7 @@ case "${1:-}" in
         ;;
     logs)
         if [ -z "${2:-}" ]; then
-            log_error "Please specify service name (e.g., authsrv)"
+            log_error "Please specify service name (e.g., auth-service)"
             exit 1
         fi
         logs_service "$2"
