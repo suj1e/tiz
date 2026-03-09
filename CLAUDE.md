@@ -6,35 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Tiz is an AI-driven knowledge practice platform. Users interact with AI through conversational chat to generate personalized practice questions and quizzes.
 
-## Project Structure
-
-```
-tiz/
-├── tiz-web/           # Frontend (React + TypeScript + Vite)
-├── tiz-backend/       # Backend services (independent services in shared directory)
-│   ├── common/        # Shared utilities (published to Aliyun Maven)
-│   ├── llm-api/       # LLM service API (Java DTOs for Python service)
-│   ├── .env.*         # Environment-specific configuration files
-│   ├── llm-service/   # AI service (Python/FastAPI) (:8106)
-│   ├── auth-service/  # Authentication service (:8101)
-│   ├── chat-service/  # Chat service (:8102)
-│   ├── content-service/   # Content service (:8103)
-│   ├── practice-service/  # Practice service (:8104)
-│   ├── quiz-service/      # Quiz service (:8105)
-│   ├── user-service/      # User service (:8107)
-│   └── gateway/            # API Gateway (:8080)
-├── infra/             # Infrastructure
-│   ├── dev/           # Development
-│   ├── staging/       # Staging
-│   ├── prod/          # Production
-│   └── infra.sh       # Management script
-├── deploy/            # Application Deployment
-│   ├── staging/       # Staging environment
-│   ├── prod/          # Production environment
-│   └── deploy.sh      # Deployment script
-├── standards/         # Development standards
-└── openspec/          # OpenSpec change management
-```
 
 ## Independent Team Maintenance
 
