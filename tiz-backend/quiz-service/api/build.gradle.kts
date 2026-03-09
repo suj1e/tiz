@@ -11,7 +11,7 @@ dependencies {
     api(libs.common)
 
     // Jakarta validation for DTO annotations
-    api("jakarta.validation:jakarta.validation-api:3.0.2")
+    api("jakarta.validation:jakarta.validation-api:3.1.1")
 }
 
 publishing {
