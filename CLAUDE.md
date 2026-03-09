@@ -210,7 +210,7 @@ Each service is an **independent project** with its own Dockerfile and docker-co
 - **Spring Cloud Gateway** (API Gateway)
 - **Spring Data JPA** + **QueryDSL**
 - **MySQL 9.2** + **Redis 7.4** + **Kafka 7.8**
-- **Python 3.11+** + **FastAPI** + **LangGraph** (llmsrv)
+- **Python 3.11+** + **FastAPI** + **LangGraph** (llm-service)
 
 ### Quick Start
 

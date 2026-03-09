@@ -1,8 +1,8 @@
 services:
-  chatsrv:
-    image: registry.cn-hangzhou.aliyuncs.com/nxo/chatsrv:latest
+  chat-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/chat-service:latest
     pull_policy: always
-    container_name: tiz-chatsrv
+    container_name: tiz-chat-service
     restart: always
     ports:
       - "8102:8102"
@@ -25,7 +25,7 @@ services:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
 
       # LLM Service
-      - LLM_SERVICE_URL=${LLM_SERVICE_URL:-http://llmsrv:8106}
+      - LLM_SERVICE_URL=${LLM_SERVICE_URL:-http://llm-service:8106}
 
       # JWT
       - JWT_SECRET=${JWT_SECRET}

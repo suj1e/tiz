@@ -24,7 +24,7 @@ Quiz service for the Tiz platform. Manages quizzes, quiz attempts, and uses outb
 - Nacos 3.x+ - Service discovery and configuration
 
 ### Services
-- **llm-service** - AI-powered quiz generation and grading (via Docker DNS: `llmsrv:8106`)
+- **llm-service** - AI-powered quiz generation and grading (via Docker DNS: `llm-service:8106`)
 - **content-service** - Content and topic management (via Nacos service discovery)
 
 ### Libraries
@@ -37,7 +37,7 @@ Quiz service for the Tiz platform. Manages quizzes, quiz attempts, and uses outb
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
 | `JWT_SECRET` | JWT signing secret | - | Yes |
-| `LLM_SERVICE_URL` | LLM service URL | `http://llmsrv:8106` | No |
+| `LLM_SERVICE_URL` | LLM service URL | `http://llm-service:8106` | No |
 | `NACOS_SERVER_ADDR` | Nacos server address | `localhost:30848` | No |
 | `NACOS_NAMESPACE` | Nacos namespace | - | No |
 | `SPRING_DATASOURCE_URL` | Database JDBC URL | - | Yes |

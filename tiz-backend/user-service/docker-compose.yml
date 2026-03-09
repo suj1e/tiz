@@ -1,8 +1,8 @@
 services:
-  usersrv:
-    image: registry.cn-hangzhou.aliyuncs.com/nxo/usersrv:latest
+  user-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/user-service:latest
     pull_policy: always
-    container_name: tiz-usersrv
+    container_name: tiz-user-service
     restart: always
     ports:
       - "8107:8107"

@@ -16,10 +16,10 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class HttpClientConfig {
 
-    @Value("${llm.service.url:http://llmsrv:8106}")
+    @Value("${llm.service.url:http://llm-service:8106}")
     private String llmServiceUrl;
 
-    @Value("${content.service.url:http://contentsrv:8103}")
+    @Value("${content.service.url:http://content-service:8103}")
     private String contentServiceUrl;
 
     /**

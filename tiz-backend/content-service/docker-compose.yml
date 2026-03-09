@@ -1,8 +1,8 @@
 services:
-  contentsrv:
-    image: registry.cn-hangzhou.aliyuncs.com/nxo/contentsrv:latest
+  content-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/content-service:latest
     pull_policy: always
-    container_name: tiz-contentsrv
+    container_name: tiz-content-service
     restart: always
     ports:
       - "8103:8103"
@@ -25,7 +25,7 @@ services:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
 
       # LLM Service
-      - LLM_SERVICE_URL=${LLM_SERVICE_URL:-http://llmsrv:8106}
+      - LLM_SERVICE_URL=${LLM_SERVICE_URL:-http://llm-service:8106}
 
       # Logging
       - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT:-INFO}

@@ -74,7 +74,7 @@ def _format_sse_event(event_type: str, data: dict) -> str:
 @app.get("/health")
 async def health_check() -> dict:
     """Health check endpoint."""
-    return {"status": "healthy", "service": "llmsrv"}
+    return {"status": "healthy", "service": "llm-service"}
 
 
 @app.post("/internal/ai/chat")

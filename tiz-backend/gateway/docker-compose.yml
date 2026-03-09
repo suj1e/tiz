@@ -1,8 +1,8 @@
 services:
-  gatewaysrv:
-    image: registry.cn-hangzhou.aliyuncs.com/nxo/gatewaysrv:latest
+  gateway:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/gateway:latest
     pull_policy: always
-    container_name: tiz-gatewaysrv
+    container_name: tiz-gateway
     restart: always
     ports:
       - "8080:8080"

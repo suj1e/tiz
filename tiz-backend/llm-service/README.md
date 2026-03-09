@@ -198,10 +198,10 @@ Build and run with Docker:
 
 ```bash
 # Build
-docker build -t llmsrv .
+docker build -t llm-service .
 
 # Run
-docker run -p 8106:8106 --env-file .env llmsrv
+docker run -p 8106:8106 --env-file .env llm-service
 ```
 
 ## Service Port

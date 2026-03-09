@@ -1,8 +1,8 @@
 services:
-  quizsrv:
-    image: registry.cn-hangzhou.aliyuncs.com/nxo/quizsrv:latest
+  quiz-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/quiz-service:latest
     pull_policy: always
-    container_name: tiz-quizsrv
+    container_name: tiz-quiz-service
     restart: always
     ports:
       - "8105:8105"
@@ -25,7 +25,7 @@ services:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
 
       # LLM Service
-      - LLM_SERVICE_URL=${LLM_SERVICE_URL:-http://llmsrv:8106}
+      - LLM_SERVICE_URL=${LLM_SERVICE_URL:-http://llm-service:8106}
 
       # Logging
       - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT:-INFO}

@@ -16,10 +16,10 @@ WORKDIR /app
 COPY pixi.toml extract_deps.py ./
 
 # Install toml package, extract dependencies, and install them
-RUN pip install toml -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+RUN pip install toml -i https://mirrors.aliyun.com/pypi/simple/ && \
     python3 extract_deps.py && \
     cat requirements.txt && \
-    pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+    pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 
 # ============================================
 # Stage 2: Production

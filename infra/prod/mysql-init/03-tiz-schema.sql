@@ -6,7 +6,7 @@
 USE tiz;
 
 -- ============================================================
--- authsrv: 认证服务
+-- auth-service: 认证服务
 -- ============================================================
 
 -- 用户表
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- usersrv: 用户服务
+-- user-service: 用户服务
 -- ============================================================
 
 -- 用户设置表
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS webhooks (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- contentsrv: 内容服务
+-- content-service: 内容服务
 -- ============================================================
 
 -- 分类表
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS questions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- chatsrv: 对话服务
+-- chat-service: 对话服务
 -- ============================================================
 
 -- 对话会话表
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- practicesrv: 练习服务
+-- practice-service: 练习服务
 -- ============================================================
 
 -- 练习会话表
@@ -225,7 +225,7 @@ CREATE TABLE IF NOT EXISTS practice_answers (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- quizsrv: 测验服务
+-- quiz-service: 测验服务
 -- ============================================================
 
 -- 测验会话表

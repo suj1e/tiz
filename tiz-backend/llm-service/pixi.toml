@@ -1,5 +1,5 @@
 [project]
-name = "llmsrv"
+name = "llm-service"
 version = "0.1.0"
 description = "Tiz AI Service"
 channels = ["conda-forge"]

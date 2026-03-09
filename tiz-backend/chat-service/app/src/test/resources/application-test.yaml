@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: chatsrv-test
+    name: chat-service-test
 
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1

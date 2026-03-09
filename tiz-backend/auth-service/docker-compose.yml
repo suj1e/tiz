@@ -1,8 +1,8 @@
 services:
-  authsrv:
-    image: registry.cn-hangzhou.aliyuncs.com/nxo/authsrv:latest
+  auth-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/auth-service:latest
     pull_policy: always
-    container_name: tiz-authsrv
+    container_name: tiz-auth-service
     restart: always
     ports:
       - "8101:8101"

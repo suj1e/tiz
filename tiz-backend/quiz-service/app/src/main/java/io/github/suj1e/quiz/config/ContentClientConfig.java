@@ -15,7 +15,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class ContentClientConfig {
 
-    @Value("${content.service.url:http://contentsrv:8103}")
+    @Value("${content.service.url:http://content-service:8103}")
     private String contentServiceUrl;
 
     /**

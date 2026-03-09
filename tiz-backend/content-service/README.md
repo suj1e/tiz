@@ -20,7 +20,7 @@ Content service for the Tiz platform. Manages learning content including topics,
 - Nacos 3.x+ - Service discovery and configuration
 
 ### Services
-- **llm-service** - AI-powered content analysis (via Docker DNS: `llmsrv:8106`)
+- **llm-service** - AI-powered content analysis (via Docker DNS: `llm-service:8106`)
 
 ### Libraries
 - `io.github.suj1e:common:1.0.0-SNAPSHOT` - Common utilities
@@ -31,7 +31,7 @@ Content service for the Tiz platform. Manages learning content including topics,
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
 | `JWT_SECRET` | JWT signing secret | - | Yes |
-| `LLM_SERVICE_URL` | LLM service URL | `http://llmsrv:8106` | No |
+| `LLM_SERVICE_URL` | LLM service URL | `http://llm-service:8106` | No |
 | `NACOS_SERVER_ADDR` | Nacos server address | `localhost:30848` | No |
 | `NACOS_NAMESPACE` | Nacos namespace | - | No |
 | `SPRING_DATASOURCE_URL` | Database JDBC URL | - | Yes |

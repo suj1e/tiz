@@ -20,7 +20,7 @@ Chat service for the Tiz platform. Handles chat conversations with AI, SSE strea
 - Nacos 3.x+ - Service discovery and configuration
 
 ### Services
-- **llm-service** - AI question generation and grading (via Docker DNS: `llmsrv:8106`)
+- **llm-service** - AI question generation and grading (via Docker DNS: `llm-service:8106`)
 - **content-service** - Content management (via Nacos service discovery)
 
 ### Libraries
@@ -33,7 +33,7 @@ Chat service for the Tiz platform. Handles chat conversations with AI, SSE strea
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
 | `JWT_SECRET` | JWT signing secret | - | Yes |
-| `LLM_SERVICE_URL` | LLM service URL | `http://llmsrv:8106` | No |
+| `LLM_SERVICE_URL` | LLM service URL | `http://llm-service:8106` | No |
 | `NACOS_SERVER_ADDR` | Nacos server address | `localhost:30848` | No |
 | `NACOS_NAMESPACE` | Nacos namespace | - | No |
 | `SPRING_DATASOURCE_URL` | Database JDBC URL | - | Yes |

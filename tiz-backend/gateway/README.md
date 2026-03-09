@@ -24,12 +24,12 @@ API Gateway for the Tiz platform. Routes requests to backend services and handle
 
 | Path | Target Service | Service Name |
 |------|----------------|--------------|
-| `/api/auth/v1/**` | auth-service | `authsrv` |
-| `/api/user/v1/**` | user-service | `usersrv` |
-| `/api/chat/v1/**` | chat-service | `chatsrv` |
-| `/api/content/v1/**` | content-service | `contentsrv` |
-| `/api/practice/v1/**` | practice-service | `practicesrv` |
-| `/api/quiz/v1/**` | quiz-service | `quizsrv` |
+| `/api/auth/v1/**` | auth-service | `auth-service` |
+| `/api/user/v1/**` | user-service | `user-service` |
+| `/api/chat/v1/**` | chat-service | `chat-service` |
+| `/api/content/v1/**` | content-service | `content-service` |
+| `/api/practice/v1/**` | practice-service | `practice-service` |
+| `/api/quiz/v1/**` | quiz-service | `quiz-service` |
 
 ## Authentication Flow
 
@@ -77,7 +77,7 @@ spring:
     gateway:
       routes:
         - id: auth-service
-          uri: lb://authsrv
+          uri: lb://auth-service
           predicates:
             - Path=/api/auth/v1/**
 

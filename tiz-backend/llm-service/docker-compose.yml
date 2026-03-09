@@ -1,8 +1,8 @@
 services:
-  llmsrv:
-    image: registry.cn-hangzhou.aliyuncs.com/nxo/llmsrv:latest
+  llm-service:
+    image: registry.cn-hangzhou.aliyuncs.com/nxo/llm-service:latest
     pull_policy: always
-    container_name: tiz-llmsrv
+    container_name: tiz-llm-service
     restart: always
     ports:
       - "8106:8106"
