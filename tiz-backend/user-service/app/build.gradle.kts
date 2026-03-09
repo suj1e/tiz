@@ -34,9 +34,6 @@ dependencies {
     implementation(libs.spring.cloud.nacos.discovery)
     implementation(libs.spring.cloud.nacos.config)
 
-    // QueryDSL
-    implementation(libs.querydsl.jpa)
-
     // Security (JWT already in common)
     implementation(libs.bundles.jjwt)
 
