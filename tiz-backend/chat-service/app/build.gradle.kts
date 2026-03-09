@@ -38,11 +38,6 @@ dependencies {
     implementation(libs.spring.cloud.nacos.config)
     implementation(libs.spring.cloud.loadbalancer)
 
-    // QueryDSL
-    implementation(libs.querydsl.jpa)
-    annotationProcessor(libs.querydsl.jpa)
-    annotationProcessor(libs.jakarta.persistence.api)
-
     // MapStruct
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
