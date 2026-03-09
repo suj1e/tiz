@@ -1,14 +1,14 @@
 [versions]
 # Java & Spring
 java = "21"
-spring-boot = "4.0.2"
+spring-boot = "4.0.3"
 spring-dependency-management = "1.1.7"
 
 # Internal APIs
 common = "1.0.0-SNAPSHOT"
 
 # Utility
-lombok = "1.18.36"
+lombok = "1.18.42"
 
 [libraries]
 # Spring Boot Starters (minimal for API client)
