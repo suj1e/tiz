@@ -1,7 +1,7 @@
 [versions]
 # Java & Spring
 java = "21"
-spring-boot = "4.0.2"
+spring-boot = "4.0.3"
 
 # Security
 jjwt = "0.13.0"
@@ -14,7 +14,7 @@ mapstruct = "1.6.3"
 mapstruct-lombok-binding = "0.2.0"
 
 # Utility
-lombok = "1.18.36"
+lombok = "1.18.42"
 
 [libraries]
 # Spring Boot Starters (with explicit versions)
@@ -37,8 +37,8 @@ jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 
 # Jackson
-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version = "2.18.2" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.18.2" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version = "2.21.1" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.21.1" }
 
 # Lombok
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
