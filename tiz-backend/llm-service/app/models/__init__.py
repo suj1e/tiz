@@ -10,7 +10,7 @@ from app.models.chat import (
     ChatErrorEvent,
 )
 from app.models.grade import GradeRequest, GradeResponse
-from app.models.question import GenerateRequest, GenerateResponse, Question
+from app.models.question import GenerateRequest, GenerateResponse, Question, QuestionType
 
 __all__ = [
     # Chat
@@ -25,6 +25,7 @@ __all__ = [
     "GenerateRequest",
     "GenerateResponse",
     "Question",
+    "QuestionType",
     # Grade
     "GradeRequest",
     "GradeResponse",

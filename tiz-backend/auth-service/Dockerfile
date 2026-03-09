@@ -29,7 +29,7 @@ FROM eclipse-temurin:21-jre-alpine AS runtime
 LABEL maintainer="tiz-team"
 
 # Install runtime dependencies and create non-root user
-RUN apk add --no-cache ca-certificates curl tzdata && \
+RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories && apk add --no-cache ca-certificates curl tzdata && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
     addgroup -S tiz && \

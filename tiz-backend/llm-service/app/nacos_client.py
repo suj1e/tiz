@@ -1,9 +1,15 @@
 """Nacos service discovery client."""
 
+import asyncio
 import logging
 import socket
 
-import nacos
+from v2.nacos import (
+    NacosNamingService,
+    ClientConfigBuilder,
+    RegisterInstanceParam,
+    DeregisterInstanceParam,
+)
 
 from app.config import get_settings
 
@@ -15,22 +21,24 @@ class NacosClient:
 
     def __init__(self) -> None:
         """Initialize Nacos client."""
-        self._client = None
+        self._naming_service = None
         self._service_name = None
         self._registered = False
 
-    @property
-    def client(self):
-        """Get or create Nacos client."""
-        if self._client is None:
+    async def _get_naming_service(self):
+        """Get or create Nacos naming service."""
+        if self._naming_service is None:
             settings = get_settings()
-            self._client = nacos.NacosClient(
-                settings.nacos_server_addr,
-                namespace=settings.nacos_namespace,
-                username=settings.nacos_username,
-                password=settings.nacos_password,
+            config = (
+                ClientConfigBuilder()
+                .server_address(settings.nacos_server_addr)
+                .namespace(settings.nacos_namespace or "public")
+                .username(settings.nacos_username or "")
+                .password(settings.nacos_password or "")
+                .build()
             )
-        return self._client
+            self._naming_service = NacosNamingService(config)
+        return self._naming_service
 
     def _get_local_ip(self) -> str:
         """Get local IP address."""
@@ -43,7 +51,7 @@ class NacosClient:
         except Exception:
             return "127.0.0.1"
 
-    def register(self) -> None:
+    async def register(self) -> None:
         """Register service to Nacos."""
         settings = get_settings()
 
@@ -56,13 +64,17 @@ class NacosClient:
             ip = self._get_local_ip()
             port = settings.service_port
 
-            self.client.add_naming_instance(
-                self._service_name,
-                ip,
-                port,
+            naming_service = await self._get_naming_service()
+
+            param = RegisterInstanceParam(
+                service_name=self._service_name,
+                ip=ip,
+                port=port,
                 group_name="DEFAULT_GROUP",
                 metadata={"version": "1.0.0", "type": "python"},
             )
+
+            await naming_service.register_instance(param)
 
             self._registered = True
             logger.info(f"Registered to Nacos: {self._service_name} @ {ip}:{port}")
@@ -70,7 +82,7 @@ class NacosClient:
         except Exception as e:
             logger.error(f"Failed to register to Nacos: {e}")
 
-    def deregister(self) -> None:
+    async def deregister(self) -> None:
         """Deregister service from Nacos."""
         if not self._registered:
             return
@@ -79,12 +91,16 @@ class NacosClient:
             ip = self._get_local_ip()
             port = get_settings().service_port
 
-            self.client.remove_naming_instance(
-                self._service_name,
-                ip,
-                port,
+            naming_service = await self._get_naming_service()
+
+            param = DeregisterInstanceParam(
+                service_name=self._service_name,
+                ip=ip,
+                port=port,
                 group_name="DEFAULT_GROUP",
             )
+
+            await naming_service.deregister_instance(param)
 
             logger.info(f"Deregistered from Nacos: {self._service_name}")
 

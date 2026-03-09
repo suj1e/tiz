@@ -41,12 +41,12 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Tiz AI Service...")
 
     # Register to Nacos
-    nacos_client.register()
+    await nacos_client.register()
 
     yield
 
     # Deregister from Nacos
-    nacos_client.deregister()
+    await nacos_client.deregister()
     logger.info("Shutting down Tiz AI Service...")
 
 
