@@ -9,7 +9,7 @@ set -e
 # =============================================================================
 
 SERVICE_NAME="gateway"
-SERVICE_PORT="${PORT:-8080}"
+SERVICE_PORT="${PORT:-9080}"
 REGISTRY="registry.cn-hangzhou.aliyuncs.com"
 IMAGE_NAME="${REGISTRY}/nxo/${SERVICE_NAME}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

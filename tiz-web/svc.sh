@@ -186,8 +186,8 @@ cmd_version() {
 
         log_info "Bumping version: ${current} -> ${new_version}"
         if [ -f "package.json" ]; then
-            # Use sed to update version in package.json
-            sed -i '' "s/\"version\": \"${current}\"/\"version\": \"${new_version}\"/" package.json
+            # Use sed to update version in package.json (Linux compatible)
+            sed -i "s/\"version\": \"${current}\"/\"version\": \"${new_version}\"/" package.json
             log_success "Version updated"
         else
             log_error "package.json not found"
