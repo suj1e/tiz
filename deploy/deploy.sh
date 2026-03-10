@@ -120,12 +120,18 @@ cmd_restart() {
     cd "$env_dir"
 
     if [[ -n "$service" ]]; then
-        docker-compose --env-file ".env" restart "$service"
+        log_info "Pulling latest image for $service..."
+        docker-compose --env-file ".env" pull "$service"
+        log_info "Recreating $service..."
+        docker-compose --env-file ".env" up -d "$service"
     else
-        docker-compose --env-file ".env" restart
+        log_info "Pulling latest images..."
+        docker-compose --env-file ".env" pull
+        log_info "Recreating services..."
+        docker-compose --env-file ".env" up -d
     fi
 
-    log_success "Services restarted"
+    log_success "Services restarted with latest images"
 }
 
 cmd_logs() {
