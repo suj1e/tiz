@@ -92,3 +92,4 @@ gradle/wrapper/gradle-wrapper.jar
 *.exec
 junit-platform.properties
 
+logs/
