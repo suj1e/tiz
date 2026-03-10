@@ -95,6 +95,28 @@ pnpm test:coverage     # With coverage
 - **MSW 2.x** for API mocking
 - **Vitest 4.x** + **Testing Library** for testing
 
+### Design System
+
+**Brand Identity:**
+- **Primary Color**: Deep Indigo `oklch(0.40 0.16 265)` / Light mode: `oklch(0.65 0.16 265)` (dark)
+- **Accent Color**: Amber Gold `oklch(0.78 0.14 70)` / Light mode: `oklch(0.82 0.14 70)` (dark)
+- **Functional Colors**: Success (green), Warning (orange), Destructive (red)
+
+**Typography:**
+- **Chinese**: Noto Sans SC (Google Fonts)
+- **English/Display**: Sora (Google Fonts)
+- **Code**: JetBrains Mono
+
+**Logo:**
+- Gradient block "T" with glow effect
+- Component: `src/shared/components/common/Logo.tsx`
+- Props: `showText`, `asLink`
+
+**Animations:**
+- Duration: 150ms (fast), 200ms (normal), 300ms (slow)
+- Easing: `cubic-bezier(0.16, 1, 0.3, 1)` (ease-out)
+- Effects: Message fade-in, card hover lift, option selection highlight
+
 ### Architecture
 
 **Directory Layout:**
@@ -179,6 +201,7 @@ export const useAuthStore = create<AuthState>((set) => ({ ... }))
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
+| `Logo` | `common/Logo.tsx` | Brand logo with gradient and glow |
 | `ThemeToggle` | `common/ThemeToggle.tsx` | Dark/light mode switch |
 | `PageError` | `common/PageError.tsx` | Data loading error display |
 | `EmptyState` | `common/EmptyState.tsx` | Empty data placeholder |

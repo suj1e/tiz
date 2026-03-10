@@ -51,6 +51,16 @@ tiz/
 | Mock | MSW 2.x |
 | 测试 | Vitest 4.x + Testing Library |
 
+### 设计系统
+| 类别 | 配置 |
+|------|------|
+| 主色 | 深靛蓝 `oklch(0.40 0.16 265)` |
+| 强调色 | 琥珀金 `oklch(0.78 0.14 70)` |
+| 中文字体 | Noto Sans SC |
+| 英文字体 | Sora |
+| 代码字体 | JetBrains Mono |
+| 动效时长 | 150-300ms |
+
 ### 后端 (tiz-backend)
 | 类别 | 技术 |
 |------|------|
