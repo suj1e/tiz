@@ -1,13 +1,16 @@
 package io.github.suj1e.content.service;
 
+import io.github.suj1e.common.exception.BusinessException;
 import io.github.suj1e.common.exception.NotFoundException;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.content.api.dto.*;
 import io.github.suj1e.content.entity.KnowledgeSet;
 import io.github.suj1e.content.entity.Question;
+import io.github.suj1e.content.error.ContentErrorCode;
 import io.github.suj1e.content.repository.KnowledgeSetRepository;
 import io.github.suj1e.content.repository.QuestionRepository;
 import io.github.suj1e.llm.api.client.LlmClient;
+import io.github.suj1e.user.api.client.UserClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ import java.util.UUID;
 public class GenerateService {
 
     private final LlmClient llmClient;
+    private final UserClient userClient;
     private final KnowledgeSetRepository knowledgeSetRepository;
     private final QuestionRepository questionRepository;
 
@@ -41,12 +45,16 @@ public class GenerateService {
      */
     @Transactional
     public GenerateResponse generate(UUID userId, io.github.suj1e.content.api.dto.GenerateRequest request) {
+        // 获取用户 AI 配置
+        io.github.suj1e.llm.api.dto.AiConfig aiConfig = fetchAiConfig(userId);
+
         // 调用 LLM 服务生成题目
         io.github.suj1e.llm.api.dto.GenerateRequest llmRequest =
             new io.github.suj1e.llm.api.dto.GenerateRequest(
                 request.sessionId(),
                 DEFAULT_BATCH_SIZE,
-                1
+                1,
+                aiConfig
             );
 
         ApiResponse<io.github.suj1e.llm.api.dto.GenerateResponse> llmResponse =
@@ -110,12 +118,16 @@ public class GenerateService {
         KnowledgeSet knowledgeSet = knowledgeSetRepository.findByIdAndUserId(knowledgeSetId, userId)
             .orElseThrow(() -> new NotFoundException("KnowledgeSet", knowledgeSetId));
 
+        // 获取用户 AI 配置
+        io.github.suj1e.llm.api.dto.AiConfig aiConfig = fetchAiConfig(userId);
+
         // 调用 LLM 服务获取后续批次
         io.github.suj1e.llm.api.dto.GenerateRequest llmRequest =
             new io.github.suj1e.llm.api.dto.GenerateRequest(
                 null, // sessionId not needed for batch
                 DEFAULT_BATCH_SIZE,
-                page
+                page,
+                aiConfig
             );
 
         ApiResponse<io.github.suj1e.llm.api.dto.GenerateResponse> llmResponse =
@@ -225,6 +237,35 @@ public class GenerateService {
             dto.answer(),
             dto.explanation(),
             dto.rubric()
+        );
+    }
+
+    /**
+     * 获取用户 AI 配置.
+     *
+     * @param userId 用户 ID
+     * @return AI 配置
+     * @throws BusinessException 如果用户未配置 AI
+     */
+    private io.github.suj1e.llm.api.dto.AiConfig fetchAiConfig(UUID userId) {
+        ApiResponse<io.github.suj1e.user.api.dto.AiConfigResponse> response =
+            userClient.getAiConfig(userId);
+
+        if (response.data() == null) {
+            throw new BusinessException(ContentErrorCode.AI_CONFIG_REQUIRED);
+        }
+
+        io.github.suj1e.user.api.dto.AiConfigResponse config = response.data();
+
+        // 转换为 LLM 服务所需的 AiConfig
+        return new io.github.suj1e.llm.api.dto.AiConfig(
+            config.preferredModel() != null ? config.preferredModel() : "gpt-4o-mini",
+            config.temperature() != null ? config.temperature() : 0.7,
+            config.maxTokens() != null ? config.maxTokens() : 2000,
+            config.systemPrompt() != null ? config.systemPrompt() : "You are a helpful assistant.",
+            config.responseLanguage() != null ? config.responseLanguage() : "en",
+            config.customApiUrl() != null ? config.customApiUrl() : "https://api.openai.com/v1",
+            config.customApiKey() != null ? config.customApiKey() : ""
         );
     }
 }

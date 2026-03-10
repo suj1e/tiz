@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Send, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -9,15 +9,18 @@ import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { Logo } from '@/components/common/Logo'
 import { useChatStore } from '@/stores/chatStore'
 import { useUIStore } from '@/stores/uiStore'
+import { useAuthStore } from '@/stores/authStore'
 import { createChatStream, type SSEEvent } from '@/services/chat'
 import { generateId } from '@/lib/utils'
 
 export default function ChatPage() {
+  const navigate = useNavigate()
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<{ abort: () => void } | null>(null)
 
   const { theme, setTheme } = useUIStore()
+  const { hasAiConfig } = useAuthStore()
 
   const {
     sessionId,
@@ -34,6 +37,13 @@ export default function ChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, streamingContent])
+
+  // Redirect to AI config if not configured
+  useEffect(() => {
+    if (hasAiConfig === false) {
+      navigate('/ai-config', { replace: true })
+    }
+  }, [hasAiConfig, navigate])
 
   const handleSend = () => {
     if (!input.trim() || status === 'streaming') return

@@ -3,28 +3,12 @@
 import json
 import logging
 import re
-from typing import TypedDict
 
 from app.llm import get_llm_client
+from app.state import ChatState
 from app.utils import get_prompts
 
 logger = logging.getLogger(__name__)
-
-
-class ChatState(TypedDict):
-    """State for chat workflow."""
-
-    session_id: str | None
-    message: str
-    history: list[dict]
-    response: str
-    intent: str
-    topic: str | None
-    count: int | None
-    difficulty: str | None
-    question_types: list[str] | None
-    summary: dict | None
-    error: str | None
 
 
 async def analyze_intent(state: ChatState) -> dict:
@@ -35,20 +19,35 @@ async def analyze_intent(state: ChatState) -> dict:
 
     Returns:
         Updated state with intent and extracted parameters if applicable
+
+    Raises:
+        ValueError: If ai_config is not provided in state
     """
     message = state["message"]
     history = state.get("history", [])
+    ai_config = state.get("ai_config")
+
+    if not ai_config:
+        raise ValueError("ai_config is required in state")
 
     logger.info(f"Analyzing intent for message: {message[:50]}...")
 
-    # Use LLM to analyze intent
-    prompts = get_prompts()
+    # Use LLM to analyze intent with user's AI configuration
     llm = get_llm_client()
+    prompts = get_prompts()
 
     analysis_prompt = prompts.format_intent_analysis(message, history)
 
     try:
-        response = await llm.chat(analysis_prompt)
+        response = await llm.chat(
+            analysis_prompt,
+            system_prompt=ai_config.system_prompt,
+            api_key=ai_config.custom_api_key,
+            api_url=ai_config.custom_api_url,
+            model=ai_config.preferred_model,
+            temperature=ai_config.temperature,
+            max_tokens=ai_config.max_tokens,
+        )
         logger.debug(f"Intent analysis response: {response}")
 
         # Parse JSON from response

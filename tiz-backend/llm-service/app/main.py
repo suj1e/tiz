@@ -12,6 +12,7 @@ from fastapi.responses import StreamingResponse
 from app.config import get_settings
 from app.graphs import build_chat_graph, build_generate_graph, build_grade_graph
 from app.models import (
+    AiConfig,
     ChatEventType,
     ChatRequest,
     ChatSessionEvent,
@@ -25,7 +26,7 @@ from app.models import (
     GradeResponse,
 )
 from app.nacos_client import nacos_client
-from app.nodes.analyze import ChatState
+from app.state import ChatState
 
 # Configure logging
 logging.basicConfig(
@@ -115,6 +116,7 @@ async def chat(request: ChatRequest) -> StreamingResponse:
                 "summary": None,
                 "questions": None,
                 "error": None,
+                "ai_config": request.ai_config,
             }
 
             # Stream graph execution
@@ -194,7 +196,7 @@ async def generate_questions(request: GenerateRequest) -> GenerateResponse:
     """Generate questions directly without chat.
 
     Args:
-        request: Generation parameters
+        request: Generation parameters including ai_config
 
     Returns:
         Generated questions
@@ -210,6 +212,7 @@ async def generate_questions(request: GenerateRequest) -> GenerateResponse:
             "questions": None,
             "summary": None,
             "error": None,
+            "ai_config": request.ai_config,
         }
 
         final_state = await graph.ainvoke(initial_state)
@@ -240,7 +243,7 @@ async def grade_answer(request: GradeRequest) -> GradeResponse:
     """Grade an essay answer.
 
     Args:
-        request: Grading parameters
+        request: Grading parameters including ai_config
 
     Returns:
         Grading result with score and feedback
@@ -255,6 +258,7 @@ async def grade_answer(request: GradeRequest) -> GradeResponse:
             "rubric": request.rubric,
             "result": None,
             "error": None,
+            "ai_config": request.ai_config,
         }
 
         final_state = await graph.ainvoke(initial_state)

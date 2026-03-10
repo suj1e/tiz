@@ -197,7 +197,7 @@ class PracticeServiceTest {
             GradingService.GradingResult gradingResult = GradingService.GradingResult.correct(
                 BigDecimal.TEN, BigDecimal.TEN
             );
-            when(gradingService.grade(question, "2")).thenReturn(gradingResult);
+            when(gradingService.grade(question, "2", userId)).thenReturn(gradingResult);
             when(answerRepository.findBySessionIdAndQuestionId(sessionId, questionId))
                 .thenReturn(Optional.empty());
             when(answerRepository.save(any())).thenReturn(null);
@@ -231,7 +231,7 @@ class PracticeServiceTest {
             GradingService.GradingResult gradingResult = GradingService.GradingResult.withFeedback(
                 true, new BigDecimal("8"), BigDecimal.TEN, "Good explanation but missing some details"
             );
-            when(gradingService.grade(question, "Spring Boot is a framework"))
+            when(gradingService.grade(question, "Spring Boot is a framework", userId))
                 .thenReturn(gradingResult);
             when(answerRepository.findBySessionIdAndQuestionId(sessionId, questionId))
                 .thenReturn(Optional.empty());

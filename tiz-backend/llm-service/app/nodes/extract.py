@@ -1,9 +1,8 @@
 """Extract parameters node for LangGraph workflow."""
 
 import logging
-from typing import TypedDict
 
-from app.nodes.analyze import ChatState
+from app.state import ChatState
 
 logger = logging.getLogger(__name__)
 

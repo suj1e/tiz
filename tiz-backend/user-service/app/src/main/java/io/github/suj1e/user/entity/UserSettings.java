@@ -33,6 +33,34 @@ public class UserSettings {
     @Builder.Default
     private String theme = "system";
 
+    @Column(name = "preferred_model", nullable = false)
+    @Builder.Default
+    private String preferredModel = "";
+
+    @Column(name = "temperature", nullable = false)
+    @Builder.Default
+    private Double temperature = 0.7;
+
+    @Column(name = "max_tokens", nullable = false)
+    @Builder.Default
+    private Integer maxTokens = 2048;
+
+    @Column(name = "system_prompt", nullable = false, columnDefinition = "TEXT")
+    @Builder.Default
+    private String systemPrompt = "";
+
+    @Column(name = "response_language", nullable = false)
+    @Builder.Default
+    private String responseLanguage = "";
+
+    @Column(name = "custom_api_url", nullable = false)
+    @Builder.Default
+    private String customApiUrl = "";
+
+    @Column(name = "custom_api_key", nullable = false)
+    @Builder.Default
+    private String customApiKey = "";
+
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
     private Instant createdAt;

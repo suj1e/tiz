@@ -2,6 +2,8 @@
 
 from pydantic import BaseModel, Field
 
+from app.models.ai_config import AiConfig
+
 
 class GradeRequest(BaseModel):
     """Grade request for essay answer evaluation."""
@@ -10,6 +12,7 @@ class GradeRequest(BaseModel):
     question_answer: str = Field(..., description="The correct answer/rubric")
     user_answer: str = Field(..., description="User's answer to grade")
     rubric: str | None = Field(default=None, description="Scoring rubric")
+    ai_config: AiConfig = Field(..., description="AI configuration for this request")
 
 
 class GradeResponse(BaseModel):

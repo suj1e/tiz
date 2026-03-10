@@ -27,7 +27,10 @@ public enum ContentErrorCode implements ErrorCode {
 
     // Tag (CONTENT_6xxx)
     TAG_NOT_FOUND("not_found_error", "CONTENT_6001", "Tag not found", HttpStatus.NOT_FOUND),
-    TAG_ALREADY_EXISTS("conflict_error", "CONTENT_6002", "Tag already exists", HttpStatus.CONFLICT);
+    TAG_ALREADY_EXISTS("conflict_error", "CONTENT_6002", "Tag already exists", HttpStatus.CONFLICT),
+
+    // AI Config (CONTENT_7xxx)
+    AI_CONFIG_REQUIRED("validation_error", "CONTENT_7001", "AI config required", HttpStatus.BAD_REQUEST);
 
     private final String type;
     private final String code;

@@ -1,26 +1,13 @@
 """Generate questions workflow graph using LangGraph."""
 
 import logging
-from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
 
-from app.models import Question
 from app.nodes.generate import generate_questions
+from app.state import GenerateState
 
 logger = logging.getLogger(__name__)
-
-
-class GenerateState(TypedDict):
-    """State for generate workflow."""
-
-    topic: str
-    count: int
-    difficulty: str
-    question_types: list[str]
-    questions: list[Question] | None
-    summary: dict | None
-    error: str | None
 
 
 def build_generate_graph() -> StateGraph:
@@ -61,6 +48,7 @@ async def _generate_wrapper(state: GenerateState) -> dict:
         "count": state["count"],
         "difficulty": state["difficulty"],
         "question_types": state["question_types"],
+        "ai_config": state["ai_config"],
     }
 
     result = await generate_questions(chat_state)
@@ -73,6 +61,7 @@ GenerateGraph = StateGraph
 
 async def run_generate_workflow(
     topic: str,
+    ai_config: AiConfig,
     count: int = 5,
     difficulty: str = "medium",
     question_types: list[str] | None = None,
@@ -81,6 +70,7 @@ async def run_generate_workflow(
 
     Args:
         topic: Topic for question generation
+        ai_config: AI configuration for LLM calls
         count: Number of questions to generate
         difficulty: Difficulty level (easy, medium, hard)
         question_types: Types of questions to generate
@@ -98,6 +88,7 @@ async def run_generate_workflow(
         "questions": None,
         "summary": None,
         "error": None,
+        "ai_config": ai_config,
     }
 
     final_state = await graph.ainvoke(initial_state)

@@ -29,7 +29,8 @@ public enum ChatErrorCode implements ErrorCode {
     // 4xxx - AI 服务相关
     CHAT_4030("api_error", "CHAT_4030", "AI 服务暂时不可用", HttpStatus.SERVICE_UNAVAILABLE),
     CHAT_4031("api_error", "CHAT_4031", "AI 服务响应超时", HttpStatus.GATEWAY_TIMEOUT),
-    CHAT_4032("api_error", "CHAT_4032", "AI 服务返回错误", HttpStatus.BAD_GATEWAY);
+    CHAT_4032("api_error", "CHAT_4032", "AI 服务返回错误", HttpStatus.BAD_GATEWAY),
+    CHAT_4033("validation_error", "CHAT_4033", "请先配置 AI 设置", HttpStatus.BAD_REQUEST);
 
     private final String type;
     private final String code;

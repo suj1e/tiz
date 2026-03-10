@@ -25,6 +25,7 @@ dependencies {
     // Service APIs (from Maven Local)
     implementation(libs.content.api)
     implementation(libs.llm.api)
+    implementation(libs.user.api)
 
     // Spring Boot Starters
     implementation(libs.spring.boot.starter.web)

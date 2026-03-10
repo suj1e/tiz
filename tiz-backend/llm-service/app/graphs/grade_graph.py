@@ -3,26 +3,15 @@
 import json
 import logging
 import re
-from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
 
 from app.llm import get_llm_client
 from app.models import GradeResponse
+from app.state import GradeState
 from app.utils import get_prompts
 
 logger = logging.getLogger(__name__)
-
-
-class GradeState(TypedDict):
-    """State for grade workflow."""
-
-    question_content: str
-    question_answer: str
-    user_answer: str
-    rubric: str | None
-    result: GradeResponse | None
-    error: str | None
 
 
 async def grade_answer(state: GradeState) -> dict:
@@ -33,15 +22,19 @@ async def grade_answer(state: GradeState) -> dict:
 
     Returns:
         Updated state with grading result
+
+    Raises:
+        ValueError: If ai_config is not provided in state
     """
     question_content = state["question_content"]
     question_answer = state["question_answer"]
     user_answer = state["user_answer"]
+    ai_config = state["ai_config"]
 
     logger.info(f"Grading answer for question: {question_content[:50]}...")
 
-    prompts = get_prompts()
     llm = get_llm_client()
+    prompts = get_prompts()
 
     grading_prompt = prompts.format_grading(
         question_content=question_content,
@@ -50,7 +43,15 @@ async def grade_answer(state: GradeState) -> dict:
     )
 
     try:
-        response = await llm.chat(grading_prompt)
+        response = await llm.chat(
+            grading_prompt,
+            system_prompt=ai_config.system_prompt,
+            api_key=ai_config.custom_api_key,
+            api_url=ai_config.custom_api_url,
+            model=ai_config.preferred_model,
+            temperature=ai_config.temperature,
+            max_tokens=ai_config.max_tokens,
+        )
         logger.debug(f"Grading response: {response}")
 
         # Parse JSON from response
@@ -133,6 +134,7 @@ async def run_grade_workflow(
     question_content: str,
     question_answer: str,
     user_answer: str,
+    ai_config: AiConfig,
     rubric: str | None = None,
 ) -> GradeState:
     """Run the grade workflow and return final state.
@@ -141,6 +143,7 @@ async def run_grade_workflow(
         question_content: The question text
         question_answer: The correct answer/rubric
         user_answer: User's answer to grade
+        ai_config: AI configuration for LLM calls
         rubric: Optional scoring rubric
 
     Returns:
@@ -155,6 +158,7 @@ async def run_grade_workflow(
         "rubric": rubric,
         "result": None,
         "error": None,
+        "ai_config": ai_config,
     }
 
     final_state = await graph.ainvoke(initial_state)

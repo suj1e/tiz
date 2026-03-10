@@ -1,5 +1,6 @@
 package io.github.suj1e.chat.service;
 
+import io.github.suj1e.chat.client.UserClient;
 import io.github.suj1e.chat.dto.ConfirmResponse;
 import io.github.suj1e.chat.entity.ChatMessage;
 import io.github.suj1e.chat.entity.ChatSession;
@@ -12,13 +13,16 @@ import io.github.suj1e.llm.api.dto.GenerateResponse;
 import io.github.suj1e.llm.api.dto.GenerateRequest;
 import io.github.suj1e.llm.api.dto.ChatRequest;
 import io.github.suj1e.llm.api.dto.ChatEvent;
+import io.github.suj1e.llm.api.dto.AiConfig;
 import io.github.suj1e.common.exception.BusinessException;
 import io.github.suj1e.common.exception.NotFoundException;
 import io.github.suj1e.common.response.ApiResponse;
+import io.github.suj1e.user.api.dto.AiConfigResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -37,6 +41,7 @@ public class ChatService {
     private final ChatMessageRepository messageRepository;
     private final LlmClient llmClient;
     private final ContentClient contentClient;
+    private final UserClient userClient;
 
     /**
      * 处理对话请求.
@@ -54,6 +59,9 @@ public class ChatService {
         // 验证会话状态
         validateSession(session, userId);
 
+        // 获取用户 AI 配置
+        AiConfig aiConfig = getAiConfig(userId);
+
         // 保存用户消息
         saveMessage(session.getId(), ChatMessage.MessageRole.USER, message);
 
@@ -70,7 +78,8 @@ public class ChatService {
         ChatRequest request = new ChatRequest(
             session.getId(),
             message,
-            chatHistory
+            chatHistory,
+            aiConfig
         );
 
         // 调用 LLM 服务并处理响应
@@ -115,11 +124,15 @@ public class ChatService {
             throw new BusinessException(ChatErrorCode.CHAT_4021);
         }
 
+        // 获取用户 AI 配置
+        AiConfig aiConfig = getAiConfig(userId);
+
         // 调用 LLM 服务生成题目
         GenerateRequest generateRequest = new GenerateRequest(
             sessionId,
             10,  // batchSize
-            1    // batchNumber
+            1,   // batchNumber
+            aiConfig
         );
 
         ApiResponse<GenerateResponse> generateResponse;
@@ -204,5 +217,31 @@ public class ChatService {
             session.setGeneratedSummary(summary);
             sessionRepository.save(session);
         });
+    }
+
+    /**
+     * 获取用户 AI 配置.
+     * 如果用户未配置，抛出异常.
+     *
+     * @param userId 用户 ID
+     * @return AI 配置
+     */
+    private AiConfig getAiConfig(UUID userId) {
+        try {
+            ApiResponse<AiConfigResponse> response = userClient.getAiConfig(userId);
+            AiConfigResponse config = response.data();
+            return new AiConfig(
+                config.preferredModel(),
+                config.temperature(),
+                config.maxTokens(),
+                config.systemPrompt(),
+                config.responseLanguage(),
+                config.customApiUrl(),
+                config.customApiKey()
+            );
+        } catch (HttpClientErrorException.NotFound e) {
+            log.warn("AI config not found for user: {}", userId);
+            throw new BusinessException(ChatErrorCode.CHAT_4033);
+        }
     }
 }

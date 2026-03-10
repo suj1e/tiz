@@ -16,7 +16,6 @@ export class ApiError extends Error {
 }
 
 interface RequestOptions extends RequestInit {
-  token?: string
   /** Return raw response without extracting .data */
   raw?: boolean
 }
@@ -25,10 +24,12 @@ async function request<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { token, raw, ...fetchOptions } = options
+  const { raw, ...fetchOptions } = options
 
   const headers = new Headers(options.headers)
 
+  // Automatically get token from auth store
+  const token = useAuthStore.getState().token
   if (token) {
     headers.set('Authorization', `Bearer ${token}`)
   }
@@ -55,6 +56,10 @@ async function request<T>(
     if (response.status === 401) {
       useAuthStore.getState().logout()
       window.location.href = '/login'
+    }
+    if (error.code === 'AI_CONFIG_REQUIRED') {
+      useAuthStore.getState().setHasAiConfig(false)
+      window.location.href = '/ai-config'
     }
     throw new ApiError(error)
   }
@@ -86,6 +91,14 @@ export const api = {
 
   delete<T>(path: string, options?: RequestOptions): Promise<T> {
     return request<T>(path, { ...options, method: 'DELETE' })
+  },
+
+  put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    return request<T>(path, {
+      ...options,
+      method: 'PUT',
+      body: body ? JSON.stringify(body) : undefined,
+    })
   },
 }
 

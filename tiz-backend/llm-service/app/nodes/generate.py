@@ -3,30 +3,13 @@
 import json
 import logging
 import re
-from typing import TypedDict
 
 from app.llm import get_llm_client
 from app.models import Question, QuestionType
+from app.state import ChatState
 from app.utils import get_prompts
 
 logger = logging.getLogger(__name__)
-
-
-class ChatState(TypedDict):
-    """State for chat workflow."""
-
-    session_id: str | None
-    message: str
-    history: list[dict]
-    response: str
-    intent: str
-    topic: str | None
-    count: int | None
-    difficulty: str | None
-    question_types: list[str] | None
-    summary: dict | None
-    questions: list[Question] | None
-    error: str | None
 
 
 async def generate_content(state: ChatState) -> dict:
@@ -37,19 +20,35 @@ async def generate_content(state: ChatState) -> dict:
 
     Returns:
         Updated state with response content
+
+    Raises:
+        ValueError: If ai_config is not provided in state
     """
     message = state["message"]
     history = state.get("history", [])
+    ai_config = state.get("ai_config")
+
+    if not ai_config:
+        raise ValueError("ai_config is required in state")
 
     logger.info(f"Generating content for message: {message[:50]}...")
 
-    prompts = get_prompts()
     llm = get_llm_client()
+    prompts = get_prompts()
 
     system_prompt = prompts.format_chat_system()
 
     try:
-        response = await llm.chat(message, system_prompt=system_prompt, history=history)
+        response = await llm.chat(
+            message,
+            system_prompt=ai_config.system_prompt,
+            history=history,
+            api_key=ai_config.custom_api_key,
+            api_url=ai_config.custom_api_url,
+            model=ai_config.preferred_model,
+            temperature=ai_config.temperature,
+            max_tokens=ai_config.max_tokens,
+        )
         logger.info(f"Generated response: {response[:100]}...")
 
         # Check if response contains confirmation marker
@@ -84,16 +83,23 @@ async def generate_questions(state: ChatState) -> dict:
 
     Returns:
         Updated state with generated questions
+
+    Raises:
+        ValueError: If ai_config is not provided in state
     """
     topic = state.get("topic", "")
     count = state.get("count", 5)
     difficulty = state.get("difficulty", "medium")
     question_types = state.get("question_types", ["choice"])
+    ai_config = state.get("ai_config")
+
+    if not ai_config:
+        raise ValueError("ai_config is required in state")
 
     logger.info(f"Generating {count} questions about: {topic}")
 
-    prompts = get_prompts()
     llm = get_llm_client()
+    prompts = get_prompts()
 
     generation_prompt = prompts.format_generate_questions(
         topic=topic,
@@ -103,7 +109,15 @@ async def generate_questions(state: ChatState) -> dict:
     )
 
     try:
-        response = await llm.chat(generation_prompt)
+        response = await llm.chat(
+            generation_prompt,
+            system_prompt=ai_config.system_prompt,
+            api_key=ai_config.custom_api_key,
+            api_url=ai_config.custom_api_url,
+            model=ai_config.preferred_model,
+            temperature=ai_config.temperature,
+            max_tokens=ai_config.max_tokens,
+        )
         logger.debug(f"Generation response: {response}")
 
         # Parse JSON from response

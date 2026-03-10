@@ -11,7 +11,7 @@ import { authService } from '@/services/auth'
 export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login } = useAuthStore()
+  const { login, checkAiConfig } = useAuthStore()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -28,7 +28,14 @@ export default function LoginPage() {
     try {
       const response = await authService.login({ email, password })
       login(response.user, response.token)
-      navigate(from, { replace: true })
+
+      // Check AI config status and redirect if needed
+      const hasConfig = await checkAiConfig()
+      if (!hasConfig) {
+        navigate('/ai-config', { replace: true })
+      } else {
+        navigate(from, { replace: true })
+      }
     }
     catch (err) {
       setError(err instanceof Error ? err.message : '登录失败')

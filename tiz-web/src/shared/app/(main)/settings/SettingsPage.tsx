@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Webhook, Mail, Lock, Trash2 } from 'lucide-react'
+import { Webhook } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -7,11 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { useUIStore } from '@/stores/uiStore'
-import { useAuthStore } from '@/stores/authStore'
 
 export default function SettingsPage() {
   const { theme, setTheme } = useUIStore()
-  const { user } = useAuthStore()
   const [notifications, setNotifications] = useState(true)
   const [webhookUrl, setWebhookUrl] = useState('')
   const [webhookEnabled, setWebhookEnabled] = useState(false)
@@ -141,59 +139,6 @@ export default function SettingsPage() {
               </div>
             </>
           )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>账户信息</CardTitle>
-          <CardDescription>管理你的账户</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground text-lg font-semibold">
-              {user?.email?.[0]?.toUpperCase() || 'U'}
-            </div>
-            <div>
-              <p className="font-medium">{user?.email || 'user@example.com'}</p>
-              <p className="text-sm text-muted-foreground">免费账户</p>
-            </div>
-          </div>
-
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">邮箱地址</p>
-                  <p className="text-xs text-muted-foreground">{user?.email || 'user@example.com'}</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm">
-                修改
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div className="flex items-center gap-3">
-                <Lock className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">密码</p>
-                  <p className="text-xs text-muted-foreground">••••••••</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm">
-                修改
-              </Button>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <Button variant="destructive" size="sm">
-              <Trash2 className="mr-2 h-4 w-4" />
-              删除账户
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>

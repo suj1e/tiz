@@ -25,7 +25,8 @@ public enum PracticeErrorCode implements ErrorCode {
 
     // Grading (PRACTICE_7xxx)
     GRADING_FAILED("api_error", "PRACTICE_7001", "Failed to grade answer", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_QUESTION_TYPE("validation_error", "PRACTICE_7002", "Invalid question type", HttpStatus.BAD_REQUEST);
+    INVALID_QUESTION_TYPE("validation_error", "PRACTICE_7002", "Invalid question type", HttpStatus.BAD_REQUEST),
+    AI_CONFIG_REQUIRED("validation_error", "PRACTICE_7003", "AI configuration required for essay grading", HttpStatus.BAD_REQUEST);
 
     private final String type;
     private final String code;

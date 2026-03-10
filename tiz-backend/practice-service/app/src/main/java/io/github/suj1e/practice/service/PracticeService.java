@@ -139,7 +139,7 @@ public class PracticeService {
         QuestionResponse question = questionResponse.data();
 
         // 评分
-        GradingService.GradingResult result = gradingService.grade(question, request.answer());
+        GradingService.GradingResult result = gradingService.grade(question, request.answer(), userId);
 
         // 保存或更新答案
         PracticeAnswer answer = answerRepository

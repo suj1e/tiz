@@ -5,6 +5,8 @@ import io.github.suj1e.content.api.dto.QuestionResponse;
 import io.github.suj1e.llm.api.client.LlmClient;
 import io.github.suj1e.llm.api.dto.GradeResponse;
 import io.github.suj1e.llm.api.dto.GradeRequest;
+import io.github.suj1e.user.api.client.UserClient;
+import io.github.suj1e.user.api.dto.AiConfigResponse;
 import io.github.suj1e.common.response.ApiResponse;
 import io.github.suj1e.practice.exception.GradingException;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,14 +35,19 @@ class GradingServiceTest {
     @Mock
     private LlmClient llmClient;
 
+    @Mock
+    private UserClient userClient;
+
     @InjectMocks
     private GradingService gradingService;
 
     private UUID questionId;
+    private UUID userId;
 
     @BeforeEach
     void setUp() {
         questionId = UUID.randomUUID();
+        userId = UUID.randomUUID();
     }
 
     @Nested
@@ -57,7 +64,7 @@ class GradingServiceTest {
             );
 
             // When
-            GradingService.GradingResult result = gradingService.grade(question, "4");
+            GradingService.GradingResult result = gradingService.grade(question, "4", userId);
 
             // Then
             assertTrue(result.correct());
@@ -76,7 +83,7 @@ class GradingServiceTest {
             );
 
             // When
-            GradingService.GradingResult result = gradingService.grade(question, "paris");
+            GradingService.GradingResult result = gradingService.grade(question, "paris", userId);
 
             // Then
             assertTrue(result.correct());
@@ -93,7 +100,7 @@ class GradingServiceTest {
             );
 
             // When
-            GradingService.GradingResult result = gradingService.grade(question, "  A  ");
+            GradingService.GradingResult result = gradingService.grade(question, "  A  ", userId);
 
             // Then
             assertTrue(result.correct());
@@ -110,7 +117,7 @@ class GradingServiceTest {
             );
 
             // When
-            GradingService.GradingResult result = gradingService.grade(question, "3");
+            GradingService.GradingResult result = gradingService.grade(question, "3", userId);
 
             // Then
             assertFalse(result.correct());
@@ -132,6 +139,13 @@ class GradingServiceTest {
                 "Dependency injection is...", "Key concepts: IoC, DI types", "Rubric content"
             );
 
+            AiConfigResponse aiConfigResponse = new AiConfigResponse(
+                "gpt-4o-mini", 0.7, 2000, "You are a helpful assistant",
+                "en", "https://api.openai.com/v1", "test-key"
+            );
+            when(userClient.getAiConfig(userId))
+                .thenReturn(ApiResponse.of(aiConfigResponse));
+
             GradeResponse llmResponse = new GradeResponse(
                 8, 10, true, "Good explanation but could be more detailed"
             );
@@ -140,7 +154,7 @@ class GradingServiceTest {
 
             // When
             GradingService.GradingResult result = gradingService.grade(
-                question, "DI is a design pattern..."
+                question, "DI is a design pattern...", userId
             );
 
             // Then
@@ -149,7 +163,27 @@ class GradingServiceTest {
             assertEquals(new BigDecimal("10"), result.maxScore());
             assertEquals("Good explanation but could be more detailed", result.feedback());
 
+            verify(userClient).getAiConfig(userId);
             verify(llmClient).gradeAnswer(any(GradeRequest.class));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when AI config not found")
+        void shouldThrowExceptionWhenAiConfigNotFound() {
+            // Given
+            QuestionResponse question = new QuestionResponse(
+                questionId, "essay", "Explain Spring Boot", null,
+                "Spring Boot is...", "Auto-configuration", "Rubric"
+            );
+
+            when(userClient.getAiConfig(userId))
+                .thenReturn(new ApiResponse<>(null));
+
+            // When & Then
+            GradingException exception = assertThrows(GradingException.class,
+                () -> gradingService.grade(question, "Spring Boot is...", userId));
+
+            assertEquals("PRACTICE_7003", exception.getErrorCode().getCode());
         }
 
         @Test
@@ -161,12 +195,19 @@ class GradingServiceTest {
                 "Spring Boot is...", "Auto-configuration", "Rubric"
             );
 
+            AiConfigResponse aiConfigResponse = new AiConfigResponse(
+                "gpt-4o-mini", 0.7, 2000, "You are a helpful assistant",
+                "en", "https://api.openai.com/v1", "test-key"
+            );
+            when(userClient.getAiConfig(userId))
+                .thenReturn(ApiResponse.of(aiConfigResponse));
+
             when(llmClient.gradeAnswer(any(GradeRequest.class)))
                 .thenReturn(new ApiResponse<>(null));
 
             // When
             GradingService.GradingResult result = gradingService.grade(
-                question, "Spring Boot is..."
+                question, "Spring Boot is...", userId
             );
 
             // Then
@@ -183,12 +224,19 @@ class GradingServiceTest {
                 "Microservices are...", "Key points", "Rubric"
             );
 
+            AiConfigResponse aiConfigResponse = new AiConfigResponse(
+                "gpt-4o-mini", 0.7, 2000, "You are a helpful assistant",
+                "en", "https://api.openai.com/v1", "test-key"
+            );
+            when(userClient.getAiConfig(userId))
+                .thenReturn(ApiResponse.of(aiConfigResponse));
+
             when(llmClient.gradeAnswer(any(GradeRequest.class)))
                 .thenThrow(new RuntimeException("LLM service unavailable"));
 
             // When & Then
             assertThrows(GradingException.class,
-                () -> gradingService.grade(question, "Microservices are small services..."));
+                () -> gradingService.grade(question, "Microservices are small services...", userId));
         }
     }
 
@@ -207,7 +255,7 @@ class GradingServiceTest {
 
             // When & Then
             assertThrows(GradingException.class,
-                () -> gradingService.grade(question, "answer"));
+                () -> gradingService.grade(question, "answer", userId));
         }
     }
 }

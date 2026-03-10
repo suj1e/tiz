@@ -20,3 +20,8 @@ spring:
 llm:
   service:
     url: ${LLM_SERVICE_URL:lb://llm-service}
+
+# User service (Nacos service discovery)
+user:
+  service:
+    url: ${USER_SERVICE_URL:lb://user-service}

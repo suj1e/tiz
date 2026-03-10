@@ -5,6 +5,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from app.models.ai_config import AiConfig
+
 
 class QuestionType(str, Enum):
     """Question types."""
@@ -35,6 +37,7 @@ class GenerateRequest(BaseModel):
         description="Types of questions to generate",
     )
     context: dict[str, Any] | None = Field(default=None, description="Additional context")
+    ai_config: AiConfig = Field(..., description="AI configuration for this request")
 
 
 class GenerateResponse(BaseModel):

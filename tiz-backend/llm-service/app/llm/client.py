@@ -1,6 +1,5 @@
 """LLM client wrapper for LangChain."""
 
-from functools import lru_cache
 from typing import AsyncIterator
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -15,7 +14,7 @@ class LLMClient:
 
     def __init__(self) -> None:
         settings = get_settings()
-        self._llm = ChatOpenAI(
+        self._default_llm = ChatOpenAI(
             api_key=settings.llm_api_key,
             base_url=settings.llm_api_url,
             model=settings.llm_model,
@@ -25,15 +24,64 @@ class LLMClient:
         )
         self._settings = settings
 
+    def _get_llm(
+        self,
+        api_key: str | None = None,
+        api_url: str | None = None,
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+    ) -> ChatOpenAI:
+        """Get LLM instance with specified or default configuration.
+
+        Args:
+            api_key: Custom API key (uses default if None)
+            api_url: Custom API URL (uses default if None)
+            model: Custom model name (uses default if None)
+            temperature: Custom temperature (uses default if None)
+            max_tokens: Custom max tokens (uses default if None)
+
+        Returns:
+            Configured ChatOpenAI instance
+        """
+        return ChatOpenAI(
+            api_key=api_key or self._settings.llm_api_key,
+            base_url=api_url or self._settings.llm_api_url,
+            model=model or self._settings.llm_model,
+            temperature=temperature if temperature is not None else self._settings.llm_temperature,
+            max_tokens=max_tokens or self._settings.llm_max_tokens,
+            timeout=self._settings.llm_timeout,
+        )
+
     async def chat(
         self,
         message: str,
         system_prompt: str | None = None,
         history: list[dict] | None = None,
+        api_key: str | None = None,
+        api_url: str | None = None,
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
     ) -> str:
-        """Send a chat message and get a response."""
+        """Send a chat message and get a response.
+
+        Args:
+            message: User message
+            system_prompt: Optional system prompt
+            history: Optional chat history
+            api_key: Custom API key for this request
+            api_url: Custom API URL for this request
+            model: Custom model for this request
+            temperature: Custom temperature for this request
+            max_tokens: Custom max tokens for this request
+
+        Returns:
+            Response content
+        """
+        llm = self._get_llm(api_key, api_url, model, temperature, max_tokens)
         messages = self._build_messages(message, system_prompt, history)
-        response = await self._llm.ainvoke(messages)
+        response = await llm.ainvoke(messages)
         return response.content
 
     async def chat_stream(
@@ -41,12 +89,32 @@ class LLMClient:
         message: str,
         system_prompt: str | None = None,
         history: list[dict] | None = None,
+        api_key: str | None = None,
+        api_url: str | None = None,
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
     ) -> AsyncIterator[str]:
-        """Send a chat message and stream the response."""
+        """Send a chat message and stream the response.
+
+        Args:
+            message: User message
+            system_prompt: Optional system prompt
+            history: Optional chat history
+            api_key: Custom API key for this request
+            api_url: Custom API URL for this request
+            model: Custom model for this request
+            temperature: Custom temperature for this request
+            max_tokens: Custom max tokens for this request
+
+        Yields:
+            Response content chunks
+        """
+        llm = self._get_llm(api_key, api_url, model, temperature, max_tokens)
         messages = self._build_messages(message, system_prompt, history)
         parser = StrOutputParser()
 
-        async for chunk in self._llm.astream(messages):
+        async for chunk in llm.astream(messages):
             parsed = parser.parse(chunk)
             if parsed:
                 yield parsed
@@ -76,7 +144,6 @@ class LLMClient:
         return messages
 
 
-@lru_cache
 def get_llm_client() -> LLMClient:
-    """Get cached LLM client instance."""
+    """Get LLM client instance."""
     return LLMClient()

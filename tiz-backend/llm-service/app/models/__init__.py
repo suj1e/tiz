@@ -1,5 +1,6 @@
 """Pydantic models module."""
 
+from app.models.ai_config import AiConfig
 from app.models.chat import (
     ChatEventType,
     ChatRequest,
@@ -13,6 +14,8 @@ from app.models.grade import GradeRequest, GradeResponse
 from app.models.question import GenerateRequest, GenerateResponse, Question, QuestionType
 
 __all__ = [
+    # AI Config
+    "AiConfig",
     # Chat
     "ChatEventType",
     "ChatRequest",

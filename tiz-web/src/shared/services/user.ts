@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { UserSettings, WebhookConfig } from '@/types'
+import type { AiConfig, AiConfigStatus, UserSettings, WebhookConfig } from '@/types'
 
 export const userService = {
   getSettings: (): Promise<UserSettings> => {
@@ -20,5 +20,17 @@ export const userService = {
 
   deleteWebhook: (): Promise<void> => {
     return api.delete('/user/v1/webhook')
+  },
+
+  getAiConfig: (): Promise<AiConfig> => {
+    return api.get('/user/v1/ai-config')
+  },
+
+  updateAiConfig: (data: Partial<AiConfig>): Promise<AiConfig> => {
+    return api.put('/user/v1/ai-config', data)
+  },
+
+  getAiConfigStatus: (): Promise<AiConfigStatus> => {
+    return api.get('/user/v1/ai-config/status')
   },
 }

@@ -16,3 +16,17 @@ export interface WebhookConfig {
   enabled: boolean
   events: WebhookEvent[]
 }
+
+export interface AiConfig {
+  preferredModel: string
+  temperature: number
+  maxTokens: number
+  systemPrompt: string
+  responseLanguage: 'zh' | 'en'
+  customApiUrl: string
+  customApiKey: string
+}
+
+export interface AiConfigStatus {
+  isConfigured: boolean
+}

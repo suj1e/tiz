@@ -1,14 +1,14 @@
 """Chat workflow graph using LangGraph."""
 
 import logging
-from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
 
-from app.nodes.analyze import ChatState
+from app.models.ai_config import AiConfig
 from app.nodes.analyze import analyze_intent
-from app.nodes.generate import generate_content, generate_questions
 from app.nodes.extract import extract_params
+from app.nodes.generate import generate_content, generate_questions
+from app.state import ChatState
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +79,7 @@ async def run_chat_workflow(
     message: str,
     session_id: str | None = None,
     history: list[dict] | None = None,
+    ai_config: AiConfig | None = None,
 ) -> ChatState:
     """Run the chat workflow and return final state.
 
@@ -86,10 +87,17 @@ async def run_chat_workflow(
         message: User message
         session_id: Optional session ID
         history: Optional chat history
+        ai_config: AI configuration for LLM calls
 
     Returns:
         Final chat state
+
+    Raises:
+        ValueError: If ai_config is not provided
     """
+    if not ai_config:
+        raise ValueError("ai_config is required")
+
     graph = build_chat_graph()
 
     initial_state: ChatState = {
@@ -105,6 +113,7 @@ async def run_chat_workflow(
         "summary": None,
         "questions": None,
         "error": None,
+        "ai_config": ai_config,
     }
 
     final_state = await graph.ainvoke(initial_state)
@@ -115,6 +124,7 @@ async def stream_chat_workflow(
     message: str,
     session_id: str | None = None,
     history: list[dict] | None = None,
+    ai_config: AiConfig | None = None,
 ):
     """Stream the chat workflow events.
 
@@ -122,10 +132,17 @@ async def stream_chat_workflow(
         message: User message
         session_id: Optional session ID
         history: Optional chat history
+        ai_config: AI configuration for LLM calls
 
     Yields:
         Dict with node name and state updates
+
+    Raises:
+        ValueError: If ai_config is not provided
     """
+    if not ai_config:
+        raise ValueError("ai_config is required")
+
     graph = build_chat_graph()
 
     initial_state: ChatState = {
@@ -141,6 +158,7 @@ async def stream_chat_workflow(
         "summary": None,
         "questions": None,
         "error": None,
+        "ai_config": ai_config,
     }
 
     async for event in graph.astream(initial_state):

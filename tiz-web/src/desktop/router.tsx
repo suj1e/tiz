@@ -17,6 +17,8 @@ const PracticePage = () => import('@/app/(main)/practice/PracticePage')
 const QuizPage = () => import('@/app/(main)/quiz/QuizPage')
 const ResultPage = () => import('@/app/(main)/result/ResultPage')
 const SettingsPage = () => import('@/app/(main)/settings/SettingsPage')
+const ProfilePage = () => import('@/app/(main)/profile/ProfilePage')
+const AiConfigPage = () => import('@/app/(main)/ai-config/AiConfigPage')
 
 // Loading fallback component
 function LoadingFallback() {
@@ -102,6 +104,14 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: lazy(SettingsPage),
+      },
+      {
+        path: 'profile',
+        element: lazy(ProfilePage),
+      },
+      {
+        path: 'ai-config',
+        element: lazy(AiConfigPage),
       },
     ],
   },

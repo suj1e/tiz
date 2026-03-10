@@ -1,4 +1,4 @@
-import { LogOut, Settings, User } from 'lucide-react'
+import { LogOut, Settings, User, Brain } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -46,13 +46,17 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/settings')}>
+        <DropdownMenuItem onClick={() => navigate('/profile')}>
           <User className="mr-2 h-4 w-4" />
           个人信息
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/settings')}>
           <Settings className="mr-2 h-4 w-4" />
           设置
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/ai-config')}>
+          <Brain className="mr-2 h-4 w-4" />
+          AI 配置
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>

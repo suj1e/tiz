@@ -1,5 +1,6 @@
 package io.github.suj1e.chat.config;
 
+import io.github.suj1e.chat.client.UserClient;
 import io.github.suj1e.content.api.client.ContentClient;
 import io.github.suj1e.llm.api.client.LlmClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,9 @@ public class HttpClientConfig {
 
     @Value("${content.service.url:http://content-service:8103}")
     private String contentServiceUrl;
+
+    @Value("${user.service.url:http://user-service:8107}")
+    private String userServiceUrl;
 
     /**
      * LoadBalanced WebClient.Builder for service discovery.
@@ -61,5 +65,21 @@ public class HttpClientConfig {
             .build();
 
         return factory.createClient(ContentClient.class);
+    }
+
+    /**
+     * User 服务客户端 (使用服务发现).
+     */
+    @Bean
+    public UserClient userClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        WebClient webClient = loadBalancedWebClientBuilder
+            .baseUrl(userServiceUrl)
+            .build();
+
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+            .builderFor(WebClientAdapter.create(webClient))
+            .build();
+
+        return factory.createClient(UserClient.class);
     }
 }

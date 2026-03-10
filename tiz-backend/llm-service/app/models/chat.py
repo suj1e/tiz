@@ -5,6 +5,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from app.models.ai_config import AiConfig
+
 
 class ChatEventType(str, Enum):
     """SSE event types for chat."""
@@ -22,6 +24,7 @@ class ChatRequest(BaseModel):
     session_id: str | None = Field(default=None, description="Session ID for context")
     message: str = Field(..., min_length=1, description="User message")
     history: list[dict[str, str]] = Field(default_factory=list, description="Chat history")
+    ai_config: AiConfig = Field(..., description="AI configuration for this request")
 
 
 class ChatSessionEvent(BaseModel):
