@@ -17,7 +17,7 @@ tiz/
 │   ├── practice-service/ # 练习服务 (:8104)
 │   ├── quiz-service/     # 测验服务 (:8105)
 │   ├── user-service/     # 用户服务 (:8107)
-│   └── gateway/          # API 网关 (:8080)
+│   └── gateway/          # API 网关 (:9080)
 ├── infra/                # 基础设施
 │   ├── dev/              # 开发环境
 │   ├── staging/          # 预发环境
@@ -201,17 +201,17 @@ docker build -t auth-service:latest .
 
 ### 服务端口
 
-| 服务 | 端口 |
-|------|------|
-| tiz-web | 80 |
-| gateway | 8080 |
-| auth-service | 8101 |
-| chat-service | 8102 |
-| content-service | 8103 |
-| practice-service | 8104 |
-| quiz-service | 8105 |
-| llm-service | 8106 |
-| user-service | 8107 |
+| 服务 | 端口 | 说明 |
+|------|------|------|
+| tiz-web | 80 | 前端 (UA 分流 desktop/mobile) |
+| gateway | 9080 | API 网关 |
+| auth-service | 8101 | 认证服务 |
+| chat-service | 8102 | 对话服务 |
+| content-service | 8103 | 内容服务 |
+| practice-service | 8104 | 练习服务 |
+| quiz-service | 8105 | 测验服务 |
+| llm-service | 8106 | AI 服务 |
+| user-service | 8107 | 用户服务 |
 
 ## API 网关路由
 

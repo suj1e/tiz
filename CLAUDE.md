@@ -606,7 +606,7 @@ deploy/
 | 服务 | 端口 | 说明 |
 |------|------|------|
 | tiz-web | 30000 | 前端 (desktop + mobile UA分流) |
-| gateway | 8080 | API 网关 |
+| gateway | 9080 | API 网关 |
 | auth-service | 8101 | 认证服务 |
 | chat-service | 8102 | 聊天服务 |
 | content-service | 8103 | 内容服务 |
