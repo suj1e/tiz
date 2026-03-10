@@ -197,6 +197,17 @@ docker-compose up -d
 docker build -t auth-service:latest .
 ```
 
+### 部署配置
+
+**CORS 配置**: Gateway 需要 `CORS_ALLOWED_ORIGINS` 环境变量指定允许的前端域名：
+
+```bash
+# deploy/staging/.env
+CORS_ALLOWED_ORIGINS=https://tiz-m.dmall.ink,https://tiz.dmall.ink
+```
+
+**注意**: 修改环境变量后需要重新创建容器 (`docker-compose up -d --force-recreate gateway`)。
+
 ### 基础设施端口 (dev 环境)
 
 | 服务 | 端口 | 用途 |

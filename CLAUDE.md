@@ -649,7 +649,8 @@ cd deploy
 
 # 管理命令
 ./deploy.sh staging stop             # 停止服务
-./deploy.sh staging restart          # 重启服务
+./deploy.sh staging restart          # 拉取最新镜像并重建服务
+./deploy.sh staging restart gateway  # 拉取最新镜像并重建单个服务
 ./deploy.sh staging logs             # 查看日志
 ./deploy.sh staging logs auth-service  # 查看单个服务日志
 ./deploy.sh staging status           # 健康检查
@@ -657,6 +658,23 @@ cd deploy
 
 # 回滚 (需要指定版本)
 ./deploy.sh staging rollback auth-service
+```
+
+**注意**: `restart` 命令会先 `pull` 最新镜像再 `up -d` 重建容器，确保使用最新版本。
+
+### CORS 配置
+
+Gateway 需要配置 `CORS_ALLOWED_ORIGINS` 环境变量：
+
+```bash
+# deploy/staging/.env
+CORS_ALLOWED_ORIGINS=https://tiz-m.dmall.ink,https://tiz.dmall.ink
+```
+
+修改后需要重建容器：
+```bash
+cd deploy/staging
+docker-compose --env-file .env up -d --force-recreate gateway
 ```
 
 ### 部署流程
