@@ -10,13 +10,13 @@ interface QuestionCardProps {
 
 export function QuestionCard({ question, onAnswer, showFeedback = false }: QuestionCardProps) {
   return (
-    <div className="rounded-lg border bg-card p-4 sm:p-6">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm transition-all sm:p-6">
       <div className="mb-3 flex items-center gap-2 sm:mb-4">
-        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+        <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
           {question.type === 'choice' ? '选择题' : '简答题'}
         </span>
       </div>
-      <p className="mb-4 text-base sm:mb-6 sm:text-lg">{question.content}</p>
+      <p className="mb-4 text-base font-medium text-foreground sm:mb-6 sm:text-lg">{question.content}</p>
 
       {question.type === 'choice' ? (
         <ChoiceQuestion

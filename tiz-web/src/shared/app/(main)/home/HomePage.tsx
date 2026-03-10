@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send } from 'lucide-react'
+import { Send, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ChatMessage } from '@/components/chat/ChatMessage'
 import { TypingIndicator } from '@/components/chat/TypingIndicator'
+import { Logo } from '@/components/common/Logo'
 import { useChatStore } from '@/stores/chatStore'
 import { createChatStream, type SSEEvent } from '@/services/chat'
 import { generateId } from '@/lib/utils'
@@ -87,30 +88,43 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl p-4 sm:py-8">
           {messages.length === 0 ? (
             <div className="flex min-h-[50vh] flex-col items-center justify-center text-center sm:min-h-[60vh]">
-              <h2 className="mb-2 text-xl font-semibold sm:text-2xl">开始学习之旅</h2>
+              {/* Logo with glow effect */}
+              <div className="mb-6 shadow-glow sm:mb-8">
+                <Logo showText={false} asLink={false} className="scale-150" />
+              </div>
+
+              {/* Welcome text */}
+              <h2 className="mb-2 font-display text-xl font-semibold sm:text-2xl">
+                开始学习之旅
+              </h2>
               <p className="mb-6 text-sm text-muted-foreground sm:mb-8 sm:text-base">
                 告诉我你想学习什么，我会帮你生成专属练习题
               </p>
+
+              {/* Quick action buttons */}
               <div className="grid w-full max-w-sm gap-2 sm:gap-3">
                 <Button
                   variant="outline"
-                  className="justify-start text-sm"
+                  className="justify-start text-sm transition-all duration-[var(--duration-normal)] hover:-translate-y-0.5 hover:shadow-md"
                   onClick={() => setInput('我想学习 JavaScript 基础知识')}
                 >
+                  <Sparkles className="mr-2 h-4 w-4 text-primary" />
                   JavaScript 基础
                 </Button>
                 <Button
                   variant="outline"
-                  className="justify-start text-sm"
+                  className="justify-start text-sm transition-all duration-[var(--duration-normal)] hover:-translate-y-0.5 hover:shadow-md"
                   onClick={() => setInput('帮我生成 React 相关的练习题')}
                 >
+                  <Sparkles className="mr-2 h-4 w-4 text-primary" />
                   React 框架
                 </Button>
                 <Button
                   variant="outline"
-                  className="justify-start text-sm"
+                  className="justify-start text-sm transition-all duration-[var(--duration-normal)] hover:-translate-y-0.5 hover:shadow-md"
                   onClick={() => setInput('我想练习 TypeScript 类型系统')}
                 >
+                  <Sparkles className="mr-2 h-4 w-4 text-primary" />
                   TypeScript
                 </Button>
               </div>

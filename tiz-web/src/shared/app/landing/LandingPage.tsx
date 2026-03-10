@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, MessageSquare, Sparkles } from 'lucide-react'
+import { MessageSquare, Sparkles, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/common/ThemeToggle'
+import { Logo } from '@/components/common/Logo'
 import { useUIStore } from '@/stores/uiStore'
 
 const features = [
@@ -31,10 +32,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-lg">
-            <BookOpen className="h-6 w-6" />
-            <span>Tiz</span>
-          </Link>
+          <Logo />
           <nav className="flex items-center gap-4">
             <ThemeToggle theme={theme} onThemeChange={setTheme} />
             <Link to="/login">
@@ -47,9 +45,16 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <h1 className="mb-6 text-4xl font-bold tracking-tight lg:text-6xl">
+      {/* Hero with gradient background and glow effect */}
+      <section className="relative container mx-auto px-4 py-20 text-center overflow-hidden">
+        {/* Subtle gradient background */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+        </div>
+        {/* Glow effect at bottom right */}
+        <div className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+
+        <h1 className="mb-6 font-display text-4xl font-bold tracking-tight lg:text-6xl">
           AI 驱动的知识练习平台
         </h1>
         <p className="mb-8 text-lg text-muted-foreground lg:text-xl">
@@ -57,23 +62,30 @@ export default function LandingPage() {
         </p>
         <div className="flex justify-center gap-4">
           <Link to="/chat">
-            <Button size="lg">开始试用</Button>
+            <Button size="lg" className="hover:scale-[1.02] transition-transform duration-200">
+              开始试用
+            </Button>
           </Link>
           <Link to="/register">
-            <Button size="lg" variant="outline">免费注册</Button>
+            <Button size="lg" variant="outline" className="hover:scale-[1.02] transition-transform duration-200">
+              免费注册
+            </Button>
           </Link>
         </div>
       </section>
 
-      {/* Features */}
+      {/* Features with hover effects */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid gap-6 md:grid-cols-3">
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <Card key={feature.title}>
+              <Card
+                key={feature.title}
+                className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
                 <CardHeader>
-                  <Icon className="mb-2 h-10 w-10 text-primary" />
+                  <Icon className="mb-2 h-10 w-10 text-primary transition-transform duration-300 hover:-rotate-12" />
                   <CardTitle>{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>

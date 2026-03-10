@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { QuestionCard } from '@/components/question/QuestionCard'
 import { QuestionProgress } from '@/components/question/QuestionProgress'
@@ -77,6 +78,7 @@ export default function PracticePage() {
 
   const currentQuestion = questions[currentIndex]
   const isLastQuestion = currentIndex === questions.length - 1
+  const hasAnswered = Boolean(currentQuestion?.userAnswer)
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -90,7 +92,7 @@ export default function PracticePage() {
         onAnswer={(answer) => answerQuestion(currentQuestion.id, answer)}
       />
 
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-2">
         <Button
           variant="outline"
           onClick={prevQuestion}
@@ -106,7 +108,14 @@ export default function PracticePage() {
             完成练习
           </Button>
         ) : (
-          <Button onClick={nextQuestion}>
+          <Button
+            onClick={nextQuestion}
+            className={cn(
+              'transition-all duration-200',
+              // 答题后下一题按钮添加脉动提示
+              hasAnswered && 'animate-pulse-ring'
+            )}
+          >
             下一题
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

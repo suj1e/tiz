@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { QuestionCard } from '@/components/question/QuestionCard'
 import { QuizTimer } from '@/components/quiz/QuizTimer'
@@ -109,6 +110,7 @@ export default function QuizPage() {
 
   const currentQuestion = questions[currentIndex]
   const isLastQuestion = currentIndex === questions.length - 1
+  const hasAnswered = Boolean(currentQuestion?.userAnswer)
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 sm:space-y-6">
@@ -116,8 +118,8 @@ export default function QuizPage() {
         <QuizTimer seconds={remainingTime} />
       )}
 
-      <div className="text-center text-xs text-muted-foreground sm:text-sm">
-        题目 {currentIndex + 1} / {questions.length}
+      <div className="text-center text-sm text-muted-foreground">
+        题目 <span className="font-medium tabular-nums">{currentIndex + 1}</span> / <span className="font-medium tabular-nums">{questions.length}</span>
       </div>
 
       <QuestionCard
@@ -151,7 +153,11 @@ export default function QuizPage() {
         ) : (
           <Button
             size="sm"
-            className="sm:size-default"
+            className={cn(
+              'sm:size-default transition-all duration-200',
+              // 答题后下一题按钮添加脉动提示
+              hasAnswered && 'animate-pulse-ring'
+            )}
             onClick={nextQuestion}
           >
             <span className="hidden sm:inline">下一题</span>

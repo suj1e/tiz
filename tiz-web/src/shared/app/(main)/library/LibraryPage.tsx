@@ -134,8 +134,8 @@ export default function LibraryPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">我的题库</h1>
-          <p className="text-muted-foreground">管理你保存的练习题</p>
+          <h1 className="text-2xl font-semibold font-display">我的题库</h1>
+          <p className="text-muted-foreground text-sm">管理你保存的练习题</p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />

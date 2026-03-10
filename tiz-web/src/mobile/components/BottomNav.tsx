@@ -21,14 +21,17 @@ export function BottomNav() {
             key={item.path}
             to={item.path}
             className={cn(
-              'flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs transition-colors',
+              'flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs transition-all',
               isActive
                 ? 'text-primary'
                 : 'text-muted-foreground',
             )}
           >
-            <Icon className="h-5 w-5" />
-            <span>{item.label}</span>
+            <Icon className={cn(
+              'h-5 w-5 transition-transform',
+              isActive && 'scale-110'
+            )} />
+            <span className="font-medium">{item.label}</span>
           </Link>
         )
       })}
