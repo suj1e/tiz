@@ -40,7 +40,9 @@ dependencies {
     implementation(libs.spring.cloud.nacos.config)
 
     // QueryDSL
-    implementation(libs.querydsl.jpa)
+    implementation(variantOf(libs.querydsl.jpa) { classifier("jakarta") })
+    annotationProcessor(variantOf(libs.querydsl.apt) { classifier("jakarta") })
+    annotationProcessor(libs.jakarta.persistence.api)
 
     // Security (JWT already in common)
     implementation(libs.bundles.jjwt)

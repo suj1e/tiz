@@ -53,6 +53,8 @@ dependencies {
 
     // QueryDSL (Jakarta)
     api(variantOf(libs.querydsl.jpa) { classifier("jakarta") })
+    annotationProcessor(variantOf(libs.querydsl.apt) { classifier("jakarta") })
+    annotationProcessor(libs.jakarta.persistence.api)
 
     // Security
     api(libs.bundles.jjwt)

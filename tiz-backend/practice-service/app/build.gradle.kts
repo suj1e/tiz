@@ -38,8 +38,8 @@ dependencies {
     implementation(libs.spring.cloud.loadbalancer)
 
     // QueryDSL
-    implementation(libs.querydsl.jpa)
-    annotationProcessor(libs.querydsl.jpa)
+    implementation(variantOf(libs.querydsl.jpa) { classifier("jakarta") })
+    annotationProcessor(variantOf(libs.querydsl.apt) { classifier("jakarta") })
     annotationProcessor(libs.jakarta.persistence.api)
 
     // MapStruct

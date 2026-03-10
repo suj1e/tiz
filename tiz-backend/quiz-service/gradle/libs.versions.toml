@@ -66,6 +66,8 @@ spring-kafka = { module = "org.springframework.kafka:spring-kafka" }
 
 # QueryDSL
 querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
+querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }
+jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api" }
 
 # Security
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }

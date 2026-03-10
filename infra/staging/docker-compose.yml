@@ -166,7 +166,8 @@ services:
       - JVM_XMN=256m
     ports:
       - "30006:8080"
-      - "31006:9848"
+      - "30848:8848"
+      - "31848:9848"
     volumes:
       - nacos-data:/home/nacos/data
     networks:

@@ -25,6 +25,7 @@ dependencies {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-data-jpa")
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-security")
         exclude(group = "com.querydsl", module = "querydsl-jpa")
+        exclude(group = "com.alibaba.nacos", module = "logback-adapter")
     }
 
     // Spring Cloud Gateway (reactive)
@@ -33,8 +34,14 @@ dependencies {
     implementation(libs.spring.cloud.loadbalancer)
 
     // Spring Cloud Nacos
-    implementation(libs.spring.cloud.nacos.discovery)
-    implementation(libs.spring.cloud.nacos.config)
+    implementation(libs.spring.cloud.nacos.discovery) {
+        exclude(group = "com.alibaba.nacos", module = "nacos-log4j2-adapter")
+    }
+    implementation(libs.spring.cloud.nacos.config) {
+        exclude(group = "com.alibaba.nacos", module = "nacos-log4j2-adapter")
+    }
+    // Explicit nacos-client version for compatibility
+    implementation("com.alibaba.nacos:nacos-client:3.0.1")
 
     // Spring Boot Actuator
     implementation(libs.spring.boot.starter.actuator)

@@ -1,5 +1,14 @@
 server:
-  port: 8080
+  port: 9080
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,gateway
 
 spring:
   application:

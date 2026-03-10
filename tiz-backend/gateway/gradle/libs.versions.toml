@@ -4,6 +4,7 @@ java = "21"
 spring-boot = "4.0.2"
 spring-cloud = "2025.1.1"
 spring-cloud-alibaba = "2025.1.0.0"
+nacos-client = "3.0.1"
 spring-dependency-management = "1.1.7"
 
 # Internal APIs
