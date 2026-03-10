@@ -1,7 +1,7 @@
 package io.github.suj1e.quiz.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import io.github.suj1e.content.api.client.ContentClient;
 import io.github.suj1e.content.api.dto.KnowledgeSetResponse;
 import io.github.suj1e.content.api.dto.QuestionResponse;
@@ -266,7 +266,7 @@ public class QuizService {
         }
         try {
             return objectMapper.readValue(snapshot, QuestionResponse.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Failed to parse question snapshot", e);
             return null;
         }

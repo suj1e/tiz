@@ -22,13 +22,20 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('请输入有效的邮箱地址')
+      return
+    }
+
     if (password !== confirmPassword) {
       setError('两次输入的密码不一致')
       return
     }
 
-    if (password.length < 6) {
-      setError('密码至少需要 6 个字符')
+    if (password.length < 8) {
+      setError('密码至少需要 8 个字符')
       return
     }
 
@@ -70,7 +77,7 @@ export default function RegisterPage() {
             <Label htmlFor="email">邮箱</Label>
             <Input
               id="email"
-              type="email"
+              type="text"
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +89,7 @@ export default function RegisterPage() {
             <Input
               id="password"
               type="password"
-              placeholder="至少 6 个字符"
+              placeholder="至少 8 个字符"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

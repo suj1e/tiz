@@ -1,7 +1,7 @@
 package io.github.suj1e.quiz.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import io.github.suj1e.content.api.client.ContentClient;
 import io.github.suj1e.content.api.dto.QuestionResponse;
 import io.github.suj1e.llm.api.client.LlmClient;
@@ -146,7 +146,7 @@ public class GradingService {
     private String toJson(Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Failed to serialize object", e);
             return "{}";
         }

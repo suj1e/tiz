@@ -45,7 +45,13 @@ async function request<T>(
   const data = await response.json()
 
   if (!response.ok) {
-    const error = data as ApiErrorType['error']
+    // Backend returns errors in format: { data: { type, code, message } }
+    const errorBody = data.data || data.error || data
+    const error = {
+      type: errorBody.type || 'unknown_error',
+      code: errorBody.code || 'UNKNOWN',
+      message: errorBody.message || '请求失败',
+    }
     if (response.status === 401) {
       useAuthStore.getState().logout()
       window.location.href = '/login'

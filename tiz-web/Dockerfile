@@ -36,9 +36,13 @@ RUN rm -rf /usr/share/nginx/html/* /var/log/nginx/*
 # Copy nginx config with UA routing
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy both builds
+# Copy both builds and rename index files
 COPY --from=builder /app/dist/desktop /usr/share/nginx/html/desktop
 COPY --from=builder /app/dist/mobile /usr/share/nginx/html/mobile
+
+# Rename index files to standard index.html
+RUN mv /usr/share/nginx/html/desktop/index.desktop.html /usr/share/nginx/html/desktop/index.html && \
+    mv /usr/share/nginx/html/mobile/index.mobile.html /usr/share/nginx/html/mobile/index.html
 
 # Create non-root user
 RUN addgroup -g 1001 -S nginx-app && \

@@ -8,9 +8,13 @@ ARG ALIYUN_MAVEN_PASSWORD
 ENV ALIYUN_MAVEN_USERNAME=${ALIYUN_MAVEN_USERNAME}
 ENV ALIYUN_MAVEN_PASSWORD=${ALIYUN_MAVEN_PASSWORD}
 
-# Configure Gradle
+# Configure Gradle with Maven credentials
 RUN mkdir -p ~/.gradle && \
-    echo "org.gradle.jvmargs=-Xmx2g" >> ~/.gradle/gradle.properties
+    echo "org.gradle.jvmargs=-Xmx2g" >> ~/.gradle/gradle.properties && \
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then \
+        echo "aliyunMavenUsername=$ALIYUN_MAVEN_USERNAME" >> ~/.gradle/gradle.properties && \
+        echo "aliyunMavenPassword=$ALIYUN_MAVEN_PASSWORD" >> ~/.gradle/gradle.properties; \
+    fi
 
 # Copy gradle wrapper and config first (for caching)
 COPY gradle ./gradle

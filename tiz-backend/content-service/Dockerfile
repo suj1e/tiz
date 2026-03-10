@@ -8,7 +8,11 @@ ENV ALIYUN_MAVEN_USERNAME=${ALIYUN_MAVEN_USERNAME}
 ENV ALIYUN_MAVEN_PASSWORD=${ALIYUN_MAVEN_PASSWORD}
 
 RUN mkdir -p ~/.gradle && \
-    echo "org.gradle.jvmargs=-Xmx2g" >> ~/.gradle/gradle.properties
+    echo "org.gradle.jvmargs=-Xmx2g" >> ~/.gradle/gradle.properties && \
+    if [ -n "$ALIYUN_MAVEN_USERNAME" ] && [ -n "$ALIYUN_MAVEN_PASSWORD" ]; then \
+        echo "aliyunMavenUsername=$ALIYUN_MAVEN_USERNAME" >> ~/.gradle/gradle.properties && \
+        echo "aliyunMavenPassword=$ALIYUN_MAVEN_PASSWORD" >> ~/.gradle/gradle.properties; \
+    fi
 
 COPY gradle ./gradle
 COPY gradle.properties settings.gradle.kts build.gradle.kts ./

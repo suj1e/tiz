@@ -44,4 +44,3 @@ Thumbs.db
 # Tests
 tests/
 pytest.ini
-pyproject.toml

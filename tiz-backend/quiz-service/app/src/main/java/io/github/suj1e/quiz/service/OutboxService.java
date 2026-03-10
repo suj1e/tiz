@@ -1,7 +1,7 @@
 package io.github.suj1e.quiz.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import io.github.suj1e.quiz.dto.QuizCompletedEvent;
 import io.github.suj1e.quiz.entity.OutboxEvent;
 import io.github.suj1e.quiz.repository.OutboxEventRepository;
@@ -50,7 +50,7 @@ public class OutboxService {
     private String toJson(Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Failed to serialize object", e);
             throw new RuntimeException("Failed to serialize event payload", e);
         }
