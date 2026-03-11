@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
     preferred_model VARCHAR(50) NOT NULL DEFAULT 'gpt-4o',
     temperature DECIMAL(3,2) NOT NULL DEFAULT 0.70,
     max_tokens INT NOT NULL DEFAULT 4096,
-    system_prompt TEXT NOT NULL DEFAULT 'You are a helpful assistant.',
+    system_prompt TEXT NOT NULL,
     response_language VARCHAR(10) NOT NULL DEFAULT 'zh',
     custom_api_url VARCHAR(500) NOT NULL DEFAULT 'https://api.openai.com/v1',
     custom_api_key VARCHAR(255) NOT NULL DEFAULT '',
