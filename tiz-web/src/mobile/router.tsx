@@ -9,6 +9,7 @@ import { AppLayout } from './layouts/AppLayout'
 const LandingPage = () => import('@/app/landing/LandingPage')
 const LoginPage = () => import('@/app/(auth)/login/LoginPage')
 const RegisterPage = () => import('@/app/(auth)/register/RegisterPage')
+const LarkCallbackPage = () => import('@/app/(auth)/lark/LarkCallbackPage')
 const ChatPage = () => import('@/app/chat/ChatPage')
 const NotFoundPage = () => import('@/app/not-found/NotFoundPage')
 const HomePage = () => import('@/app/(main)/home/HomePage')
@@ -65,6 +66,10 @@ export const router = createBrowserRouter([
       {
         path: 'register',
         element: lazy(RegisterPage),
+      },
+      {
+        path: 'lark/callback',
+        element: lazy(LarkCallbackPage),
       },
     ],
   },

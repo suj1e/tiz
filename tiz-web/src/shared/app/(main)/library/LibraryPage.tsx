@@ -1,6 +1,6 @@
 import type { KnowledgeSetSummary } from '@/types'
 import { Plus, Search } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { EmptyState } from '@/components/common/EmptyState'
 import { LoadingState } from '@/components/common/LoadingState'
 import { PageError } from '@/components/common/PageError'
@@ -18,9 +18,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { generateId } from '@/lib/utils'
 import { contentService } from '@/services/content'
+import { useAuthContext } from '@/providers/AuthProvider'
 import { useLibraryStore } from '@/stores/libraryStore'
 
 export default function LibraryPage() {
+  const { isAuthenticated } = useAuthContext()
   const {
     libraries,
     categories,
@@ -43,30 +45,34 @@ export default function LibraryPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [newTitle, setNewTitle] = useState('')
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const [libsRes, cats, tagsData] = await Promise.all([
-          contentService.getLibraries(),
-          contentService.getCategories(),
-          contentService.getTags(),
-        ])
-        setLibraries(libsRes.data)
-        setCategories(cats)
-        setTags(tagsData)
-      }
-      catch (err) {
-        setError(err instanceof Error ? err : new Error('加载失败'))
-      }
-      finally {
-        setLoading(false)
-      }
+  // 加载所有数据
+  const loadData = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const [libsRes, cats, tagsData] = await Promise.all([
+        contentService.getLibraries(),
+        contentService.getCategories(),
+        contentService.getTags(),
+      ])
+      setLibraries(libsRes.data)
+      setCategories(cats)
+      setTags(tagsData)
     }
-
-    loadData()
+    catch (err) {
+      setError(err instanceof Error ? err : new Error('加载失败'))
+    }
+    finally {
+      setLoading(false)
+    }
   }, [setLibraries, setCategories, setTags, setLoading])
+
+  useEffect(() => {
+    // 等待用户登录完成后再加载数据，避免请求携带空token失败
+    if (isAuthenticated) {
+      loadData()
+    }
+  }, [isAuthenticated, loadData])
 
   const filteredLibraries = useMemo(() => {
     let filtered = libraries
@@ -121,11 +127,7 @@ export default function LibraryPage() {
     return (
       <PageError
         message={error.message}
-        onRetry={() => {
-          setError(null)
-          setLoading(true)
-          contentService.getLibraries().then(res => setLibraries(res.data)).finally(() => setLoading(false))
-        }}
+        onRetry={loadData}
       />
     )
   }

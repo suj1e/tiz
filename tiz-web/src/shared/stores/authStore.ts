@@ -32,11 +32,11 @@ const initialState: AuthState = {
 
 export const useAuthStore = create<AuthStore>(set => ({
   ...initialState,
-  setUser: user => {
+  setUser: (user) => {
     console.log('[AuthStore] setUser called:', user?.email)
     set({ user, isAuthenticated: !!user })
   },
-  setToken: token => {
+  setToken: (token) => {
     console.log('[AuthStore] setToken called:', token ? 'exists' : 'null')
     set({ token })
   },

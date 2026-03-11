@@ -99,6 +99,38 @@ export default function LoginPage() {
             {loading ? '登录中...' : '登录'}
           </Button>
         </form>
+
+        {/* 第三方登录 */}
+        <div className="mt-6">
+          <div className="relative flex items-center justify-center">
+            <hr className="w-full border-t border-muted" />
+            <span className="absolute bg-card px-2 text-xs text-muted-foreground">
+              其他登录方式
+            </span>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => {
+                // 飞书OAuth授权跳转，替换为你的飞书APP_ID和回调地址
+                const APP_ID = import.meta.env.VITE_LARK_APP_ID
+                const REDIRECT_URI = encodeURIComponent(`${window.location.origin}/lark/callback`)
+                window.location.href = `https://open.feishu.cn/open-apis/authen/v1/index?app_id=${APP_ID}&redirect_uri=${REDIRECT_URI}&state=login`
+              }}
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.967 0C5.396 0 0 5.396 0 11.967C0 18.538 5.396 23.934 11.967 23.934C18.538 23.934 23.934 18.538 23.934 11.967C23.934 5.396 18.538 0 11.967 0Z" fill="#2663EB"/>
+                <path d="M16.972 7.077H13.771V11.705H16.972V7.077Z" fill="white"/>
+                <path d="M10.162 7.077H6.961V11.705H10.162V7.077Z" fill="white"/>
+                <path d="M16.972 13.28H13.771V17.908H16.972V13.28Z" fill="white"/>
+                <path d="M10.162 13.28H6.961V17.908H10.162V13.28Z" fill="white"/>
+              </svg>
+              飞书登录
+            </Button>
+          </div>
+        </div>
+
         <div className="mt-4 text-center text-sm text-muted-foreground">
           还没有账户？
           {' '}

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { User } from '@/types'
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, use, useCallback, useEffect, useState } from 'react'
 import { authService } from '@/services/auth'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -14,7 +14,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function useAuthContext(): AuthContextValue {
-  const context = useContext(AuthContext)
+  const context = use(AuthContext)
   if (!context) {
     throw new Error('useAuthContext must be used within an AuthProvider')
   }

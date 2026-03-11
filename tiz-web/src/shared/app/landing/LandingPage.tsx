@@ -1,3 +1,4 @@
+import React from 'react'
 import { BookOpen, MessageSquare, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Logo } from '@/components/common/Logo'
@@ -29,6 +30,13 @@ export default function LandingPage() {
   const navigate = useNavigate()
   const { theme, setTheme } = useUIStore()
   const { isAuthenticated, hasAiConfig } = useAuthContext()
+
+  // 已登录用户自动跳转到内部首页
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home')
+    }
+  }, [isAuthenticated, navigate])
 
   const handleStartTrial = () => {
     if (!isAuthenticated) {
