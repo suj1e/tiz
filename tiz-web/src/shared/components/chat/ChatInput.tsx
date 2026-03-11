@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { Send } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 
@@ -13,7 +13,8 @@ export function ChatInput({ onSend, disabled, placeholder = '输入消息...' }:
   const [value, setValue] = useState('')
 
   const handleSend = () => {
-    if (!value.trim() || disabled) return
+    if (!value.trim() || disabled)
+      return
     onSend(value.trim())
     setValue('')
   }
@@ -22,7 +23,7 @@ export function ChatInput({ onSend, disabled, placeholder = '输入消息...' }:
     <div className="flex gap-2 border-t p-4">
       <Textarea
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={e => setValue(e.target.value)}
         placeholder={placeholder}
         className="min-h-[60px] resize-none"
         onKeyDown={(e) => {

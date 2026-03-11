@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { LoadingState } from '@/components/common/LoadingState'
 import { QuestionCard } from '@/components/question/QuestionCard'
 import { QuestionProgress } from '@/components/question/QuestionProgress'
-import { LoadingState } from '@/components/common/LoadingState'
-import { usePracticeStore } from '@/stores/practiceStore'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { practiceService } from '@/services/practice'
+import { usePracticeStore } from '@/stores/practiceStore'
 
 export default function PracticePage() {
   const { id } = useParams<{ id: string }>()
@@ -30,7 +30,8 @@ export default function PracticePage() {
 
   useEffect(() => {
     const startPractice = async () => {
-      if (!id) return
+      if (!id)
+        return
 
       setLoading(true)
       try {
@@ -50,7 +51,8 @@ export default function PracticePage() {
   }, [id])
 
   const handleComplete = async () => {
-    if (!practiceId) return
+    if (!practiceId)
+      return
 
     try {
       await practiceService.complete(practiceId)
@@ -89,7 +91,7 @@ export default function PracticePage() {
 
       <QuestionCard
         question={currentQuestion}
-        onAnswer={(answer) => answerQuestion(currentQuestion.id, answer)}
+        onAnswer={answer => answerQuestion(currentQuestion.id, answer)}
       />
 
       <div className="flex justify-between gap-2">
@@ -113,7 +115,7 @@ export default function PracticePage() {
             className={cn(
               'transition-all duration-200',
               // 答题后下一题按钮添加脉动提示
-              hasAnswered && 'animate-pulse-ring'
+              hasAnswered && 'animate-pulse-ring',
             )}
           >
             下一题

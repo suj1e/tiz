@@ -45,7 +45,7 @@ export const contentHandlers = [
   http.get('/api/content/v1/library', async () => {
     await delay(300)
 
-    const libraries = mockLibrary.map((lib) => ({
+    const libraries = mockLibrary.map(lib => ({
       id: lib.id,
       title: lib.title,
       category: lib.category,
@@ -64,7 +64,7 @@ export const contentHandlers = [
 
   http.get('/api/content/v1/library/:id', async ({ params }) => {
     await delay(200)
-    const library = mockLibrary.find((lib) => lib.id === params.id)
+    const library = mockLibrary.find(lib => lib.id === params.id)
 
     if (!library) {
       return HttpResponse.json(
@@ -84,7 +84,7 @@ export const contentHandlers = [
 
   http.patch('/api/content/v1/library/:id', async ({ params, request }) => {
     await delay(300)
-    const library = mockLibrary.find((lib) => lib.id === params.id)
+    const library = mockLibrary.find(lib => lib.id === params.id)
 
     if (!library) {
       return HttpResponse.json(

@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import type { QuestionWithAnswer } from '@/types'
+import { create } from 'zustand'
 
 interface PracticeState {
   practiceId: string | null
@@ -33,23 +33,23 @@ const initialState: PracticeState = {
   startTime: null,
 }
 
-export const usePracticeStore = create<PracticeStore>((set) => ({
+export const usePracticeStore = create<PracticeStore>(set => ({
   ...initialState,
-  setPracticeId: (practiceId) => set({ practiceId }),
-  setKnowledgeSetId: (knowledgeSetId) => set({ knowledgeSetId }),
-  setQuestions: (questions) => set({ questions, startTime: Date.now() }),
-  setCurrentIndex: (currentIndex) => set({ currentIndex }),
+  setPracticeId: practiceId => set({ practiceId }),
+  setKnowledgeSetId: knowledgeSetId => set({ knowledgeSetId }),
+  setQuestions: questions => set({ questions, startTime: Date.now() }),
+  setCurrentIndex: currentIndex => set({ currentIndex }),
   answerQuestion: (questionId, answer) =>
-    set((state) => ({
-      questions: state.questions.map((q) =>
+    set(state => ({
+      questions: state.questions.map(q =>
         q.id === questionId ? { ...q, userAnswer: answer } : q,
       ),
     })),
   nextQuestion: () =>
-    set((state) => ({
+    set(state => ({
       currentIndex: Math.min(state.currentIndex + 1, state.questions.length - 1),
     })),
-  prevQuestion: () => set((state) => ({ currentIndex: Math.max(state.currentIndex - 1, 0) })),
+  prevQuestion: () => set(state => ({ currentIndex: Math.max(state.currentIndex - 1, 0) })),
   complete: () => set({ isComplete: true }),
   reset: () => set(initialState),
 }))

@@ -1,7 +1,8 @@
+import type { SSEEvent } from '@/services/chat'
 import { useCallback, useRef } from 'react'
-import { useChatStore } from '@/stores/chatStore'
-import { createChatStream, type SSEEvent } from '@/services/chat'
 import { generateId } from '@/lib/utils'
+import { createChatStream } from '@/services/chat'
+import { useChatStore } from '@/stores/chatStore'
 
 export function useChat() {
   const abortControllerRef = useRef<{ abort: () => void } | null>(null)
@@ -22,7 +23,8 @@ export function useChat() {
   } = useChatStore()
 
   const sendMessage = useCallback((content: string) => {
-    if (!content.trim() || status === 'streaming') return
+    if (!content.trim() || status === 'streaming')
+      return
 
     const userMessage = {
       id: generateId(),

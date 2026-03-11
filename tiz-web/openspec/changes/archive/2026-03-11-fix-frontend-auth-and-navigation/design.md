@@ -117,12 +117,14 @@ localStorage.removeItem('tiz-web-token')
 **决策：在点击时检查状态并跳转**
 
 ```typescript
-const handleStartTrial = () => {
+function handleStartTrial() {
   if (!isAuthenticated) {
     navigate('/login', { state: { from: { pathname: '/chat' } } })
-  } else if (!hasAiConfig) {
+  }
+  else if (!hasAiConfig) {
     navigate('/ai-config', { state: { from: { pathname: '/chat' } } })
-  } else {
+  }
+  else {
     navigate('/chat')
   }
 }

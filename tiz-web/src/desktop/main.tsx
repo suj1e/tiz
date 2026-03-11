@@ -1,9 +1,9 @@
+import { tryLarkLogin } from '@lark/auth'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { startMock } from '@/mocks/browser'
-import { tryLarkLogin } from '@lark/auth'
-import '@/index.css'
 import App from './App'
+import '@/index.css'
 
 async function bootstrap() {
   if (import.meta.env.VITE_MOCK === 'true') {

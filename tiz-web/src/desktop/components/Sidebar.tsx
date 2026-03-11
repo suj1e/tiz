@@ -1,7 +1,7 @@
+import { BookOpen, Home, Settings } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Settings, BookOpen } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { Logo } from '@/components/common/Logo'
+import { cn } from '@/lib/utils'
 
 const navItems = [
   { path: '/home', label: '首页', icon: Home },

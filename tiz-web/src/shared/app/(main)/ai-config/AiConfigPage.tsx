@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react'
+import type { AiConfig } from '@/types'
+import { ArrowLeft, Brain, Cpu, Globe, KeyRound, Sparkles } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Brain, Cpu, Sparkles, Globe, KeyRound, ArrowLeft } from 'lucide-react'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { Slider } from '@/components/ui/slider'
+import { Textarea } from '@/components/ui/textarea'
 import { userService } from '@/services/user'
-import type { AiConfig } from '@/types'
-import { toast } from 'sonner'
 
 export default function AiConfigPage() {
   const navigate = useNavigate()
@@ -36,10 +36,12 @@ export default function AiConfigPage() {
       if (data) {
         setConfig(data)
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to load AI config:', error)
       // Use default values on error
-    } finally {
+    }
+    finally {
       setLoading(false)
     }
   }
@@ -50,10 +52,12 @@ export default function AiConfigPage() {
       await userService.updateAiConfig(config as AiConfig)
       toast.success('AI 配置已保存')
       navigate('/home')
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to save AI config:', error)
       toast.error('保存失败，请重试')
-    } finally {
+    }
+    finally {
       setSaving(false)
     }
   }
@@ -121,7 +125,7 @@ export default function AiConfigPage() {
                 <SelectValue placeholder="选择 AI 模型" />
               </SelectTrigger>
               <SelectContent>
-                {modelOptions.map((option) => (
+                {modelOptions.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     <div className="flex flex-col">
                       <span className="font-medium">{option.label}</span>
@@ -165,7 +169,7 @@ export default function AiConfigPage() {
               max={32768}
               step={256}
               value={config.maxTokens ?? 4096}
-              onChange={(e) => setConfig({ ...config, maxTokens: parseInt(e.target.value) || 4096 })}
+              onChange={e => setConfig({ ...config, maxTokens: Number.parseInt(e.target.value) || 4096 })}
               placeholder="4096"
             />
             <p className="text-xs text-muted-foreground">
@@ -191,7 +195,7 @@ export default function AiConfigPage() {
             <Textarea
               id="systemPrompt"
               value={config.systemPrompt ?? ''}
-              onChange={(e) => setConfig({ ...config, systemPrompt: e.target.value })}
+              onChange={e => setConfig({ ...config, systemPrompt: e.target.value })}
               placeholder="You are a helpful assistant."
               rows={4}
               className="resize-none"
@@ -212,7 +216,7 @@ export default function AiConfigPage() {
                 <SelectValue placeholder="选择语言" />
               </SelectTrigger>
               <SelectContent>
-                {languageOptions.map((option) => (
+                {languageOptions.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -240,7 +244,7 @@ export default function AiConfigPage() {
               id="apiUrl"
               type="url"
               value={config.customApiUrl ?? ''}
-              onChange={(e) => setConfig({ ...config, customApiUrl: e.target.value })}
+              onChange={e => setConfig({ ...config, customApiUrl: e.target.value })}
               placeholder="https://api.openai.com/v1"
             />
             <p className="text-xs text-muted-foreground">
@@ -257,7 +261,7 @@ export default function AiConfigPage() {
                 id="apiKey"
                 type="password"
                 value={config.customApiKey ?? ''}
-                onChange={(e) => setConfig({ ...config, customApiKey: e.target.value })}
+                onChange={e => setConfig({ ...config, customApiKey: e.target.value })}
                 placeholder="sk-..."
                 className="pl-9"
               />

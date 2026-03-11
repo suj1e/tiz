@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import type { Category, KnowledgeSetSummary, Tag } from '@/types'
+import { create } from 'zustand'
 
 interface LibraryState {
   libraries: KnowledgeSetSummary[]
@@ -44,25 +44,25 @@ const initialState: LibraryState = {
   nextToken: null,
 }
 
-export const useLibraryStore = create<LibraryStore>((set) => ({
+export const useLibraryStore = create<LibraryStore>(set => ({
   ...initialState,
-  setLibraries: (libraries) => set({ libraries }),
-  appendLibraries: (newLibraries) =>
-    set((state) => ({ libraries: [...state.libraries, ...newLibraries] })),
-  addLibrary: (library) => set((state) => ({ libraries: [library, ...state.libraries] })),
-  removeLibrary: (id) => set((state) => ({ libraries: state.libraries.filter((l) => l.id !== id) })),
-  setCategories: (categories) => set({ categories }),
-  setTags: (tags) => set({ tags }),
-  setSelectedCategory: (selectedCategory) => set({ selectedCategory }),
-  setSelectedTags: (selectedTags) => set({ selectedTags }),
-  toggleTag: (tag) =>
-    set((state) => ({
+  setLibraries: libraries => set({ libraries }),
+  appendLibraries: newLibraries =>
+    set(state => ({ libraries: [...state.libraries, ...newLibraries] })),
+  addLibrary: library => set(state => ({ libraries: [library, ...state.libraries] })),
+  removeLibrary: id => set(state => ({ libraries: state.libraries.filter(l => l.id !== id) })),
+  setCategories: categories => set({ categories }),
+  setTags: tags => set({ tags }),
+  setSelectedCategory: selectedCategory => set({ selectedCategory }),
+  setSelectedTags: selectedTags => set({ selectedTags }),
+  toggleTag: tag =>
+    set(state => ({
       selectedTags: state.selectedTags.includes(tag)
-        ? state.selectedTags.filter((t) => t !== tag)
+        ? state.selectedTags.filter(t => t !== tag)
         : [...state.selectedTags, tag],
     })),
-  setSearchQuery: (searchQuery) => set({ searchQuery }),
-  setLoading: (isLoading) => set({ isLoading }),
+  setSearchQuery: searchQuery => set({ searchQuery }),
+  setLoading: isLoading => set({ isLoading }),
   setPagination: (hasNextPage, nextToken) => set({ hasNextPage, nextToken }),
   resetPagination: () => set({ hasNextPage: false, nextToken: null }),
 }))

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/stores/authStore'
 import { authService } from '@/services/auth'
+import { useAuthStore } from '@/stores/authStore'
 
 /**
  * @deprecated Use AuthProvider instead. This hook will be removed in a future version.

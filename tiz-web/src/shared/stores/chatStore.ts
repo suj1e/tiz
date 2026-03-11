@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import type { GenerationSummary, Message } from '@/types'
+import { create } from 'zustand'
 
 interface ChatState {
   sessionId: string | null
@@ -31,11 +31,11 @@ const initialState: ChatState = {
   streamingContent: '',
 }
 
-export const useChatStore = create<ChatStore>((set) => ({
+export const useChatStore = create<ChatStore>(set => ({
   ...initialState,
-  setSessionId: (sessionId) => set({ sessionId }),
-  addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-  updateLastMessage: (content) =>
+  setSessionId: sessionId => set({ sessionId }),
+  addMessage: message => set(state => ({ messages: [...state.messages, message] })),
+  updateLastMessage: content =>
     set((state) => {
       const messages = [...state.messages]
       if (messages.length > 0) {
@@ -43,11 +43,11 @@ export const useChatStore = create<ChatStore>((set) => ({
       }
       return { messages }
     }),
-  setSummary: (summary) => set({ summary }),
-  setStatus: (status) => set({ status }),
-  setStreamingContent: (streamingContent) => set({ streamingContent }),
-  appendStreamingContent: (content) =>
-    set((state) => ({ streamingContent: state.streamingContent + content })),
+  setSummary: summary => set({ summary }),
+  setStatus: status => set({ status }),
+  setStreamingContent: streamingContent => set({ streamingContent }),
+  appendStreamingContent: content =>
+    set(state => ({ streamingContent: state.streamingContent + content })),
   clearStreamingContent: () => set({ streamingContent: '' }),
   reset: () => set(initialState),
 }))

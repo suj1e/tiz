@@ -22,11 +22,11 @@ const initialState: UIState = {
   theme: 'system',
 }
 
-export const useUIStore = create<UIStore>((set) => ({
+export const useUIStore = create<UIStore>(set => ({
   ...initialState,
-  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-  setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
-  toggleMobileMenu: () => set((state) => ({ mobileMenuOpen: !state.mobileMenuOpen })),
-  setMobileMenuOpen: (mobileMenuOpen) => set({ mobileMenuOpen }),
-  setTheme: (theme) => set({ theme }),
+  toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen })),
+  setSidebarOpen: sidebarOpen => set({ sidebarOpen }),
+  toggleMobileMenu: () => set(state => ({ mobileMenuOpen: !state.mobileMenuOpen })),
+  setMobileMenuOpen: mobileMenuOpen => set({ mobileMenuOpen }),
+  setTheme: theme => set({ theme }),
 }))

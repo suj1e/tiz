@@ -1,5 +1,5 @@
-import { useAuthStore } from '@/stores/authStore'
 import type { ChatStreamRequest, ConfirmGenerationRequest, GenerationSummary, Message } from '@/types'
+import { useAuthStore } from '@/stores/authStore'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
@@ -62,7 +62,8 @@ export function createChatStream(
 
       while (true) {
         const { done, value } = await reader.read()
-        if (done) break
+        if (done)
+          break
 
         buffer += decoder.decode(value, { stream: true })
         const lines = buffer.split('\n')
@@ -103,7 +104,7 @@ export const chatService = {
           : {}),
       },
       body: JSON.stringify(request),
-    }).then((res) => res.json().then((data) => data.data))
+    }).then(res => res.json().then(data => data.data))
   },
 
   getHistory: (sessionId: string): Promise<{ messages: Message[] }> => {
@@ -113,6 +114,6 @@ export const chatService = {
           ? { Authorization: `Bearer ${useAuthStore.getState().token}` }
           : {}),
       },
-    }).then((res) => res.json().then((data) => data.data))
+    }).then(res => res.json().then(data => data.data))
   },
 }

@@ -1,5 +1,5 @@
-import { api } from './api'
 import type { QuestionWithAnswer, QuizResult } from '@/types'
+import { api } from './api'
 
 interface StartQuizResponse {
   quiz_id: string
@@ -21,7 +21,7 @@ export const quizService = {
 
   submit: (
     quizId: string,
-    answers: Array<{ question_id: string; answer: string }>,
+    answers: Array<{ question_id: string, answer: string }>,
   ): Promise<{ result_id: string }> => {
     return api.post(`/quiz/v1/${quizId}/submit`, { answers })
   },

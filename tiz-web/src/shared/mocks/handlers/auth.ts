@@ -1,12 +1,12 @@
-import { http, HttpResponse, delay } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { mockUsers } from '../data/users'
 
 export const authHandlers = [
   http.post('/api/auth/v1/register', async ({ request }) => {
     await delay(500)
-    const body = (await request.json()) as { email: string; password: string }
+    const body = (await request.json()) as { email: string, password: string }
 
-    const existingUser = mockUsers.find((u) => u.email === body.email)
+    const existingUser = mockUsers.find(u => u.email === body.email)
     if (existingUser) {
       return HttpResponse.json(
         {
@@ -37,9 +37,9 @@ export const authHandlers = [
 
   http.post('/api/auth/v1/login', async ({ request }) => {
     await delay(500)
-    const body = (await request.json()) as { email: string; password: string }
+    const body = (await request.json()) as { email: string, password: string }
 
-    const user = mockUsers.find((u) => u.email === body.email)
+    const user = mockUsers.find(u => u.email === body.email)
     if (!user) {
       return HttpResponse.json(
         {

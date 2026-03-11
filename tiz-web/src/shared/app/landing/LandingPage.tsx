@@ -1,11 +1,11 @@
+import { BookOpen, MessageSquare, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
-import { MessageSquare, Sparkles, BookOpen } from 'lucide-react'
+import { Logo } from '@/components/common/Logo'
+import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ThemeToggle } from '@/components/common/ThemeToggle'
-import { Logo } from '@/components/common/Logo'
-import { useUIStore } from '@/stores/uiStore'
 import { useAuthContext } from '@/providers/AuthProvider'
+import { useUIStore } from '@/stores/uiStore'
 
 const features = [
   {
@@ -33,9 +33,11 @@ export default function LandingPage() {
   const handleStartTrial = () => {
     if (!isAuthenticated) {
       navigate('/login')
-    } else if (hasAiConfig === false) {
+    }
+    else if (hasAiConfig === false) {
       navigate('/ai-config')
-    } else {
+    }
+    else {
       navigate('/chat')
     }
   }

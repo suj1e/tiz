@@ -1,11 +1,11 @@
-import { useState } from 'react'
 import { Webhook } from 'lucide-react'
+import { useState } from 'react'
+import { ThemeToggle } from '@/components/common/ThemeToggle'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { useUIStore } from '@/stores/uiStore'
 
 export default function SettingsPage() {
@@ -20,7 +20,8 @@ export default function SettingsPage() {
   })
 
   const testWebhook = async () => {
-    if (!webhookUrl) return
+    if (!webhookUrl)
+      return
     // Mock webhook test
     alert('Webhook 测试请求已发送')
   }
@@ -97,7 +98,7 @@ export default function SettingsPage() {
                     type="url"
                     placeholder="https://your-server.com/webhook"
                     value={webhookUrl}
-                    onChange={(e) => setWebhookUrl(e.target.value)}
+                    onChange={e => setWebhookUrl(e.target.value)}
                   />
                   <Button variant="outline" onClick={testWebhook} disabled={!webhookUrl}>
                     测试
@@ -112,27 +113,24 @@ export default function SettingsPage() {
                     <span className="text-sm">练习完成</span>
                     <Switch
                       checked={webhookEvents.practiceComplete}
-                      onCheckedChange={(checked) =>
-                        setWebhookEvents({ ...webhookEvents, practiceComplete: checked })
-                      }
+                      onCheckedChange={checked =>
+                        setWebhookEvents({ ...webhookEvents, practiceComplete: checked })}
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">测验完成</span>
                     <Switch
                       checked={webhookEvents.quizComplete}
-                      onCheckedChange={(checked) =>
-                        setWebhookEvents({ ...webhookEvents, quizComplete: checked })
-                      }
+                      onCheckedChange={checked =>
+                        setWebhookEvents({ ...webhookEvents, quizComplete: checked })}
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">题库更新</span>
                     <Switch
                       checked={webhookEvents.libraryUpdate}
-                      onCheckedChange={(checked) =>
-                        setWebhookEvents({ ...webhookEvents, libraryUpdate: checked })
-                      }
+                      onCheckedChange={checked =>
+                        setWebhookEvents({ ...webhookEvents, libraryUpdate: checked })}
                     />
                   </div>
                 </div>

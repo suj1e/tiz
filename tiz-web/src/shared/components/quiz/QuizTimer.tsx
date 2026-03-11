@@ -29,9 +29,12 @@ export function QuizTimer({ seconds }: QuizTimerProps) {
         'h-4 w-4 sm:h-5 sm:w-5',
         isWarning && 'animate-spin-slow',
         isCritical && 'animate-ping',
-      )} />
+      )}
+      />
       <span className="font-mono text-xl font-bold tabular-nums sm:text-2xl">
-        {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
+        {String(minutes).padStart(2, '0')}
+        :
+        {String(secs).padStart(2, '0')}
       </span>
     </div>
   )

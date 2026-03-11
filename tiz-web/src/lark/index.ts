@@ -6,9 +6,9 @@ export const LARK_APP_ID = import.meta.env.VITE_LARK_APP_ID || ''
 export function isInLarkEnv(): boolean {
   const ua = navigator.userAgent
   return (
-    ua.includes('Lark') ||
-    ua.includes('Feishu') ||
-    new URLSearchParams(window.location.search).has('mock_lark')
+    ua.includes('Lark')
+    || ua.includes('Feishu')
+    || new URLSearchParams(window.location.search).has('mock_lark')
   )
 }
 
@@ -42,8 +42,8 @@ export function getLarkAuthCode(): Promise<string> {
 
     window.tt.requestAuthCode({
       app_id: LARK_APP_ID,
-      success: (res) => resolve(res.code),
-      fail: (err) => reject(err),
+      success: res => resolve(res.code),
+      fail: err => reject(err),
     })
   })
 }

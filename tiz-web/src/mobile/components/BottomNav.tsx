@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom'
 import { BookOpen, Home, Settings } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -29,8 +29,9 @@ export function BottomNav() {
           >
             <Icon className={cn(
               'h-5 w-5 transition-transform',
-              isActive && 'scale-110'
-            )} />
+              isActive && 'scale-110',
+            )}
+            />
             <span className="font-medium">{item.label}</span>
           </Link>
         )

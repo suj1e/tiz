@@ -16,17 +16,19 @@ export function AnswerFeedback({ isCorrect, correctAnswer, explanation }: Answer
       )}
     >
       <div className="flex items-center gap-2">
-        {isCorrect ? (
-          <>
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span className="font-medium text-green-700 dark:text-green-300">回答正确</span>
-          </>
-        ) : (
-          <>
-            <XCircle className="h-5 w-5 text-red-500" />
-            <span className="font-medium text-red-700 dark:text-red-300">回答错误</span>
-          </>
-        )}
+        {isCorrect
+          ? (
+              <>
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="font-medium text-green-700 dark:text-green-300">回答正确</span>
+              </>
+            )
+          : (
+              <>
+                <XCircle className="h-5 w-5 text-red-500" />
+                <span className="font-medium text-red-700 dark:text-red-300">回答错误</span>
+              </>
+            )}
       </div>
 
       {!isCorrect && correctAnswer && (

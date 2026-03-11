@@ -20,7 +20,7 @@ export function EssayQuestion({
     <div className="space-y-4">
       <Textarea
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         placeholder="输入你的答案..."
         className="min-h-[120px]"
         disabled={showFeedback}

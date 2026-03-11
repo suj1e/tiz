@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 import { EmptyState } from '@/components/common/EmptyState'
 import { LoadingState } from '@/components/common/LoadingState'
+
 import { PageError } from '@/components/common/PageError'
 
-describe('EmptyState', () => {
+describe('emptyState', () => {
   it('should render with title', () => {
     render(<EmptyState title="No items" />)
     expect(screen.getByText('No items')).toBeInTheDocument()
@@ -32,7 +33,7 @@ describe('EmptyState', () => {
   })
 })
 
-describe('LoadingState', () => {
+describe('loadingState', () => {
   it('should render with default text', () => {
     render(<LoadingState />)
     expect(screen.getByText('加载中...')).toBeInTheDocument()
@@ -44,7 +45,7 @@ describe('LoadingState', () => {
   })
 })
 
-describe('PageError', () => {
+describe('pageError', () => {
   it('should render with default message', () => {
     render(<PageError />)
     expect(screen.getByText('出错了')).toBeInTheDocument()
@@ -73,5 +74,3 @@ describe('PageError', () => {
     expect(onRetry).toHaveBeenCalled()
   })
 })
-
-import { vi } from 'vitest'

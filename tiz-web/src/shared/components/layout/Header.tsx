@@ -1,6 +1,6 @@
+import { Logo } from '@/components/common/Logo'
 import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { UserMenu } from '@/components/common/UserMenu'
-import { Logo } from '@/components/common/Logo'
 
 export function Header() {
   return (

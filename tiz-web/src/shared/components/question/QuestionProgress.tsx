@@ -13,7 +13,13 @@ export function QuestionProgress({ current, total }: QuestionProgressProps) {
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
         <span className="text-muted-foreground">进度</span>
-        <span className="font-medium tabular-nums">{current} / {total}</span>
+        <span className="font-medium tabular-nums">
+          {current}
+          {' '}
+          /
+          {' '}
+          {total}
+        </span>
       </div>
       <div className="h-2.5 overflow-hidden rounded-full bg-muted">
         <div
@@ -21,7 +27,7 @@ export function QuestionProgress({ current, total }: QuestionProgressProps) {
             'h-full transition-all duration-500 ease-out',
             isComplete
               ? 'bg-success'
-              : 'bg-gradient-to-r from-primary to-accent'
+              : 'bg-gradient-to-r from-primary to-accent',
           )}
           style={{ width: `${percentage}%` }}
         />

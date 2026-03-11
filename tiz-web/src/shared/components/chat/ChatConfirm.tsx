@@ -1,7 +1,7 @@
+import type { GenerationSummary } from '@/types'
 import { Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { GenerationSummary } from '@/types'
 
 interface ChatConfirmProps {
   summary: GenerationSummary
@@ -36,14 +36,14 @@ export function ChatConfirm({ summary, onConfirm, onCancel }: ChatConfirmProps) 
           <div className="flex justify-between">
             <span className="text-muted-foreground">题型</span>
             <span className="font-medium">
-              {summary.question_types.map((t) => (t === 'choice' ? '选择题' : '简答题')).join('、')}
+              {summary.question_types.map(t => (t === 'choice' ? '选择题' : '简答题')).join('、')}
             </span>
           </div>
           {summary.tags.length > 0 && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">标签</span>
               <div className="flex gap-1">
-                {summary.tags.map((tag) => (
+                {summary.tags.map(tag => (
                   <span
                     key={tag}
                     className="rounded-full bg-muted px-2 py-0.5 text-xs"

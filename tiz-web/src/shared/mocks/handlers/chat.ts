@@ -2,7 +2,7 @@ import { delay, http, HttpResponse } from 'msw'
 
 export const chatHandlers = [
   http.post('/api/chat/v1/stream', async ({ request }) => {
-    const body = (await request.json()) as { message: string; session_id?: string }
+    const body = (await request.json()) as { message: string, session_id?: string }
 
     const encoder = new TextEncoder()
     const stream = new ReadableStream({

@@ -11,7 +11,7 @@ export function TagList({ tags, maxVisible = 3 }: TagListProps) {
 
   return (
     <div className="flex flex-wrap gap-1">
-      {visibleTags.map((tag) => (
+      {visibleTags.map(tag => (
         <span
           key={tag}
           className="rounded-full bg-muted px-2 py-0.5 text-xs"
@@ -25,7 +25,8 @@ export function TagList({ tags, maxVisible = 3 }: TagListProps) {
             'rounded-full bg-muted px-2 py-0.5 text-xs',
           )}
         >
-          +{remainingCount}
+          +
+          {remainingCount}
         </span>
       )}
     </div>

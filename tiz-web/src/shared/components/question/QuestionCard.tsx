@@ -1,6 +1,6 @@
+import type { QuestionWithAnswer } from '@/types'
 import { ChoiceQuestion } from './ChoiceQuestion'
 import { EssayQuestion } from './EssayQuestion'
-import type { QuestionWithAnswer } from '@/types'
 
 interface QuestionCardProps {
   question: QuestionWithAnswer
@@ -18,23 +18,25 @@ export function QuestionCard({ question, onAnswer, showFeedback = false }: Quest
       </div>
       <p className="mb-4 text-base font-medium text-foreground sm:mb-6 sm:text-lg">{question.content}</p>
 
-      {question.type === 'choice' ? (
-        <ChoiceQuestion
-          options={question.options || []}
-          selected={question.userAnswer}
-          onSelect={onAnswer}
-          showFeedback={showFeedback}
-          correctAnswer={question.answer}
-        />
-      ) : (
-        <EssayQuestion
-          value={question.userAnswer || ''}
-          onChange={onAnswer}
-          showFeedback={showFeedback}
-          correctAnswer={question.answer}
-          rubric={question.rubric}
-        />
-      )}
+      {question.type === 'choice'
+        ? (
+            <ChoiceQuestion
+              options={question.options || []}
+              selected={question.userAnswer}
+              onSelect={onAnswer}
+              showFeedback={showFeedback}
+              correctAnswer={question.answer}
+            />
+          )
+        : (
+            <EssayQuestion
+              value={question.userAnswer || ''}
+              onChange={onAnswer}
+              showFeedback={showFeedback}
+              correctAnswer={question.answer}
+              rubric={question.rubric}
+            />
+          )}
     </div>
   )
 }

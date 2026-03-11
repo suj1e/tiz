@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils'
 import type { Category, Tag } from '@/types'
+import { cn } from '@/lib/utils'
 
 interface LibraryFilterProps {
   categories: Category[]
@@ -35,7 +35,7 @@ export function LibraryFilter({
           >
             全部
           </button>
-          {categories.map((category) => (
+          {categories.map(category => (
             <button
               key={category.name}
               type="button"
@@ -50,8 +50,11 @@ export function LibraryFilter({
               <span>{category.name}</span>
               <span className={cn(
                 'text-xs',
-                selectedCategory === category.name ? 'opacity-80' : 'opacity-60'
-              )}>{category.count}</span>
+                selectedCategory === category.name ? 'opacity-80' : 'opacity-60',
+              )}
+              >
+                {category.count}
+              </span>
             </button>
           ))}
         </div>
@@ -60,7 +63,7 @@ export function LibraryFilter({
       <div>
         <h3 className="mb-3 font-medium text-sm">标签</h3>
         <div className="flex flex-wrap gap-2">
-          {tags.map((tag) => (
+          {tags.map(tag => (
             <button
               key={tag.name}
               type="button"

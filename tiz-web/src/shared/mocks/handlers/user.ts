@@ -1,5 +1,5 @@
-import { delay, http, HttpResponse } from 'msw'
 import type { WebhookConfig } from '@/types'
+import { delay, http, HttpResponse } from 'msw'
 
 // 内存中存储 webhook 配置（mock 用）
 let mockWebhook: WebhookConfig | null = null

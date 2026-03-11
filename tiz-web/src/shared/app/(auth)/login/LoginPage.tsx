@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { BookOpen } from 'lucide-react'
+import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuthStore } from '@/stores/authStore'
 import { authService } from '@/services/auth'
+import { useAuthStore } from '@/stores/authStore'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -33,7 +33,8 @@ export default function LoginPage() {
       const hasConfig = await checkAiConfig()
       if (!hasConfig) {
         navigate('/ai-config', { replace: true })
-      } else {
+      }
+      else {
         navigate(from, { replace: true })
       }
     }
@@ -71,7 +72,7 @@ export default function LoginPage() {
               type="email"
               placeholder="your@email.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               required
             />
           </div>
@@ -82,7 +83,7 @@ export default function LoginPage() {
               type="password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               required
             />
           </div>
@@ -91,7 +92,8 @@ export default function LoginPage() {
           </Button>
         </form>
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          还没有账户？{' '}
+          还没有账户？
+          {' '}
           <Link to="/register" className="text-primary hover:underline">
             立即注册
           </Link>

@@ -18,8 +18,9 @@ export function EmptyState({ icon, title, description, action, className }: Empt
   return (
     <div className={cn(
       'flex min-h-[50vh] flex-col items-center justify-center text-center p-4 animate-in fade-in duration-300',
-      className
-    )}>
+      className,
+    )}
+    >
       <div className="mb-4 text-muted-foreground">
         {icon || <FileQuestion className="h-12 w-12" />}
       </div>

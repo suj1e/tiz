@@ -1,4 +1,4 @@
-import { Trophy, Target } from 'lucide-react'
+import { Target, Trophy } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDateTime } from '@/lib/utils'
 
@@ -24,7 +24,10 @@ export function QuizResult({ score, total, correctCount, completedAt }: QuizResu
       <CardContent>
         <div className="flex items-center justify-center">
           <div className="text-center">
-            <div className="mb-2 text-5xl font-bold">{percentage}%</div>
+            <div className="mb-2 text-5xl font-bold">
+              {percentage}
+              %
+            </div>
             <div className="text-muted-foreground">
               {isPassed ? '恭喜通过！' : '继续努力！'}
             </div>

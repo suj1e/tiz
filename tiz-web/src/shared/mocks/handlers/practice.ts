@@ -4,7 +4,7 @@ import { mockLibrary } from '../data/library'
 export const practiceHandlers = [
   http.post('/api/practice/v1/start', async () => {
     await delay(500)
-    const questions = mockLibrary[0].questions.map((q) => ({
+    const questions = mockLibrary[0].questions.map(q => ({
       ...q,
       userAnswer: undefined,
       isCorrect: undefined,

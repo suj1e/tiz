@@ -1,5 +1,5 @@
-import { useAuthStore } from '@/stores/authStore'
 import type { ApiError as ApiErrorType, ApiResponse } from '@/types'
+import { useAuthStore } from '@/stores/authStore'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 

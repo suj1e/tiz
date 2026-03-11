@@ -1,13 +1,14 @@
-import { useState, useRef, useEffect } from 'react'
+import type { SSEEvent } from '@/services/chat'
 import { Send, Sparkles } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
+import { useEffect, useRef, useState } from 'react'
 import { ChatMessage } from '@/components/chat/ChatMessage'
 import { TypingIndicator } from '@/components/chat/TypingIndicator'
 import { Logo } from '@/components/common/Logo'
-import { useChatStore } from '@/stores/chatStore'
-import { createChatStream, type SSEEvent } from '@/services/chat'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import { generateId } from '@/lib/utils'
+import { createChatStream } from '@/services/chat'
+import { useChatStore } from '@/stores/chatStore'
 
 export default function HomePage() {
   const [input, setInput] = useState('')
@@ -31,7 +32,8 @@ export default function HomePage() {
   }, [messages, streamingContent])
 
   const handleSend = () => {
-    if (!input.trim() || status === 'streaming') return
+    if (!input.trim() || status === 'streaming')
+      return
 
     const userMessage = {
       id: generateId(),
@@ -153,7 +155,7 @@ export default function HomePage() {
           <div className="flex gap-2">
             <Textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={e => setInput(e.target.value)}
               placeholder="输入你想学习的内容..."
               className="min-h-14 resize-none text-sm sm:min-h-16 sm:text-base"
               onKeyDown={(e) => {

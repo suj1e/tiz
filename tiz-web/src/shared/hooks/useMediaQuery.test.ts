@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
-import { useMediaQuery, useIsMobile, useIsDesktop } from '@/hooks/useMediaQuery'
+import { act, renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useIsDesktop, useIsMobile, useMediaQuery } from '@/hooks/useMediaQuery'
 
 describe('useMediaQuery', () => {
   const originalMatchMedia = window.matchMedia
@@ -14,7 +14,7 @@ describe('useMediaQuery', () => {
   })
 
   it('should return true when query matches', () => {
-    window.matchMedia = vi.fn().mockImplementation((query) => ({
+    window.matchMedia = vi.fn().mockImplementation(query => ({
       matches: true,
       media: query,
       onchange: null,
@@ -30,7 +30,7 @@ describe('useMediaQuery', () => {
   })
 
   it('should return false when query does not match', () => {
-    window.matchMedia = vi.fn().mockImplementation((query) => ({
+    window.matchMedia = vi.fn().mockImplementation(query => ({
       matches: false,
       media: query,
       onchange: null,
@@ -48,7 +48,7 @@ describe('useMediaQuery', () => {
   it('should update when query changes', () => {
     const listeners: Array<(event: { matches: boolean }) => void> = []
 
-    window.matchMedia = vi.fn().mockImplementation((query) => ({
+    window.matchMedia = vi.fn().mockImplementation(query => ({
       matches: false,
       media: query,
       onchange: null,
@@ -65,7 +65,7 @@ describe('useMediaQuery', () => {
     expect(result.current).toBe(false)
 
     act(() => {
-      listeners.forEach((listener) => listener({ matches: true }))
+      listeners.forEach(listener => listener({ matches: true }))
     })
 
     expect(result.current).toBe(true)
@@ -84,7 +84,7 @@ describe('useIsMobile', () => {
   })
 
   it('should return true for mobile viewport', () => {
-    window.matchMedia = vi.fn().mockImplementation((query) => ({
+    window.matchMedia = vi.fn().mockImplementation(query => ({
       matches: query === '(max-width: 768px)',
       media: query,
       onchange: null,
@@ -112,7 +112,7 @@ describe('useIsDesktop', () => {
   })
 
   it('should return true for desktop viewport', () => {
-    window.matchMedia = vi.fn().mockImplementation((query) => ({
+    window.matchMedia = vi.fn().mockImplementation(query => ({
       matches: query === '(min-width: 1024px)',
       media: query,
       onchange: null,

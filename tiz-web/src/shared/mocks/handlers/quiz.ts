@@ -4,7 +4,7 @@ import { mockLibrary } from '../data/library'
 export const quizHandlers = [
   http.post('/api/quiz/v1/start', async () => {
     await delay(500)
-    const questions = mockLibrary[0].questions.map((q) => ({
+    const questions = mockLibrary[0].questions.map(q => ({
       ...q,
       userAnswer: undefined,
       isCorrect: undefined,
@@ -41,7 +41,7 @@ export const quizHandlers = [
         score: 70,
         total: 100,
         correct_count: 7,
-        wrong_answers: questions.slice(0, 3).map((q) => ({
+        wrong_answers: questions.slice(0, 3).map(q => ({
           question_id: q.id,
           question: q.content,
           user_answer: '错误答案',

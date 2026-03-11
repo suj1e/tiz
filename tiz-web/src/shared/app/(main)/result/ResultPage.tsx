@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import type { QuizResult as QuizResultType } from '@/types'
 import { ArrowLeft, XCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { LoadingState } from '@/components/common/LoadingState'
 import { QuizResult } from '@/components/quiz/QuizResult'
 import { WrongAnswerReview } from '@/components/quiz/WrongAnswerReview'
-import { LoadingState } from '@/components/common/LoadingState'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { quizService } from '@/services/quiz'
-import type { QuizResult as QuizResultType } from '@/types'
 
 export default function ResultPage() {
   const { id } = useParams<{ id: string }>()
@@ -18,7 +18,8 @@ export default function ResultPage() {
 
   useEffect(() => {
     const loadResult = async () => {
-      if (!id) return
+      if (!id)
+        return
 
       try {
         const data = await quizService.getResult(id)

@@ -1,6 +1,6 @@
-import { useAuthStore } from '@/stores/authStore'
 import { authService } from '@/services/auth'
-import { isInLarkEnv, loadLarkSDK, getLarkAuthCode } from './index'
+import { useAuthStore } from '@/stores/authStore'
+import { getLarkAuthCode, isInLarkEnv, loadLarkSDK } from './index'
 
 /**
  * Try to login with Lark auth
@@ -20,7 +20,8 @@ export async function tryLarkLogin(): Promise<boolean> {
     useAuthStore.getState().setToken(token)
 
     return true
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Lark login failed:', error)
     return false
   }

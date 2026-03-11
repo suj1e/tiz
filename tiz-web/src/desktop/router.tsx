@@ -1,9 +1,9 @@
-import React from 'react'
+import * as React from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { AppLayout } from './layouts/AppLayout'
-import { AuthLayout } from '@/components/layout/AuthLayout'
 import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 import { RootErrorBoundary } from '@/components/common/RootErrorBoundary'
+import { AuthLayout } from '@/components/layout/AuthLayout'
+import { AppLayout } from './layouts/AppLayout'
 
 // Pages - lazy loaded
 const LandingPage = () => import('@/app/landing/LandingPage')
@@ -30,7 +30,7 @@ function LoadingFallback() {
 }
 
 // Lazy load helper with error handling
-const lazy = (loader: () => Promise<{ default: React.ComponentType }>) => {
+function lazy(loader: () => Promise<{ default: React.ComponentType }>) {
   const LazyComponent = React.lazy(loader)
   return (
     <React.Suspense fallback={<LoadingFallback />}>

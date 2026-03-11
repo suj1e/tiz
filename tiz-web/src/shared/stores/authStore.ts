@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import type { User } from '@/types'
+import { create } from 'zustand'
 import { userService } from '@/services/user'
 
 interface AuthState {
@@ -7,7 +7,7 @@ interface AuthState {
   token: string | null
   isAuthenticated: boolean
   isLoading: boolean
-  hasAiConfig: boolean | null  // null = not checked yet
+  hasAiConfig: boolean | null // null = not checked yet
 }
 
 interface AuthActions {
@@ -30,10 +30,10 @@ const initialState: AuthState = {
   hasAiConfig: null,
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
+export const useAuthStore = create<AuthStore>(set => ({
   ...initialState,
-  setUser: (user) => set({ user, isAuthenticated: !!user }),
-  setToken: (token) => set({ token }),
+  setUser: user => set({ user, isAuthenticated: !!user }),
+  setToken: token => set({ token }),
   login: (user, token) => {
     localStorage.setItem('tiz-web-token', token)
     set({ user, token, isAuthenticated: true, isLoading: false })
@@ -42,14 +42,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
     localStorage.removeItem('tiz-web-token')
     set(initialState)
   },
-  setLoading: (isLoading) => set({ isLoading }),
-  setHasAiConfig: (value) => set({ hasAiConfig: value }),
+  setLoading: isLoading => set({ isLoading }),
+  setHasAiConfig: value => set({ hasAiConfig: value }),
   checkAiConfig: async () => {
     try {
       const status = await userService.getAiConfigStatus()
       set({ hasAiConfig: status.isConfigured })
       return status.isConfigured
-    } catch {
+    }
+    catch {
       set({ hasAiConfig: false })
       return false
     }

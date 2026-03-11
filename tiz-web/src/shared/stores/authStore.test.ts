@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { useAuthStore } from '@/stores/authStore'
 import type { User } from '@/types'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { useAuthStore } from '@/stores/authStore'
 
 describe('useAuthStore', () => {
   const mockUser: User = {

@@ -1,12 +1,12 @@
+import { BookOpen } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuthStore } from '@/stores/authStore'
 import { authService } from '@/services/auth'
+import { useAuthStore } from '@/stores/authStore'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -23,7 +23,7 @@ export default function RegisterPage() {
     setError('')
 
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       setError('请输入有效的邮箱地址')
       return
@@ -80,7 +80,7 @@ export default function RegisterPage() {
               type="text"
               placeholder="your@email.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               required
             />
           </div>
@@ -91,7 +91,7 @@ export default function RegisterPage() {
               type="password"
               placeholder="至少 8 个字符"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               required
             />
           </div>
@@ -102,7 +102,7 @@ export default function RegisterPage() {
               type="password"
               placeholder="再次输入密码"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={e => setConfirmPassword(e.target.value)}
               required
             />
           </div>
@@ -111,7 +111,8 @@ export default function RegisterPage() {
           </Button>
         </form>
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          已有账户？{' '}
+          已有账户？
+          {' '}
           <Link to="/login" className="text-primary hover:underline">
             立即登录
           </Link>

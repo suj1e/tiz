@@ -1,13 +1,13 @@
-import { useEffect, useState, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { LoadingState } from '@/components/common/LoadingState'
 import { QuestionCard } from '@/components/question/QuestionCard'
 import { QuizTimer } from '@/components/quiz/QuizTimer'
-import { LoadingState } from '@/components/common/LoadingState'
-import { useQuizStore } from '@/stores/quizStore'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { quizService } from '@/services/quiz'
+import { useQuizStore } from '@/stores/quizStore'
 
 export default function QuizPage() {
   const { id } = useParams<{ id: string }>()
@@ -34,7 +34,8 @@ export default function QuizPage() {
 
   useEffect(() => {
     const startQuiz = async () => {
-      if (!id) return
+      if (!id)
+        return
 
       setLoading(true)
       try {
@@ -55,11 +56,12 @@ export default function QuizPage() {
   }, [id])
 
   const handleSubmit = useCallback(async () => {
-    if (!quizId) return
+    if (!quizId)
+      return
 
     setSubmitting(true)
     try {
-      const answers = questions.map((q) => ({
+      const answers = questions.map(q => ({
         question_id: q.id,
         answer: q.userAnswer || '',
       }))
@@ -77,7 +79,8 @@ export default function QuizPage() {
 
   // Timer effect
   useEffect(() => {
-    if (remainingTime === null || remainingTime <= 0 || isComplete) return
+    if (remainingTime === null || remainingTime <= 0 || isComplete)
+      return
 
     const timer = setInterval(() => {
       decrementTime()
@@ -119,12 +122,18 @@ export default function QuizPage() {
       )}
 
       <div className="text-center text-sm text-muted-foreground">
-        题目 <span className="font-medium tabular-nums">{currentIndex + 1}</span> / <span className="font-medium tabular-nums">{questions.length}</span>
+        题目
+        {' '}
+        <span className="font-medium tabular-nums">{currentIndex + 1}</span>
+        {' '}
+        /
+        {' '}
+        <span className="font-medium tabular-nums">{questions.length}</span>
       </div>
 
       <QuestionCard
         question={currentQuestion}
-        onAnswer={(answer) => answerQuestion(currentQuestion.id, answer)}
+        onAnswer={answer => answerQuestion(currentQuestion.id, answer)}
       />
 
       <div className="flex justify-between gap-2">
@@ -156,7 +165,7 @@ export default function QuizPage() {
             className={cn(
               'sm:size-default transition-all duration-200',
               // 答题后下一题按钮添加脉动提示
-              hasAnswered && 'animate-pulse-ring'
+              hasAnswered && 'animate-pulse-ring',
             )}
             onClick={nextQuestion}
           >

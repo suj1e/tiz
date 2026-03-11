@@ -1,17 +1,18 @@
-import { useState, useRef, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import type { SSEEvent } from '@/services/chat'
 import { Send, Sparkles } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { ChatMessage } from '@/components/chat/ChatMessage'
 import { TypingIndicator } from '@/components/chat/TypingIndicator'
-import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { Logo } from '@/components/common/Logo'
+import { ThemeToggle } from '@/components/common/ThemeToggle'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { generateId } from '@/lib/utils'
+import { createChatStream } from '@/services/chat'
+import { useAuthStore } from '@/stores/authStore'
 import { useChatStore } from '@/stores/chatStore'
 import { useUIStore } from '@/stores/uiStore'
-import { useAuthStore } from '@/stores/authStore'
-import { createChatStream, type SSEEvent } from '@/services/chat'
-import { generateId } from '@/lib/utils'
 
 export default function ChatPage() {
   const navigate = useNavigate()
@@ -46,7 +47,8 @@ export default function ChatPage() {
   }, [hasAiConfig, navigate])
 
   const handleSend = () => {
-    if (!input.trim() || status === 'streaming') return
+    if (!input.trim() || status === 'streaming')
+      return
 
     const userMessage = {
       id: generateId(),
@@ -186,7 +188,7 @@ export default function ChatPage() {
           <div className="flex gap-2">
             <Textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={e => setInput(e.target.value)}
               placeholder="输入你想学习的内容..."
               className="min-h-[50px] resize-none text-sm sm:min-h-[60px] sm:text-base"
               onKeyDown={(e) => {

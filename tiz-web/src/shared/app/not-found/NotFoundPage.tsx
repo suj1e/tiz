@@ -1,5 +1,5 @@
+import { ArrowLeft, Home } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Home, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function NotFoundPage() {
@@ -9,7 +9,8 @@ export default function NotFoundPage() {
     // Check if there's history to go back to
     if (window.history.length > 1) {
       navigate(-1)
-    } else {
+    }
+    else {
       // No history, go to home
       navigate('/home', { replace: true })
     }

@@ -30,19 +30,24 @@ export function QuestionNav({
       </Button>
 
       <span className="text-sm text-muted-foreground">
-        {current + 1} / {total}
+        {current + 1}
+        {' '}
+        /
+        {total}
       </span>
 
-      {showSubmit && current === total - 1 ? (
-        <Button onClick={onSubmit}>
-          提交
-        </Button>
-      ) : (
-        <Button onClick={onNext} disabled={current === total - 1}>
-          下一题
-          <ChevronRight className="ml-2 h-4 w-4" />
-        </Button>
-      )}
+      {showSubmit && current === total - 1
+        ? (
+            <Button onClick={onSubmit}>
+              提交
+            </Button>
+          )
+        : (
+            <Button onClick={onNext} disabled={current === total - 1}>
+              下一题
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
     </div>
   )
 }

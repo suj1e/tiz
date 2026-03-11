@@ -1,5 +1,6 @@
-import { Component, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
+import { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 

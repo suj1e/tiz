@@ -1,5 +1,5 @@
-import { api } from './api'
 import type { QuestionWithAnswer } from '@/types'
+import { api } from './api'
 
 interface StartPracticeResponse {
   practice_id: string
