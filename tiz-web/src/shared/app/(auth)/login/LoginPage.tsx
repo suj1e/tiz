@@ -24,21 +24,29 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
+    console.log('[LoginPage] handleSubmit called')
 
     try {
+      console.log('[LoginPage] Calling authService.login...')
       const response = await authService.login({ email, password })
+      console.log('[LoginPage] Login response:', response)
       login(response.user, response.token)
+      console.log('[LoginPage] login() called, checking AI config...')
 
       // Check AI config status and redirect if needed
       const hasConfig = await checkAiConfig()
+      console.log('[LoginPage] AI config check result:', hasConfig)
       if (!hasConfig) {
+        console.log('[LoginPage] Navigating to /ai-config')
         navigate('/ai-config', { replace: true })
       }
       else {
+        console.log('[LoginPage] Navigating to:', from)
         navigate(from, { replace: true })
       }
     }
     catch (err) {
+      console.error('[LoginPage] Login error:', err)
       setError(err instanceof Error ? err.message : '登录失败')
     }
     finally {

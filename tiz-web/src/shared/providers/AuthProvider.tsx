@@ -31,6 +31,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const initializeAuth = useCallback(async () => {
     const storedToken = localStorage.getItem('tiz-web-token')
+    console.log('[AuthProvider] initializeAuth called, token exists:', !!storedToken)
 
     if (!storedToken) {
       setLoading(false)
@@ -41,6 +42,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       // Set token first so api.ts can use it
       setToken(storedToken)
+      console.log('[AuthProvider] Token set, fetching user data...')
 
       // Fetch user data and AI config in parallel
       const [userData] = await Promise.all([
@@ -48,16 +50,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         checkAiConfig(),
       ])
 
+      console.log('[AuthProvider] User data fetched:', userData?.email)
       setUser(userData)
     }
     catch (error) {
       // Token invalid or expired
-      console.warn('Auth initialization failed:', error)
+      console.warn('[AuthProvider] Auth initialization failed:', error)
       logout()
     }
     finally {
       setLoading(false)
       setIsInitialized(true)
+      console.log('[AuthProvider] Initialization complete')
     }
   }, [setUser, setToken, setLoading, checkAiConfig, logout])
 
