@@ -31,6 +31,6 @@ export const userService = {
   },
 
   getAiConfigStatus: (): Promise<AiConfigStatus> => {
-    return api.get('/user/v1/ai-config/status')
+    return api.get('/user/v1/ai-config/status', { skipAuthRedirect: true })
   },
 }

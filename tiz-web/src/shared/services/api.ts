@@ -18,13 +18,15 @@ export class ApiError extends Error {
 interface RequestOptions extends RequestInit {
   /** Return raw response without extracting .data */
   raw?: boolean
+  /** Skip automatic logout/redirect on 401 (for non-critical checks like AI config) */
+  skipAuthRedirect?: boolean
 }
 
 async function request<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { raw, ...fetchOptions } = options
+  const { raw, skipAuthRedirect, ...fetchOptions } = options
 
   const headers = new Headers(options.headers)
 
@@ -53,7 +55,7 @@ async function request<T>(
       code: errorBody.code || 'UNKNOWN',
       message: errorBody.message || '请求失败',
     }
-    if (response.status === 401) {
+    if (response.status === 401 && !skipAuthRedirect) {
       useAuthStore.getState().logout()
       window.location.href = '/login'
     }
