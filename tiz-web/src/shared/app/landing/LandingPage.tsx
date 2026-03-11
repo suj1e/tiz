@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { MessageSquare, Sparkles, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { Logo } from '@/components/common/Logo'
 import { useUIStore } from '@/stores/uiStore'
+import { useAuthContext } from '@/providers/AuthProvider'
 
 const features = [
   {
@@ -25,7 +26,19 @@ const features = [
 ]
 
 export default function LandingPage() {
+  const navigate = useNavigate()
   const { theme, setTheme } = useUIStore()
+  const { isAuthenticated, hasAiConfig } = useAuthContext()
+
+  const handleStartTrial = () => {
+    if (!isAuthenticated) {
+      navigate('/login')
+    } else if (hasAiConfig === false) {
+      navigate('/ai-config')
+    } else {
+      navigate('/chat')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -61,11 +74,13 @@ export default function LandingPage() {
           通过对话探索学习需求，AI 智能生成个性化练习题
         </p>
         <div className="flex justify-center gap-4">
-          <Link to="/chat">
-            <Button size="lg" className="hover:scale-[1.02] transition-transform duration-200">
-              开始试用
-            </Button>
-          </Link>
+          <Button
+            size="lg"
+            className="hover:scale-[1.02] transition-transform duration-200"
+            onClick={handleStartTrial}
+          >
+            开始试用
+          </Button>
           <Link to="/register">
             <Button size="lg" variant="outline" className="hover:scale-[1.02] transition-transform duration-200">
               免费注册

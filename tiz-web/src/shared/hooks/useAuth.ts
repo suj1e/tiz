@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { authService } from '@/services/auth'
 
+/**
+ * @deprecated Use AuthProvider instead. This hook will be removed in a future version.
+ * Auth initialization is now handled by AuthProvider at the app root level.
+ */
 export function useAuth(requireAuth = false) {
   const navigate = useNavigate()
   const { user, isAuthenticated, isLoading, login, logout, setLoading } = useAuthStore()

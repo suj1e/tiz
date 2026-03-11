@@ -34,8 +34,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
   ...initialState,
   setUser: (user) => set({ user, isAuthenticated: !!user }),
   setToken: (token) => set({ token }),
-  login: (user, token) => set({ user, token, isAuthenticated: true, isLoading: false }),
-  logout: () => set(initialState),
+  login: (user, token) => {
+    localStorage.setItem('tiz-web-token', token)
+    set({ user, token, isAuthenticated: true, isLoading: false })
+  },
+  logout: () => {
+    localStorage.removeItem('tiz-web-token')
+    set(initialState)
+  },
   setLoading: (isLoading) => set({ isLoading }),
   setHasAiConfig: (value) => set({ hasAiConfig: value }),
   checkAiConfig: async () => {
