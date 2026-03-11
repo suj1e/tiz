@@ -39,6 +39,7 @@ services:
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      - JWT_SECRET=${JWT_SECRET}
     networks:
       - npass
     healthcheck:
