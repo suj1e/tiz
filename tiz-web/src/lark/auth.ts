@@ -16,8 +16,8 @@ export async function tryLarkLogin(): Promise<boolean> {
     const code = await getLarkAuthCode()
     const { user, token } = await authService.larkLogin(code)
 
-    useAuthStore.getState().setUser(user)
-    useAuthStore.getState().setToken(token)
+    // Use login() to ensure consistent state (localStorage, isAuthenticated, etc.)
+    useAuthStore.getState().login(user, token)
 
     return true
   }

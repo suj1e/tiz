@@ -45,15 +45,33 @@ async function request<T>(
     headers,
   })
 
-  const data = await response.json()
+  // Safely parse JSON - handle non-JSON responses
+  let data: Record<string, unknown>
+  const contentType = response.headers.get('content-type')
+  if (contentType?.includes('application/json')) {
+    data = await response.json() as Record<string, unknown>
+  }
+  else {
+    // Handle non-JSON responses (HTML error pages, plain text, etc.)
+    const text = await response.text()
+    if (!response.ok) {
+      throw new ApiError({
+        type: 'network_error',
+        code: 'NON_JSON_RESPONSE',
+        message: text || `请求失败 (${response.status})`,
+      })
+    }
+    // For successful non-JSON responses, return empty object
+    data = {}
+  }
 
   if (!response.ok) {
     // Backend returns errors in format: { data: { type, code, message } }
-    const errorBody = data.data || data.error || data
+    const errorBody = (data.data || data.error || data) as Record<string, unknown>
     const error = {
-      type: errorBody.type || 'unknown_error',
-      code: errorBody.code || 'UNKNOWN',
-      message: errorBody.message || '请求失败',
+      type: (errorBody.type as string) || 'unknown_error',
+      code: (errorBody.code as string) || 'UNKNOWN',
+      message: (errorBody.message as string) || '请求失败',
     }
     if (response.status === 401 && !skipAuthRedirect) {
       useAuthStore.getState().logout()
@@ -67,7 +85,7 @@ async function request<T>(
   }
 
   // Return raw response if requested, otherwise extract .data
-  return raw ? data : (data as ApiResponse<T>).data
+  return raw ? data as T : ((data as unknown) as ApiResponse<T>).data
 }
 
 export const api = {
