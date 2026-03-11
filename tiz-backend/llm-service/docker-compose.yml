@@ -19,10 +19,7 @@ services:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
-      # LLM Provider
-      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
-      - LLM_API_KEY=${LLM_API_KEY}
-      - LLM_MODEL=${LLM_MODEL:-gpt-4}
+      # Note: LLM config is per-user, stored in user_settings table
 
       # Logging
       - LOG_LEVEL=${LOG_LEVEL:-INFO}

@@ -237,7 +237,7 @@ services:
       - NACOS_NAMESPACE=${NACOS_NAMESPACE:-}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # Note: LLM config is per-user, stored in user_settings table
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
     networks:
       - npass
