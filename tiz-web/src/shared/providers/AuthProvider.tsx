@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
-import { useAuthStore } from '@/stores/authStore'
-import { authService } from '@/services/auth'
+import type { ReactNode } from 'react'
 import type { User } from '@/types'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { authService } from '@/services/auth'
+import { useAuthStore } from '@/stores/authStore'
 
 interface AuthContextValue {
   isLoading: boolean
@@ -40,16 +41,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       // Set token first so api.ts can use it
       setToken(storedToken)
-      const userData = await authService.getCurrentUser()
-      setUser(userData)
 
-      // Check AI config status
-      await checkAiConfig()
-    } catch (error) {
+      // Fetch user data and AI config in parallel
+      const [userData] = await Promise.all([
+        authService.getCurrentUser(),
+        checkAiConfig(),
+      ])
+
+      setUser(userData)
+    }
+    catch (error) {
       // Token invalid or expired
       console.warn('Auth initialization failed:', error)
       logout()
-    } finally {
+    }
+    finally {
       setLoading(false)
       setIsInitialized(true)
     }
@@ -72,7 +78,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   return (
-    <AuthContext.Provider
+    <AuthContext
       value={{
         isLoading,
         isAuthenticated,
@@ -81,6 +87,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </AuthContext>
   )
 }

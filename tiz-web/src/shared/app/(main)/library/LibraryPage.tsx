@@ -1,6 +1,11 @@
-import { useEffect, useState } from 'react'
+import type { KnowledgeSetSummary } from '@/types'
 import { Plus, Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { useEffect, useMemo, useState } from 'react'
+import { EmptyState } from '@/components/common/EmptyState'
+import { LoadingState } from '@/components/common/LoadingState'
+import { PageError } from '@/components/common/PageError'
+import { LibraryFilter } from '@/components/library/LibraryFilter'
+import { LibraryList } from '@/components/library/LibraryList'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -10,15 +15,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { LibraryList } from '@/components/library/LibraryList'
-import { LibraryFilter } from '@/components/library/LibraryFilter'
-import { LoadingState } from '@/components/common/LoadingState'
-import { EmptyState } from '@/components/common/EmptyState'
-import { PageError } from '@/components/common/PageError'
-import { useLibraryStore } from '@/stores/libraryStore'
-import { contentService } from '@/services/content'
+import { Input } from '@/components/ui/input'
 import { generateId } from '@/lib/utils'
-import type { KnowledgeSetSummary } from '@/types'
+import { contentService } from '@/services/content'
+import { useLibraryStore } from '@/stores/libraryStore'
 
 export default function LibraryPage() {
   const {
@@ -39,7 +39,6 @@ export default function LibraryPage() {
     addLibrary,
   } = useLibraryStore()
 
-  const [filteredLibraries, setFilteredLibraries] = useState<KnowledgeSetSummary[]>([])
   const [error, setError] = useState<Error | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [newTitle, setNewTitle] = useState('')
@@ -69,33 +68,34 @@ export default function LibraryPage() {
     loadData()
   }, [setLibraries, setCategories, setTags, setLoading])
 
-  useEffect(() => {
+  const filteredLibraries = useMemo(() => {
     let filtered = libraries
 
     if (selectedCategory) {
-      filtered = filtered.filter((lib) => lib.category === selectedCategory)
+      filtered = filtered.filter(lib => lib.category === selectedCategory)
     }
 
     if (selectedTags.length > 0) {
-      filtered = filtered.filter((lib) =>
-        selectedTags.some((tag) => lib.tags.includes(tag)),
+      filtered = filtered.filter(lib =>
+        selectedTags.some(tag => lib.tags.includes(tag)),
       )
     }
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
-        (lib) =>
+        lib =>
           lib.title.toLowerCase().includes(query)
-          || lib.tags.some((tag) => tag.toLowerCase().includes(query)),
+          || lib.tags.some(tag => tag.toLowerCase().includes(query)),
       )
     }
 
-    setFilteredLibraries(filtered)
+    return filtered
   }, [libraries, selectedCategory, selectedTags, searchQuery])
 
   const handleCreate = () => {
-    if (!newTitle.trim()) return
+    if (!newTitle.trim())
+      return
 
     // 创建空题库（仅本地，mock 模式）
     const newLibrary: KnowledgeSetSummary = {
@@ -151,18 +151,20 @@ export default function LibraryPage() {
               placeholder="搜索题库..."
               className="pl-9"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
             />
           </div>
 
-          {filteredLibraries.length === 0 ? (
-            <EmptyState
-              title="暂无题库"
-              description="开始对话生成练习题，然后保存到题库"
-            />
-          ) : (
-            <LibraryList libraries={filteredLibraries} />
-          )}
+          {filteredLibraries.length === 0
+            ? (
+                <EmptyState
+                  title="暂无题库"
+                  description="开始对话生成练习题，然后保存到题库"
+                />
+              )
+            : (
+                <LibraryList libraries={filteredLibraries} />
+              )}
         </div>
 
         <div className="lg:w-64">
@@ -189,7 +191,7 @@ export default function LibraryPage() {
             <Input
               placeholder="输入题库名称"
               value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
+              onChange={e => setNewTitle(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   handleCreate()
